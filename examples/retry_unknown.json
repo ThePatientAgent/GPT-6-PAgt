@@ -1,0 +1,7 @@
+{
+  "operation_id": "payment-demo-123",
+  "authorized": true,
+  "commit_status": "unknown",
+  "trusted_idempotent": false,
+  "status_query_available": true
+}
