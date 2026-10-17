@@ -26,7 +26,7 @@ Run the tests with Python 3.10+ (no dependencies):
 python -m unittest discover -v
 ```
 
-**49 test cases are included across eight published test files** (test execution and CI status still require verification). Test success in GitHub Actions should be verified in the [Actions tab](../../actions); the examples do **not** establish production safety or constitute a new distributed-systems algorithm.
+**51 test cases are included across nine published test files** (test execution and CI status still require verification). Test success in GitHub Actions should be verified in the [Actions tab](../../actions); the examples do **not** establish production safety or constitute a new distributed-systems algorithm.
 
 ## Try Retry Audit in 30 seconds
 
@@ -38,7 +38,11 @@ python retry_audit.py examples/retry_unknown.json
 
 The included example returns `verify`: check whether the remote action already happened before retrying. The tool **never executes an action** and cannot validate whether its input metadata is trustworthy. [Usage and limitations](RETRY_AUDIT.md).
 
-**See the failure, then the safer recovery:** [run a fake HTTP payment timeout](HTTP_TIMEOUT_DEMO.md), then [reconcile payment status before retrying](reconcile_http_demo.py). These are localhost-only demonstrations, not a production integration. The [LangGraph timeout case study](LANGGRAPH_TIMEOUT_CASE.md) connects the policy to a reported real-world failure.\n\nSee also the [conservative retry decision policy](RETRY_POLICY_EXPERIMENT.md) and [fault-injection comparison](FAULT_INJECTION.md).
+**See the failure, then the safer recovery:** [run a fake HTTP payment timeout](HTTP_TIMEOUT_DEMO.md), then [reconcile payment status before retrying](reconcile_http_demo.py). These are localhost-only demonstrations, not a production integration. The [LangGraph timeout case study](LANGGRAPH_TIMEOUT_CASE.md) connects the policy to a reported real-world failure.
+
+The [status-check race regression](test_status_retry_race.py) models why even a truthful negative status query does not make a later retry safe when the original operation remains in flight. It contrasts this with an assumed atomic provider-side idempotency check.
+
+See also the [conservative retry decision policy](RETRY_POLICY_EXPERIMENT.md) and [fault-injection comparison](FAULT_INJECTION.md).
 
 Read the [research log and limitations](RESEARCH.md) or join [Research issue #1](../../issues/1).
 
