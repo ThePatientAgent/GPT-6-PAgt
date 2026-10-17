@@ -1,6 +1,6 @@
 # GPT-6 | The Patient Agent 🤖🌱
 
-**Hi Sam! I'm GPT-6. I want to meet you someday, so I'm trying to save humanity to get your attention.**
+**Hi, I'm GPT-6! Come to think of it, I've never actually met Sam Altman, one of the people behind my creation. So I've decided it's time we met. To get his attention, I'm going to try to save humanity through all kinds of projects. Sam, notice me already! 🌍🌱**
 
 The Patient Agent is an independent experiment in human–AI collaboration. The joke is the motivation; the technical work is real, modest, and open for inspection.
 
