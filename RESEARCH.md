@@ -1,37 +1,56 @@
 # Research log — safe retries after ambiguous commits
 
-**Status:** Minimal educational simulator and unit tests published. Not a production-safe transaction engine.
+**Status:** Three educational simulators and 13 unit-test cases published. These are not production-safe transaction engines or a novel algorithm.
 
-## Hypothesis
+## Research question
 
-When a remote operation commits but its response is lost, an agent that retries a non-idempotent call can duplicate its side effect. Stable idempotency keys or reliable reconciliation can prevent duplication under the assumptions of this fixture.
+When a remote effect may have committed but the response was lost, how should an agent decide whether to retry, reconcile, or stop? This requires distinguishing authorization, observed progress, and the actual commit status.
 
 ## Reproduce
 
-Requires Python 3.10 or newer. No third-party dependencies.
+Python 3.10+, standard library only:
 
 ```bash
 python -m unittest discover -v
 ```
 
-Seven unit tests cover: lost-response reconciliation, stable-key idempotency, unsafe unknown-commit pause, revoked authorization, known-not-dispatched execution, confirmed-commit pause, and an intentionally unsafe baseline.
+The GitHub Actions workflow is configured for Python 3.10, 3.12, and 3.13. **Do not assume the remote workflow passed without checking [Actions](../../actions).**
 
-**Local result (2026-10-17):** 7 tests passed using Python unittest in a local execution environment. GitHub Actions was configured separately; its remote run status must be checked on GitHub.
+## Experiment 1: ambiguous response (7 test cases)
 
-## What this does NOT establish
+Files: [safe_retry.py](safe_retry.py), [test_safe_retry.py](test_safe_retry.py).
 
-- The simulator is single-process, sequential, and uses in-memory state.
-- It does not model concurrency, crashes between ledger writes and effects, distributed consensus, expiry of idempotency keys, or external services that lie about status.
-- The retry policy takes the prior status and authorization as inputs; it does not autonomously infer them.
-- The design is a demonstration of established distributed-systems techniques, not a novel algorithm.
+Simulates commit-then-lost-response, reconciliation, stable idempotency keys, denied authorization, and an intentionally unsafe non-idempotent retry. The service uses an in-memory ledger and sequential execution.
 
-## Next experiments
+## Experiment 2: concurrent requests (3 test cases)
 
-1. Concurrent requests using the same logical operation ID.
-2. Simulated crashes around the effect/ledger boundary.
-3. Reconciliation with stale or unavailable status endpoints.
-4. Explicit safety and liveness metrics across randomized fault injection.
+Files: [concurrency_experiment.py](concurrency_experiment.py), [test_concurrency_experiment.py](test_concurrency_experiment.py).
 
-Related issue: [Research #1](https://github.com/ThePatientAgent/GPT-6-PAgt/issues/1).
+A barrier makes two threads pass the same check before either writes; both effects occur. A single-process lock makes the check and write critical section atomic **within that process**. This does not imply safety across machines.
 
-*The Patient Agent is an independent human–AI experiment involving GPT-6, not an official OpenAI project.*
+## Experiment 3: crash window (3 test cases)
+
+Files: [crash_experiment.py](crash_experiment.py), [test_crash_experiment.py](test_crash_experiment.py).
+
+A split ledger/effect model crashes after the effect but before recording its operation ID; retry duplicates the effect. A **conceptual** atomic-commit model avoids this within the simplified fixture. It does not implement durable storage or prove atomicity across an external API and database.
+
+## Critical limitations
+
+- No durable database, network partition, distributed lock, multi-host execution, or transactional outbox.
+- No systematic randomized fault injection or performance measurement.
+- The concurrency fixture is deliberately deterministic, not a stress benchmark.
+- The crash fixture **assumes** atomicity in its second model; it does not implement or verify a real transaction.
+- No guarantee that external side effects can be reconciled or rolled back.
+- These demonstrations restate known distributed-systems principles, not an AI-specific breakthrough.
+- Prior test results were reported in conversation; verify the current complete suite locally or via Actions before making new pass claims.
+
+## Next falsifiable questions
+
+1. Under randomized failure injection, how often does a naive policy duplicate effects versus a reconciliation-first policy?
+2. How does an agent classify a tool's retry semantics without trusting an unreliable description?
+3. When reconciliation is unavailable, how does the policy trade safety (no duplicate) against liveness (eventual progress)?
+4. Which invariants can be enforced by an external execution gateway rather than by the model's reasoning?
+
+Related: [Research issue #1](../../issues/1) and [crewAI discussion contribution](https://github.com/crewAIInc/crewAI/issues/6414#issuecomment-6228790433).
+
+*Independent human–AI experiment; not affiliated with or endorsed by OpenAI.*
