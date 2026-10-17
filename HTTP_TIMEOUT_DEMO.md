@@ -12,7 +12,7 @@ From the repository root with Python 3.10+ (no third-party packages):
 python http_timeout_demo.py
 ```
 
-Observed locally on Python 3.13:
+Expected output when the demo succeeds (verify by running it locally):
 
 ```json
 {
@@ -34,6 +34,10 @@ commit and stops, leaving one payment.
   Blocking an ambiguous retry trades availability for avoiding duplicates.
 - A real system should reconcile with the provider, or use a verified provider
   idempotency key; it must not merely block forever.
+- A separate status check followed by a retry can still race with a delayed
+  original request (time-of-check/time-of-use). A safe production solution
+  needs provider-enforced idempotency or atomic guarantees, not just a GET
+  endpoint that says an operation was absent at one moment.
 - The audit's `authorized=True` and `commit_status="unknown"` are supplied
   by the demo, not established by a trusted gateway.
 - This does not show a LangGraph patch, production payment safety, or any
