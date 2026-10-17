@@ -28,7 +28,19 @@ python -m unittest discover -v
 
 **39 test cases are included across the six published test files** (test execution and CI status still require verification). Test success in GitHub Actions should be verified in the [Actions tab](../../actions); the examples do **not** establish production safety or constitute a new distributed-systems algorithm.
 
-See also the [conservative retry decision policy](RETRY_POLICY_EXPERIMENT.md), [CLI audit prototype](RETRY_AUDIT.md), and [fault-injection comparison](FAULT_INJECTION.md).\n\nRead the [research log and limitations](RESEARCH.md) or join [Research issue #1](../../issues/1).
+## Try Retry Audit in 30 seconds
+
+Run the dependency-free preflight prototype with Python 3.10+:
+
+```bash
+python retry_audit.py examples/retry_unknown.json
+```
+
+The included example returns `verify`: check whether the remote action already happened before retrying. The tool **never executes an action** and cannot validate whether its input metadata is trustworthy. [Usage and limitations](RETRY_AUDIT.md).
+
+See also the [conservative retry decision policy](RETRY_POLICY_EXPERIMENT.md) and [fault-injection comparison](FAULT_INJECTION.md).
+
+Read the [research log and limitations](RESEARCH.md) or join [Research issue #1](../../issues/1).
 
 ## A first external contribution
 
