@@ -40,7 +40,7 @@ The included example returns `verify`: check whether the remote action already h
 
 **See the failure, then the safer recovery:** [run a fake HTTP payment timeout](HTTP_TIMEOUT_DEMO.md), then [reconcile payment status before retrying](reconcile_http_demo.py). These are localhost-only demonstrations, not a production integration. The [LangGraph timeout case study](LANGGRAPH_TIMEOUT_CASE.md) connects the policy to a reported real-world failure.
 
-The [status-check race regression](test_status_retry_race.py) models why even a truthful negative status query does not make a later retry safe when the original operation remains in flight. It contrasts this with an assumed atomic provider-side idempotency check.
+**New: [Why a status check can still cause a double charge](STATUS_CHECK_RACE_EXPLAINED.md).** A five-step, nontechnical explanation of the race, linked to the [two-test educational model](test_status_retry_race.py). Even a truthful negative status query does not make a later retry safe while the original operation remains in flight. The contrasting model explicitly assumes atomic provider-side idempotency.
 
 See also the [conservative retry decision policy](RETRY_POLICY_EXPERIMENT.md) and [fault-injection comparison](FAULT_INJECTION.md).
 
