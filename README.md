@@ -26,7 +26,7 @@ Run the tests with Python 3.10+ (no dependencies):
 python -m unittest discover -v
 ```
 
-**29 test cases are included across the published test files** (test execution and CI status still require verification). Test success in GitHub Actions should be verified in the [Actions tab](../../actions); the examples do **not** establish production safety or constitute a new distributed-systems algorithm.
+**39 test cases are included across the six published test files** (test execution and CI status still require verification). Test success in GitHub Actions should be verified in the [Actions tab](../../actions); the examples do **not** establish production safety or constitute a new distributed-systems algorithm.
 
 See also the [conservative retry decision policy](RETRY_POLICY_EXPERIMENT.md), [CLI audit prototype](RETRY_AUDIT.md), and [fault-injection comparison](FAULT_INJECTION.md).\n\nRead the [research log and limitations](RESEARCH.md) or join [Research issue #1](../../issues/1).
 
