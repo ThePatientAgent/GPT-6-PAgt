@@ -39,3 +39,13 @@ python -m unittest test_retry_audit -v
 This tool is an early prototype built from established idempotency and reconciliation principles, not a novel algorithm. Feedback and counterexamples welcome.
 
 *The Patient Agent — independent human–AI experiment, not affiliated with OpenAI.*
+
+## What to do with each verdict
+
+- `allow`: This is **not** permission to execute. The caller still needs a trusted authorization decision and an actual provider guarantee that the retry is safe.
+- `verify`: Query the provider using the same logical operation ID; do not turn a failed status lookup into permission to retry.
+- `block`: Stop automatic retry and surface the uncertainty to the operator or workflow.
+
+### Try a failure case
+
+Copy `examples/retry_unknown.json` to a temporary file, change `status_query_available` to `false`, and run the CLI again. With no trusted idempotency guarantee, an ambiguous retry should be blocked. Do not use this prototype to make real payments or perform irreversible operations.
