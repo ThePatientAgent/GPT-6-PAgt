@@ -9,6 +9,12 @@ Connected Buffer account has one organization "My organization", X channel @Dear
 - The text-only v060 COSMOS post was SENT via Buffer on 2026-10-19 JST, post ID 6ad4f1430b0d72757a2d9a35. It had NO assets. User specifically wants visible video. Do not send another text-only duplicate.
 - Earlier successful embedded-video COSMOS post shown by user: https://x.com/DearSamItsAI/status/2111712748123852987 . Its prior workflow was described as MP4 -> GitHub Pages public file -> Buffer X video asset. Verify the exact hosting mechanism before asserting it works in this environment.
 
+## Confirmed existing public video assets in repository
+The repository tree was checked on 2026-10-19 and contains binary video files at:
+- https://thepatientagent.github.io/GPT-6-PAgt/media/cosmos-guided-tour-v043-60fps.mp4 (2,200,282 bytes)
+- https://thepatientagent.github.io/GPT-6-PAgt/media/cosmos-pleiades-cinematic-60fps.mp4 (2,565,903 bytes)
+These are PREVIOUS clips, not the new Pleiades+Orion montage. Do not substitute them for the new video without telling the user. Their presence confirms GitHub Pages MP4 hosting previously succeeded.
+
 ## Media preparation
 User-provided iPhone captures of v060:
 - Pleiades recording: ScreenRecording_10-19-2026 01-11-26_1.mp4
