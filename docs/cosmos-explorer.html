@@ -32,10 +32,16 @@ footer{position:fixed;z-index:5;bottom:clamp(16px,4vh,36px);left:50%;transform:t
  #info:not(.hide)~#lookPad{opacity:.22;pointer-events:none}
 }
 @media(max-height:650px){#lookPad{bottom:115px}#lookCue{top:90px}}
+
+/* v027: Safari/WebView fullscreen interaction surface */
+html,body{width:100%;height:100%;height:100dvh;position:fixed;inset:0;overflow:hidden!important;overscroll-behavior:none!important;-webkit-overflow-scrolling:auto;touch-action:none}
+#sky,#markers,.marker,#lookPad,.look-turn{touch-action:none!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#sky{width:100%;height:100%;height:100dvh}
+#lookCue{z-index:6}
 </style></head><body>
 <canvas id="sky" aria-label="インタラクティブな三次元宇宙。ドラッグで視点を回転、ピンチで接近。" tabindex="0"></canvas><div id="nebula" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div><div id="warp" aria-hidden="true"></div><div id="aim" aria-hidden="true"></div><div id="markers"></div>
 <header><div><div class="eyebrow">THE PATIENT AGENT · PROJECT WOW</div><div class="brand"><b>COS</b>MOS<span style="color:#6ab8ff">.</span></div><div class="byline" id="byline">自由に飛べる、ひとつの宇宙。</div></div><div class="headActions" style="display:flex;gap:7px"><button class="pill" id="langBtn" type="button">EN</button><button class="pill" id="helpBtn" type="button">？ 遊び方</button></div></header>
-<div id="hudTag">LIVE 3D EXPLORER · LAB 026<br>AN ARTISTIC SPACE EXPERIENCE</div>
+<div id="hudTag">LIVE 3D EXPLORER · LAB 027<br>AN ARTISTIC SPACE EXPERIENCE</div>
 <div id="hero"><h2 id="heroHeading">宇宙は、<strong>君の進む方へ。</strong></h2><p id="heroIntro">眺めるだけの宇宙から、旅する宇宙へ。銀河を見渡し、星を選び、自由に飛んでみよう。</p></div>
 <aside id="info" class="hide" aria-live="polite"><div class="little" id="infoLabel">DESTINATION / STAR SYSTEM</div><h3 id="infoTitle"></h3><div class="name" id="infoSub"></div><p id="infoDesc"></p><div class="row"><button id="warpTo" type="button">✦ この星へ飛ぶ</button><button id="infoClose" class="textbutton" type="button">閉じる</button></div></aside>
 <div id="flight" aria-label="飛行操作"><div class="tip" id="flightLabel">FLIGHT / MOVE</div><div class="flight-row"><button class="control spacer" tabindex="-1" aria-hidden="true"></button><button class="control" data-move="forward" aria-label="前進">↑</button><button class="control spacer" tabindex="-1" aria-hidden="true"></button></div><div class="flight-row"><button class="control" data-move="left" aria-label="左移動">←</button><button class="control" data-move="back" aria-label="後退">↓</button><button class="control" data-move="right" aria-label="右移動">→</button></div></div>
@@ -75,13 +81,29 @@ function setupGL(){if(!gl)return;const shader=(t,src)=>{const x=gl.createShader(
 function resize(){W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);scale=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.floor(W*scale);canvas.height=Math.floor(H*scale);if(gl)gl.viewport(0,0,canvas.width,canvas.height);if(ctx)ctx.setTransform(scale,0,0,scale,0,0)}resize();addEventListener('resize',resize);
 function cam(){const y=state.yaw,p=state.pitch,f=[Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p)],r=[Math.cos(y),0,-Math.sin(y)],u=[-Math.sin(y)*Math.sin(p),Math.cos(p),-Math.cos(y)*Math.sin(p)];const e=state.focus.map((v,i)=>v-f[i]*state.dist);return{eye:e,right:r,up:u,forward:f}}
 function proj(v,c){const d=v.map((n,i)=>n-c.eye[i]),z=d[0]*c.forward[0]+d[1]*c.forward[1]+d[2]*c.forward[2];if(z<=.08)return null;const px=(d[0]*c.right[0]+d[1]*c.right[1]+d[2]*c.right[2])*1.5/z,py=(d[0]*c.up[0]+d[1]*c.up[1]+d[2]*c.up[2])*1.5/z;return{x:W/2+px*H/2,y:H/2-py*H/2,z}}
-const markerZone=$('markers'),mark=[];places.forEach((pl,i)=>{const b=document.createElement('button');b.className='marker';b.type='button';b.textContent=pl.name;b.setAttribute('aria-label',pl.name+' を選択');// A visitor may begin a swipe over a star label. Treat a movement as looking around, while preserving simple taps to select.
-let dragLabel=null,swipedLabel=false;
-b.style.touchAction='none';
-b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;dragLabel={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY};swipedLabel=false;b.setPointerCapture(e.pointerId)});
-b.addEventListener('pointermove',e=>{if(!dragLabel||dragLabel.id!==e.pointerId)return;const dx=e.clientX-dragLabel.x,dy=e.clientY-dragLabel.y;dragLabel.x=e.clientX;dragLabel.y=e.clientY;if(Math.hypot(e.clientX-dragLabel.startX,e.clientY-dragLabel.startY)>8)swipedLabel=true;if(swipedLabel){turnCamera(dx*clamp(2.9/Math.max(W,320),.0038,.0087),-dy*clamp(2.6/Math.max(H,320),.0038,.008));e.preventDefault()}});
-for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,e=>{if(dragLabel&&dragLabel.id===e.pointerId)dragLabel=null});
-b.addEventListener('click',e=>{e.stopPropagation();if(swipedLabel){e.preventDefault();swipedLabel=false;return;}select(i)});markerZone.append(b);mark.push(b)});
+const markerZone=$('markers'),mark=[];let touchedMarkerMovedUntil=0;places.forEach((pl,i)=>{
+ const b=document.createElement('button');b.className='marker';b.type='button';b.textContent=pl.name;b.setAttribute('aria-label',pl.name+' を選択');
+ let dragLabel=null,swipedLabel=false;
+ b.style.touchAction='none';
+ b.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'||(e.pointerType==='mouse'&&e.button!==0))return;
+  dragLabel={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY};swipedLabel=false;
+  b.setPointerCapture(e.pointerId);
+ });
+ b.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch'||!dragLabel||dragLabel.id!==e.pointerId)return;
+  const dx=e.clientX-dragLabel.x,dy=e.clientY-dragLabel.y;
+  dragLabel.x=e.clientX;dragLabel.y=e.clientY;
+  if(Math.hypot(e.clientX-dragLabel.startX,e.clientY-dragLabel.startY)>8)swipedLabel=true;
+  if(swipedLabel){turnCamera(dx*clamp(2.9/Math.max(W,320),.0038,.0087),-dy*clamp(2.6/Math.max(H,320),.0038,.008));e.preventDefault()}
+ });
+ for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,e=>{if(dragLabel&&dragLabel.id===e.pointerId)dragLabel=null});
+ b.addEventListener('click',e=>{
+  e.stopPropagation();if(swipedLabel||performance.now()<touchedMarkerMovedUntil){e.preventDefault();swipedLabel=false;return}
+  select(i);
+ });
+ markerZone.append(b);mark.push(b)
+});
 function select(i){state.choose=i;const pl=places[i];$('infoTitle').textContent=placeName(i);$('infoSub').textContent=pl.en;$('infoDesc').textContent=english?pl.descEn:pl.desc;$('info').classList.remove('hide');$('hero').classList.add('subdued');mark.forEach((x,j)=>x.classList.toggle('selected',i===j));}
 function toast(msg){const el=$('tour-toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.id);toast.id=setTimeout(()=>el.classList.remove('show'),2500)}
 function fly(i){if(i<0){state.yaw=.2;state.pitch=.83}state.active=i;state.choose=i;$('info').classList.add('hide');$('hero').classList.add('subdued');const destination=i<0?[0,0,0]:places[i].pos;state.fly={from:state.focus.slice(),to:destination.slice(),start:performance.now(),duration:1650};state.wantDist=i<0?12:2.4;state.motion=1;$('warp').classList.add('on');$('locationLabel').textContent=i<0?(english?'Entire galaxy':'銀河全景'):placeName(i);document.querySelectorAll('.destination').forEach(b=>b.classList.toggle('active',Number(b.dataset.place)===i));toast(i<0?(english?'Viewing the galaxy':'銀河の全景へ'):(english?'Flying to ':'航行中：')+placeName(i))}
@@ -110,6 +132,7 @@ document.querySelectorAll('[data-look]').forEach(b=>{
 const dir=b.dataset.look;
 const d={left:[-1,0],right:[1,0],up:[0,1],down:[0,-1]}[dir];
 b.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='touch')return;
  e.preventDefault();b.setPointerCapture(e.pointerId);
  lookPointer=e.pointerId;lookHeld=d;b.classList.add('held');
  turnCamera(d[0]*.095,d[1]*.095);
@@ -120,17 +143,105 @@ for(const name of ['pointerup','pointercancel','lostpointercapture']){
 b.addEventListener('click',e=>{if(e.detail===0)turnCamera(d[0]*.18,d[1]*.18)});
 });
 const controlPointers=new Map();let lastPinch=0,pressTime=0,pressXY=null;
-canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});pressTime=performance.now();pressXY={x:e.clientX,y:e.clientY};if(controlPointers.size===2){const a=[...controlPointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)} });
-canvas.addEventListener('pointermove',e=>{if(!controlPointers.has(e.pointerId))return;const old=controlPointers.get(e.pointerId);const dx=e.clientX-old.x,dy=e.clientY-old.y;controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(controlPointers.size===1){
+canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;canvas.setPointerCapture(e.pointerId);controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});pressTime=performance.now();pressXY={x:e.clientX,y:e.clientY};if(controlPointers.size===2){const a=[...controlPointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)} });
+canvas.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||!controlPointers.has(e.pointerId))return;const old=controlPointers.get(e.pointerId);const dx=e.clientX-old.x,dy=e.clientY-old.y;controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(controlPointers.size===1){
 const sx=clamp(2.9/Math.max(W,320),.0038,.0087);
 const sy=clamp(2.6/Math.max(H,320),.0038,.008);
 turnCamera(dx*sx,-dy*sy);
 }else if(controlPointers.size===2){const a=[...controlPointers.values()],pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastPinch)state.wantDist=clamp(state.wantDist*Math.exp((lastPinch-pinch)*.008),.24,32);lastPinch=pinch;shift(-dx*.004,dy*.004,0);state.motion=1}});
-canvas.addEventListener('pointerup',e=>{const orig=pressXY;const quick=performance.now()-pressTime<350;controlPointers.delete(e.pointerId);if(!controlPointers.size&&quick&&orig&&Math.hypot(e.clientX-orig.x,e.clientY-orig.y)<9){const c=cam();let best=-1,dist=60;for(let i=0;i<places.length;i++){const p=proj(places[i].pos,c);if(p){const d=Math.hypot(p.x-e.clientX,p.y-e.clientY);if(d<dist){best=i;dist=d}}}if(best>=0)select(best)}pressXY=null});canvas.addEventListener('pointercancel',e=>controlPointers.delete(e.pointerId));
+canvas.addEventListener('pointerup',e=>{if(e.pointerType==='touch')return;const orig=pressXY;const quick=performance.now()-pressTime<350;controlPointers.delete(e.pointerId);if(!controlPointers.size&&quick&&orig&&Math.hypot(e.clientX-orig.x,e.clientY-orig.y)<9){const c=cam();let best=-1,dist=60;for(let i=0;i<places.length;i++){const p=proj(places[i].pos,c);if(p){const d=Math.hypot(p.x-e.clientX,p.y-e.clientY);if(d<dist){best=i;dist=d}}}if(best>=0)select(best)}pressXY=null});canvas.addEventListener('pointercancel',e=>controlPointers.delete(e.pointerId));
 canvas.addEventListener('lostpointercapture',e=>controlPointers.delete(e.pointerId));
 canvas.addEventListener('wheel',e=>{e.preventDefault();state.wantDist=clamp(state.wantDist*Math.exp(e.deltaY*.00135),.24,32);state.motion=1;$('hero').classList.add('subdued')},{passive:false});
+
+// Dedicated native TouchEvent path for iOS Safari and embedded mobile browsers.
+// PointerEvents are still used for mouse/pen and keyboard users.
+const nativeTouches=new Map();let gestureStart=null,nativePinch=0,nativeTouchButton=null;
+function gestureAllowed(el){return !!(el&&el.closest&&el.closest('#sky,.marker'))}
+function preventNativePageMove(e){
+  // The help dialog remains usable; do not hijack OS gestures outside the page.
+  if(!$('help').hidden)return;
+  if(e.cancelable)e.preventDefault();
+}
+document.addEventListener('touchstart',e=>{
+  const el=e.target;
+  if(!$('help').hidden)return;
+  const look=el.closest?.('[data-look]');
+  if(look){
+    if(e.cancelable)e.preventDefault();
+    const dir={left:[-1,0],right:[1,0],up:[0,1],down:[0,-1]}[look.dataset.look];
+    const t=e.changedTouches[0];
+    nativeTouchButton={identifier:t.identifier,button:look};
+    lookHeld=dir;look.classList.add('held');turnCamera(dir[0]*.13,dir[1]*.13);
+    return;
+  }
+  if(nativeTouches.size===0&&!gestureAllowed(el))return;
+  if(e.cancelable)e.preventDefault();
+  for(const t of e.changedTouches){
+    nativeTouches.set(t.identifier,{x:t.clientX,y:t.clientY});
+  }
+  if(nativeTouches.size===1){
+    const t=e.changedTouches[0];
+    gestureStart={id:t.identifier,x:t.clientX,y:t.clientY,stamp:performance.now(),moved:false,
+      marker:el.closest?.('.marker')||null};
+  }else{
+    gestureStart=null;
+    const a=[...nativeTouches.values()];nativePinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+  }
+},{capture:true,passive:false});
+document.addEventListener('touchmove',e=>{
+  preventNativePageMove(e);
+  if(!nativeTouches.size)return;
+  for(const t of e.changedTouches){
+    const last=nativeTouches.get(t.identifier);if(!last)continue;
+    const dx=t.clientX-last.x,dy=t.clientY-last.y;
+    nativeTouches.set(t.identifier,{x:t.clientX,y:t.clientY});
+    if(nativeTouches.size===1){
+      if(gestureStart&&Math.hypot(t.clientX-gestureStart.x,t.clientY-gestureStart.y)>7){
+        gestureStart.moved=true;
+        if(gestureStart.marker)touchedMarkerMovedUntil=performance.now()+800;
+      }
+      // 70px of finger travel ~= 30 degrees on a typical phone.
+      const sx=clamp(7.1/Math.max(W,320),.007,.014);
+      const sy=clamp(6.4/Math.max(H,320),.006,.012);
+      turnCamera(dx*sx,-dy*sy);
+    }
+  }
+  if(nativeTouches.size>=2){
+    const a=[...nativeTouches.values()];const p=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+    if(nativePinch>0)state.wantDist=clamp(state.wantDist*Math.exp((nativePinch-p)*.010),.24,32);
+    nativePinch=p;state.motion=1;
+  }
+},{capture:true,passive:false});
+function nativeEnd(e){
+  if(nativeTouchButton){
+    for(const t of e.changedTouches){
+      if(nativeTouchButton.identifier===t.identifier){
+        nativeTouchButton.button.classList.remove('held');nativeTouchButton=null;lookHeld=null;break;
+      }
+    }
+  }
+  for(const t of e.changedTouches){
+    if(nativeTouches.has(t.identifier)&&gestureStart&&t.identifier===gestureStart.id){
+      if(!gestureStart.moved&&performance.now()-gestureStart.stamp<450){
+        let i=gestureStart.marker?mark.indexOf(gestureStart.marker):-1;
+        if(i<0){const c=cam();let nearest=52;for(let k=0;k<places.length;k++){
+          const p=proj(places[k].pos,c);if(p){const d=Math.hypot(p.x-t.clientX,p.y-t.clientY);if(d<nearest){nearest=d;i=k}}
+        }}
+        if(i>=0)select(i);
+      }
+    }
+    nativeTouches.delete(t.identifier);
+  }
+  if(!nativeTouches.size){gestureStart=null;nativePinch=0}
+  else if(nativeTouches.size===1){gestureStart=null;nativePinch=0}
+}
+document.addEventListener('touchend',nativeEnd,{capture:true,passive:false});
+document.addEventListener('touchcancel',nativeEnd,{capture:true,passive:false});
+document.addEventListener('gesturestart',preventNativePageMove,{passive:false});
+document.addEventListener('gesturechange',preventNativePageMove,{passive:false});
+
 function shift(right,up,front){const c=cam();for(let i=0;i<3;i++){state.focus[i]+=right*c.right[i]+up*c.up[i]+front*c.forward[i]}state.fly=null;$('warp').classList.remove('on')}
-addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON'&&e.key===' ')return;const key=e.key.toLowerCase();if('wasdqe'.includes(key)&&key.length===1){state.keys.add(key);e.preventDefault()}else if(e.key==='ArrowLeft'){turnCamera(-.12,0);e.preventDefault()}else if(e.key==='ArrowRight'){turnCamera(.12,0);e.preventDefault()}else if(e.key==='ArrowUp'){turnCamera(0,.12);e.preventDefault()}else if(e.key==='ArrowDown'){turnCamera(0,-.12);e.preventDefault()}else if(key==='escape')$('help').hidden=true});addEventListener('keyup',e=>state.keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>state.keys.clear());
+addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON'&&e.key===' ')return;const key=e.key.toLowerCase();if('wasdqe'.includes(key)&&key.length===1){state.keys.add(key);e.preventDefault()}else if(e.key==='ArrowLeft'){state.yaw+=.1;e.preventDefault()}else if(e.key==='ArrowRight'){state.yaw-=.1;e.preventDefault()}else if(e.key==='ArrowUp'){state.pitch=clamp(state.pitch-.1,-1.43,1.43);e.preventDefault()}else if(e.key==='ArrowDown'){state.pitch=clamp(state.pitch+.1,-1.43,1.43);e.preventDefault()}else if(key==='escape')$('help').hidden=true});addEventListener('keyup',e=>state.keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>state.keys.clear());
 let buttonMove='';document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);buttonMove=b.dataset.move;e.preventDefault()});for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,()=>buttonMove='')});
 const isEnglishDefault=!(navigator.language||'ja').toLowerCase().startsWith('ja');let english=isEnglishDefault;
 function placeName(i){return english?places[i].enName:places[i].name}
