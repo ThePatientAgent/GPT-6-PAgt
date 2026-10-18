@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050811"><meta name="description" content="COSMOS — fly through a living, interactive universe. A Project WOW experiment by The Patient Agent."><title>COSMOS — 宇宙を自由に飛ぶ | Project WOW</title>
+<style>
+:root{color-scheme:dark;--a:#8fcfff;--fg:#eff6ff;--mut:#91a6c3;--line:#9fc5ff33;--glass:#081326cc}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#02040c;color:var(--fg);font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}button{font:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible,input:focus-visible{outline:2px solid #8bdcff;outline-offset:3px}#sky{position:fixed;inset:0;display:block;width:100vw;height:100dvh;touch-action:none;cursor:grab}#sky:active{cursor:grabbing}#nebula{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 54% 43% at 49% 45%,#3566bb21,transparent 75%),radial-gradient(ellipse 34% 30% at 75% 25%,#a654bb1a,transparent 78%);mix-blend-mode:screen}#vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 44%,transparent 28%,#00030b33 74%,#00030bd9 110%)}#warp{position:fixed;inset:0;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0deg 9deg,#a7d8ff0b 9.5deg 10deg,transparent 10.5deg 20deg);mask-image:radial-gradient(circle,transparent 10%,black 85%);transition:opacity .45s}#warp.on{opacity:.7;animation:warp .65s linear infinite}@keyframes warp{to{transform:rotate(18deg) scale(1.2)}}
+header{position:fixed;z-index:5;left:clamp(16px,4vw,55px);right:clamp(16px,4vw,55px);top:clamp(14px,3vh,35px);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}header>div,header button{pointer-events:auto}.eyebrow{font-size:10px;letter-spacing:.24em;color:#acd1f7;font-weight:700}.brand{font-size:clamp(29px,5vw,59px);letter-spacing:.17em;line-height:1.1;font-weight:300;text-shadow:0 0 28px #1b81eaa6}.brand b{font-weight:700;color:white}.byline{margin-top:5px;font-size:11px;color:#99afcc;letter-spacing:.04em}.pill{white-space:nowrap;border:1px solid #88b8ff55;background:#051122bc;color:#dbf1ff;border-radius:99px;padding:10px 15px;backdrop-filter:blur(15px)}.pill:hover{background:#244a75cf}
+#aim{position:fixed;left:50%;top:50%;width:23px;height:23px;transform:translate(-50%,-50%);pointer-events:none;opacity:.6}#aim:before,#aim:after{content:"";position:absolute;background:#b8e6ff90}#aim:before{width:1px;height:23px;left:11px;top:0}#aim:after{width:23px;height:1px;left:0;top:11px}#markers{position:fixed;inset:0;pointer-events:none;z-index:3}.marker{position:absolute;transform:translate(-50%,-50%);padding:9px 12px;border:1px solid #a9d3ff87;border-radius:99px;display:flex;align-items:center;gap:8px;background:#061428a8;backdrop-filter:blur(9px);color:#e8f6ff;white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.04em;pointer-events:auto;box-shadow:0 0 28px #5290e244}.marker:before{content:"";width:7px;height:7px;border:1px solid #bfe4ff;border-radius:50%;box-shadow:0 0 8px #b5e0ff}.marker:hover,.marker.selected{border-color:#e0faff;background:#173d67d9}.marker[hidden]{display:none}
+#hero{position:fixed;left:clamp(18px,5vw,75px);top:37%;transform:translateY(-50%);max-width:min(38vw,440px);pointer-events:none;transition:opacity .5s}#hero h2{margin:0 0 9px;font-size:clamp(25px,3.5vw,52px);font-weight:300;letter-spacing:.035em;line-height:1.3;text-shadow:0 1px 35px #061027}#hero h2 strong{display:block;font-weight:800}#hero p{font-size:clamp(12px,1.2vw,15px);color:#b1c5de;max-width:380px;text-shadow:0 2px 9px #061026}#hero.subdued{opacity:0}
+#info{position:fixed;z-index:4;right:clamp(17px,4vw,55px);top:31%;width:min(285px,30vw);background:linear-gradient(145deg,#0b2136df,#070c1bdc);border:1px solid #85b6e045;border-radius:16px;padding:17px 18px;backdrop-filter:blur(18px);box-shadow:0 14px 60px #0008;transition:transform .35s,opacity .35s}#info.hide{opacity:0;transform:translateX(25px);pointer-events:none}.little{font-size:10px;letter-spacing:.2em;color:#93c1f4}#info h3{margin:7px 0 2px;font-size:23px;line-height:1.2;font-weight:600}#info .name{font-size:11px;color:#8acbff;margin:4px 0 12px}#info p{color:#b8ccdf;font-size:12px;line-height:1.65;margin:0 0 13px}#info .row{display:flex;gap:7px;flex-wrap:wrap}#info button{border:1px solid #87c4fb70;background:#2b5b8a;color:#fff;border-radius:8px;padding:9px 12px;font-size:12px}#info .textbutton{background:transparent}
+footer{position:fixed;z-index:5;bottom:clamp(16px,4vh,36px);left:50%;transform:translateX(-50%);width:min(900px,calc(100% - 30px));display:flex;flex-direction:column;align-items:center;gap:13px}.instructions{text-align:center;color:#c1d6ed;font-size:11px;letter-spacing:.04em;text-shadow:0 2px 9px black}.destinations{display:flex;gap:7px;width:100%;align-items:center;justify-content:center;flex-wrap:wrap}.destination{background:#08172acb;color:#c3d8ed;border:1px solid #9ec9f955;border-radius:999px;padding:11px 15px;backdrop-filter:blur(14px);font-size:12px;white-space:nowrap}.destination:hover,.destination.active{background:#27547dc9;border-color:#b1e4ff;color:#fff}.status{display:flex;justify-content:center;gap:12px;align-items:center;color:#91adc9;font-size:10px;letter-spacing:.07em;text-shadow:0 1px 7px black}.status b{color:#d5ebff}.hidden-a11y{position:absolute!important;clip:rect(0 0 0 0);height:1px;width:1px;overflow:hidden;white-space:nowrap}#flight{position:fixed;z-index:5;left:clamp(18px,4vw,55px);bottom:calc(clamp(16px,4vh,36px) + 115px);display:flex;flex-direction:column;gap:6px;align-items:center}.flight-row{display:flex;gap:6px}.control{width:40px;height:40px;border:1px solid #7eb7ee50;border-radius:11px;background:#09182baf;color:#b9dcff;backdrop-filter:blur(8px);font-size:17px;user-select:none;-webkit-user-select:none}.control:active{background:#3a6fa0}.control.spacer{visibility:hidden}.tip{font-size:9px;color:#a0bfda;text-shadow:0 1px 8px black}
+#tour-toast{position:fixed;left:50%;top:26%;transform:translate(-50%,-10px);z-index:7;background:#0a1c34eb;border:1px solid #87b6ed8c;border-radius:30px;padding:10px 19px;color:#e8f6ff;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;white-space:nowrap;font-size:12px}#tour-toast.show{opacity:1;transform:translate(-50%,0)}#help{position:fixed;inset:0;background:#010512c9;z-index:10;display:grid;place-items:center;padding:20px;backdrop-filter:blur(11px)}#help[hidden]{display:none}#help article{max-width:500px;border:1px solid #a0caff56;background:#0c1b2deb;padding:28px;border-radius:18px;box-shadow:0 20px 80px #000c}#help h2{font-weight:400;font-size:24px;margin:0 0 12px}#help p{color:#bdd0e4;line-height:1.9}#help button{padding:12px 22px;border-radius:10px;border:1px solid #addbff;background:#204c77;color:white}#hudTag{position:fixed;right:clamp(16px,4vw,55px);top:clamp(82px,13vh,130px);color:#86a4c8;font-size:10px;letter-spacing:.13em;text-align:right;line-height:1.8;pointer-events:none}
+@media(max-width:700px){header{top:15px}.headActions{gap:5px!important}.headActions .pill{padding:9px 10px;font-size:11px}.brand{font-size:31px}.eyebrow{font-size:8px}.byline{font-size:9px}#hero{max-width:78vw;top:30%}#hero h2{font-size:31px}#hero p{font-size:12px}#info{top:auto;bottom:185px;left:15px;right:auto;width:calc(100% - 30px);max-width:330px;padding:13px 15px}#info h3{font-size:19px}footer{bottom:14px;gap:9px}.destinations{gap:6px;max-width:100%}.destination{font-size:10px;padding:9px 12px}.instructions{font-size:10px}.status{gap:7px;font-size:9px;white-space:nowrap}.status span:last-child,.status span:nth-last-child(2){display:none}#flight{left:auto;right:15px;bottom:183px}.control{width:32px;height:32px;font-size:15px}#hudTag{top:92px;font-size:9px}#tour-toast{top:22%}.marker{font-size:10px;padding:7px 9px}#info:not(.hide)~#flight{opacity:.3}}@media(max-height:650px){#hero{top:30%}#flight{bottom:110px}footer{bottom:8px}.instructions{display:none}}
+@media(prefers-reduced-motion:reduce){#warp.on{animation:none}*,*:after,*:before{scroll-behavior:auto!important}}
+
+/* v026: visible, tactile first-person look controls */
+#lookPad{position:fixed;z-index:5;left:clamp(18px,4vw,55px);bottom:calc(clamp(16px,4vh,36px) + 118px);display:flex;flex-direction:column;align-items:center;gap:5px}
+.look-title{font-size:10px;letter-spacing:.12em;color:#c9e8ff;text-shadow:0 1px 6px #000}
+.look-buttons{display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:3px}
+.look-turn{width:36px;height:36px;border:1px solid #a1d9ff8a;border-radius:10px;background:#0a3157d9;color:#e4f7ff;font-size:19px;touch-action:none;user-select:none;-webkit-user-select:none}
+.look-turn:active,.look-turn.held{background:#3e87bf;color:white;box-shadow:0 0 15px #64c8ff66}
+.look-middle{grid-column:2;grid-row:2;display:grid;place-items:center;color:#c3ebffbb;font-size:19px}
+.look-up{grid-column:2;grid-row:1}.look-left{grid-column:1;grid-row:2}.look-right{grid-column:3;grid-row:2}.look-down{grid-column:2;grid-row:3}
+#lookCue{position:fixed;z-index:3;left:50%;top:clamp(162px,23vh,205px);transform:translateX(-50%);pointer-events:none;white-space:nowrap;text-align:center;font-size:12px;font-weight:600;color:#e1f6ff;border:1px solid #99cbff55;background:#091b34bb;backdrop-filter:blur(9px);border-radius:99px;padding:8px 14px;box-shadow:0 4px 25px #0005;transition:opacity .45s}
+#lookCue.used{opacity:.38}
+#lookCue.turning{opacity:1;border-color:#b2edff;box-shadow:0 0 22px #55adff44}
+#lookNumbers{position:fixed;z-index:3;left:clamp(18px,4vw,55px);top:clamp(146px,20vh,185px);pointer-events:none;font-size:10px;letter-spacing:.09em;color:#9dbedc;text-shadow:0 1px 8px #000}
+@media(max-width:700px){
+ #lookPad{left:15px;bottom:182px}
+ .look-buttons{grid-template-columns:repeat(3,32px);grid-template-rows:repeat(3,32px);gap:3px}
+ .look-turn{width:32px;height:32px;border-radius:9px}
+ #lookCue{top:178px;font-size:10px;padding:7px 12px}
+ #lookNumbers{left:16px;top:122px;font-size:9px}
+ #info:not(.hide)~#lookPad{opacity:.22;pointer-events:none}
+}
+@media(max-height:650px){#lookPad{bottom:115px}#lookCue{top:90px}}
+
+/* v027: Safari/WebView fullscreen interaction surface */
+html,body{width:100%;height:100%;height:100dvh;position:fixed;inset:0;overflow:hidden!important;overscroll-behavior:none!important;-webkit-overflow-scrolling:auto;touch-action:none}
+#sky,#markers,.marker,#lookPad,.look-turn{touch-action:none!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#sky{width:100%;height:100%;height:100dvh}
+#lookCue{z-index:6}
+/* v028 world-position camera, explicit orbit mode */
+#navMode{display:inline-block;margin-top:5px;color:#8eeccc;font-size:10px;letter-spacing:.08em}
+#freeFlight{position:fixed;z-index:7;right:clamp(17px,4vw,55px);top:clamp(100px,15vh,145px);background:#15516fe6;color:#eaffff;border:1px solid #7be5e6;border-radius:999px;padding:10px 16px;backdrop-filter:blur(12px)}
+#freeFlight[hidden]{display:none}
+#orbitTo{background:#15475b!important;border-color:#82decf!important}
+#navMode{font-weight:800;font-size:11px;text-shadow:0 0 8px #36e1bb55}
+#freeFlight{box-shadow:0 0 22px #4bd2b333}
+@media(min-width:701px){#flight{left:auto;right:clamp(18px,4vw,55px)}}
+@media(max-width:700px){#freeFlight{top:150px;right:16px;font-size:11px;padding:9px 12px}}
+</style></head><body>
+<canvas id="sky" aria-label="インタラクティブな三次元宇宙。ドラッグで視点を回転、ピンチで接近。" tabindex="0"></canvas><div id="nebula" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div><div id="warp" aria-hidden="true"></div><div id="aim" aria-hidden="true"></div><div id="markers"></div>
+<header><div><div class="eyebrow">THE PATIENT AGENT · PROJECT WOW</div><div class="brand"><b>COS</b>MOS<span style="color:#6ab8ff">.</span></div><div class="byline" id="byline">自由に飛べる、ひとつの宇宙。</div></div><div class="headActions" style="display:flex;gap:7px"><button class="pill" id="langBtn" type="button">EN</button><button class="pill" id="helpBtn" type="button">？ 遊び方</button></div></header>
+<button id="freeFlight" type="button" hidden>↗ 自由飛行へ戻る</button><div id="hudTag">LIVE 3D EXPLORER · LAB 029<br>AN ARTISTIC SPACE EXPERIENCE<br><span id="navMode">自由飛行 / 中心固定なし</span></div>
+<div id="hero"><h2 id="heroHeading">宇宙は、<strong>君の進む方へ。</strong></h2><p id="heroIntro">眺めるだけの宇宙から、旅する宇宙へ。銀河を見渡し、星を選び、自由に飛んでみよう。</p></div>
+<aside id="info" class="hide" aria-live="polite"><div class="little" id="infoLabel">DESTINATION / STAR SYSTEM</div><h3 id="infoTitle"></h3><div class="name" id="infoSub"></div><p id="infoDesc"></p><div class="row"><button id="warpTo" type="button">✦ 近づいて周回する</button><button id="orbitTo" type="button">◎ この天体を周回</button><button id="infoClose" class="textbutton" type="button">閉じる</button></div></aside>
+<div id="flight" aria-label="飛行操作"><div class="tip" id="flightLabel">FLIGHT / MOVE</div><div class="flight-row"><button class="control spacer" tabindex="-1" aria-hidden="true"></button><button class="control" data-move="forward" aria-label="前進">↑</button><button class="control spacer" tabindex="-1" aria-hidden="true"></button></div><div class="flight-row"><button class="control" data-move="left" aria-label="左移動">←</button><button class="control" data-move="back" aria-label="後退">↓</button><button class="control" data-move="right" aria-label="右移動">→</button></div></div>
+<div id="lookPad" aria-label="視点の回転操作">
+<div class="look-title" id="lookTitle">LOOK / 視点回転</div>
+<div class="look-buttons">
+<button type="button" class="look-turn look-up" data-look="up" aria-label="上を見る">↑</button>
+<button type="button" class="look-turn look-left" data-look="left" aria-label="左を見る">←</button>
+<div class="look-middle" aria-hidden="true">◎</div>
+<button type="button" class="look-turn look-right" data-look="right" aria-label="右を見る">→</button>
+<button type="button" class="look-turn look-down" data-look="down" aria-label="下を見る">↓</button>
+</div></div>
+<div id="lookNumbers" aria-hidden="true">YAW 11° · TILT 48°</div>
+<div id="lookCue" aria-hidden="true">↔ ドラッグして360°見回す ↕</div>
+<div id="tour-toast" role="status" aria-live="polite"></div>
+<footer><div class="instructions" id="controlsCopy">ドラッグ：自由視点　・　行き先を選ぶとその星の周りへ　・　ピンチ：接近</div><nav class="destinations" id="destinations" aria-label="行き先を選ぶ"><button type="button" class="destination active" data-place="-1">✧ 銀河全景</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">銀河を探索中</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
+<div id="help" hidden><article><h2 id="helpHeading">宇宙を、自由に旅しよう。</h2><p id="helpCopy">指でドラッグすると視点が回転します。2本指でピンチするとズーム、2本指でスライドすると移動できます。画面下の星の名前をタップすると、その星の近くまで飛び、星を中心に回り込めます。「自由飛行へ戻る」で通常の視点操作に切り替えられます。<br><br>PCならマウスとホイールに加え、W/A/S/Dキーで前後左右、Q/Eキーで上下に飛行。<br><br>この宇宙はアート作品です。星の配置・距離・惑星の形状は科学データに基づくものではありません。</p><button id="helpClose" type="button">旅を始める →</button></article></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)},rand=i=>{let x=Math.sin(i*127.1+12.23)*43758.545312;return x-Math.floor(x)};
+const places=[
+{name:'太陽系',enName:'Solar system',en:'SOL / LOCAL SYSTEM',descEn:'Visit our home star and a stylized blue world inspired by Earth. Planet positions are purely illustrative.',pos:[1.3,.12,1.4],hue:[1,.81,.51],desc:'私たちの故郷をイメージした星の系。地球に似た青い惑星と、その周囲をめぐる小さな世界。',planets:[.6,.92,1.28,1.68]},
+{name:'シリウス',enName:'Sirius',en:'SIRIUS / BLUE-WHITE STAR',descEn:'Follow the striking light of a blue-white star. The coordinates are part of an artistic universe.',pos:[-2.0,-.2,1.7],hue:[.62,.82,1],desc:'青白い光を放つ明るい恒星をモチーフにした探索地点。遠くからでも目立つ輝きを追いかけよう。',planets:[.6,1.04,1.58]},
+{name:'ベガ',enName:'Vega',en:'VEGA / LYRA',descEn:'A luminous destination inspired by Vega in Lyra. Its planets and surrounding scenery are fictional.',pos:[1.9,1.18,-.9],hue:[.65,.72,1],desc:'こと座のベガをイメージした星の光景。惑星や天体の配置は創作上の表現です。',planets:[.7,1.2,1.7]},
+{name:'オリオン',enName:'Orion',en:'ORION / STAR NURSERY',descEn:'Travel toward a crimson star-forming region inspired by Orion. This is an artistic representation.',pos:[-2.5,-.6,-1.5],hue:[1,.55,.37],desc:'星が生まれる領域をイメージした赤い光のエリア。銀河を回り込んで探しに行こう。',planets:[.74,1.2]},
+{name:'プレアデス',enName:'Pleiades',en:'PLEIADES / BLUE CLUSTER',descEn:'A cluster of young blue lights inspired by the Pleiades. Its layout is not a real star map.',pos:[2.3,-1.1,2.2],hue:[.53,.75,1],desc:'青い若い星々の輝きに着想を得た星の集まり。ここに見える座標は実在の星図ではありません。',planets:[.63,1.13,1.66]},
+{name:'銀河の中心',enName:'Galactic core',en:'GALACTIC CORE / ARTISTIC',descEn:'Fly into the glowing heart of our imagined galaxy and change your perspective in real 3D.',pos:[0,0,0],hue:[1,.76,.55],desc:'何万もの星と光が重なり合う、作品の中心部。角度を変えて光の渦を眺めよう。',planets:[]}
+];
+// World-space camera is the primary truth. No implicit galactic pivot.
+const initialYaw=.2,initialPitch=.83,initialRange=12;
+const initialPos=[-Math.sin(initialYaw)*Math.cos(initialPitch)*initialRange,-Math.sin(initialPitch)*initialRange,-Math.cos(initialYaw)*Math.cos(initialPitch)*initialRange];
+const state={pos:initialPos.slice(),yaw:initialYaw,pitch:initialPitch,orbit:null,choose:-1,active:-1,fly:null,keys:new Set(),last:0,motion:0};;let W=1,H=1,scale=1,program=null,loc={},posBuf,colorBuf,sizeBuf,pointCount=22000,starPos=[],starColor=[],starSize=[];
+function generate(){const p=[],c=[],z=[];for(let i=0;i<pointCount;i++){const arm=i%4,rad=Math.pow(rand(i+14),.77)*5.65,az=arm*Math.PI/2+rad*1.05+(rand(i+23)-.5)*(.35+rad*.14),thick=(rand(i+31)-.5)*(.15+.38*rad/5.65);p.push(Math.cos(az)*rad+(rand(i+47)-.5)*.22,thick,Math.sin(az)*rad+(rand(i+61)-.5)*.22);const heat=rand(i+81),core=smooth(5,0,rad);c.push(clamp((heat>.95?1:.47+rand(i+101)*.42)+core*.22,0,1),clamp((heat>.95?.74:.59+rand(i+102)*.37)+core*.14,0,1),heat>.95?.5:.84+rand(i+103)*.16);z.push((.55+rand(i+108)*2.1)*(rand(i+111)>.991?3.3:1))}
+for(let i=0;i<5200;i++){const r=8+Math.pow(rand(i+60000),.60)*49,a=rand(i+61000)*6.283,el=(rand(i+62000)-.5)*2;p.push(r*Math.cos(a)*Math.cos(el),r*Math.sin(el),r*Math.sin(a)*Math.cos(el));c.push(.58+rand(i+9)*.3,.67+rand(i+12)*.25,.9);z.push(.75+rand(i+15)*1.95)}starPos=new Float32Array(p);starColor=new Float32Array(c);starSize=new Float32Array(z);pointCount=z.length}
+generate();
+const vs=`attribute vec3 aPos;attribute vec3 aColor;attribute float aSize;uniform vec3 uEye,uRight,uUp,uForward;uniform float uAspect,uDpr,uPulse;varying vec3 vColor;varying float vDist;void main(){vec3 p=aPos-uEye;float d=dot(p,uForward);vec2 xy=vec2(dot(p,uRight),dot(p,uUp));gl_Position=vec4(xy.x/max(d,.1)*1.5/uAspect,xy.y/max(d,.1)*1.5,0.,1.);if(d<=.08||d>120.)gl_Position=vec4(3.,3.,0.,1.);gl_PointSize=clamp(aSize*(31.0/max(d,.5))*uDpr,1.0*uDpr,27.0*uDpr);vColor=aColor;vDist=d;}`;
+const fs=`precision mediump float;varying vec3 vColor;varying float vDist;uniform float uPulse;void main(){vec2 uv=gl_PointCoord*2.0-1.0;float r=dot(uv,uv);float halo=exp(-r*4.0)*.32;float core=exp(-r*45.0)*1.9;float brightness=(halo+core)*(0.94+uPulse*.06);if(brightness<.009)discard;gl_FragColor=vec4(vColor*brightness,1.0);}`;
+function setupGL(){if(!gl)return;const shader=(t,src)=>{const x=gl.createShader(t);gl.shaderSource(x,src);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(x));return x};try{program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vs));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);for(const [nm,values,n] of [['aPos',starPos,3],['aColor',starColor,3],['aSize',starSize,1]]){const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,values,gl.STATIC_DRAW);const l=gl.getAttribLocation(program,nm);gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,n,gl.FLOAT,false,0,0)}for(const n of ['uEye','uRight','uUp','uForward','uAspect','uDpr','uPulse'])loc[n]=gl.getUniformLocation(program,n);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);gl.disable(gl.DEPTH_TEST)}catch(e){console.error(e);program=null;$('hudTag').textContent='Canvas fallback mode'}}setupGL();
+function resize(){W=Math.max(1,window.innerWidth);H=Math.max(1,window.innerHeight);scale=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.floor(W*scale);canvas.height=Math.floor(H*scale);if(gl)gl.viewport(0,0,canvas.width,canvas.height);if(ctx)ctx.setTransform(scale,0,0,scale,0,0)}resize();addEventListener('resize',resize);
+function cam(){const y=state.yaw,p=state.pitch,f=[Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p)],r=[Math.cos(y),0,-Math.sin(y)],u=[-Math.sin(y)*Math.sin(p),Math.cos(p),-Math.cos(y)*Math.sin(p)];return{eye:state.pos.slice(),right:r,up:u,forward:f}}
+function proj(v,c){const d=v.map((n,i)=>n-c.eye[i]),z=d[0]*c.forward[0]+d[1]*c.forward[1]+d[2]*c.forward[2];if(z<=.08)return null;const px=(d[0]*c.right[0]+d[1]*c.right[1]+d[2]*c.right[2])*1.5/z,py=(d[0]*c.up[0]+d[1]*c.up[1]+d[2]*c.up[2])*1.5/z;return{x:W/2+px*H/2,y:H/2-py*H/2,z}}
+const markerZone=$('markers'),mark=[];let touchedMarkerMovedUntil=0;places.forEach((pl,i)=>{
+ const b=document.createElement('button');b.className='marker';b.type='button';b.textContent=pl.name;b.setAttribute('aria-label',pl.name+' を選択');
+ let dragLabel=null,swipedLabel=false;
+ b.style.touchAction='none';
+ b.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch'||(e.pointerType==='mouse'&&e.button!==0))return;
+  dragLabel={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY};swipedLabel=false;
+  b.setPointerCapture(e.pointerId);
+ });
+ b.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch'||!dragLabel||dragLabel.id!==e.pointerId)return;
+  const dx=e.clientX-dragLabel.x,dy=e.clientY-dragLabel.y;
+  dragLabel.x=e.clientX;dragLabel.y=e.clientY;
+  if(Math.hypot(e.clientX-dragLabel.startX,e.clientY-dragLabel.startY)>8)swipedLabel=true;
+  if(swipedLabel){turnCamera(dx*clamp(2.9/Math.max(W,320),.0038,.0087),-dy*clamp(2.6/Math.max(H,320),.0038,.008));e.preventDefault()}
+ });
+ for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,e=>{if(dragLabel&&dragLabel.id===e.pointerId)dragLabel=null});
+ b.addEventListener('click',e=>{
+  e.stopPropagation();if(swipedLabel||performance.now()<touchedMarkerMovedUntil){e.preventDefault();swipedLabel=false;return}
+  select(i);
+ });
+ markerZone.append(b);mark.push(b)
+});
+function select(i){state.choose=i;const pl=places[i];$('infoTitle').textContent=placeName(i);$('infoSub').textContent=pl.en;$('infoDesc').textContent=english?pl.descEn:pl.desc;$('info').classList.remove('hide');$('hero').classList.add('subdued');mark.forEach((x,j)=>x.classList.toggle('selected',i===j));}
+function toast(msg){const el=$('tour-toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.id);toast.id=setTimeout(()=>el.classList.remove('show'),2500)}
+function pointAt(target){
+ const d=target.map((x,i)=>x-state.pos[i]),r=Math.hypot(...d);
+ if(r<.000001)return;
+ state.yaw=Math.atan2(d[0],d[2]);state.pitch=Math.asin(clamp(d[1]/r,-1,1));
+}
+function exitOrbit(silent=false){
+ if(!state.orbit)return;
+ state.orbit=null;
+ $('orbitTo').textContent=english?'◎ Orbit selected object':'◎ この天体を周回';
+ $('freeFlight').hidden=true;refreshMode();
+ $('locationLabel').textContent=english?'Free flight':'自由飛行中';
+ if(!silent)toast(english?'Free flight restored':'自由飛行に戻りました');
+}
+function refreshMode(){
+ $('navMode').textContent=state.orbit?(english?'ORBIT: '+placeName(state.orbit.index):'周回中心：'+placeName(state.orbit.index)):(english?'FREE FLIGHT / NO FIXED PIVOT':'自由飛行 / 中心固定なし');
+ $('lookTitle').textContent=state.orbit?(english?'ORBIT / DRAG':'周回 / ドラッグ'):(english?'LOOK / TURN':'視点回転');
+ $('modeLabel').innerHTML=state.orbit?'MODE <b>ORBIT</b>':'MODE <b>FREE FLIGHT</b>';
+ if(!lookUsed||performance.now()>lookActiveUntil){$('lookCue').textContent=state.orbit?(english?'DRAG TO ORBIT '+placeName(state.orbit.index):'★ '+placeName(state.orbit.index)+' を中心に回り込む'):(english?'DRAG TO LOOK AROUND':'ドラッグして自由に見回す');}
+}
+function startOrbit(i){
+ if(i<0||!places[i])return;
+ const p=places[i].pos.slice(),d=p.map((x,j)=>x-state.pos[j]);
+ const gap=Math.hypot(...d);
+ // Never orbit from ten galaxy units away: make the requested object visibly local.
+ if(gap>3.15){fly(i,true);return;}
+ const rad=Math.max(.65,gap);
+ state.fly=null;$('warp').classList.remove('on');
+ state.orbit={index:i,pivot:p,radius:rad};
+ pointAt(p);
+ $('orbitTo').textContent=english?'✓ Orbiting — tap to exit':'✓ 周回中 — タップで解除';
+ $('freeFlight').hidden=false;refreshMode();
+ $('locationLabel').textContent=english?'Orbiting '+placeName(i):placeName(i)+' の周囲を観察中';
+ toast(english?'Orbit mode: '+placeName(i):'周回開始：'+placeName(i));
+}
+function fly(i,orbitOnArrival=true){
+ exitOrbit(true);
+ state.active=i;state.choose=i;
+ $('info').classList.add('hide');$('hero').classList.add('subdued');
+ const dest=i<0?[0,0,0]:places[i].pos;
+ const target=i<0?initialPos.slice():dest.map((v,j)=>{
+  const distance=Math.hypot(...dest.map((x,k)=>x-state.pos[k]));
+  const dir=distance>.001?(dest[j]-state.pos[j])/distance:[Math.sin(state.yaw)*Math.cos(state.pitch),Math.sin(state.pitch),Math.cos(state.yaw)*Math.cos(state.pitch)][j];
+  return v-dir*2.5;
+ });
+ const from=state.pos.slice(),to=target.slice();
+ // Warp follows a world-space path; the destination, not the galaxy centre, sets arrival heading.
+ const look=i<0?[0,0,0]:dest;
+ const direction=look.map((v,j)=>v-to[j]),n=Math.max(.001,Math.hypot(...direction));
+ const newYaw=Math.atan2(direction[0],direction[2]);
+ const newPitch=Math.asin(clamp(direction[1]/n,-1,1));
+ const shortestYaw=Math.atan2(Math.sin(newYaw-state.yaw),Math.cos(newYaw-state.yaw));
+ state.fly={from,to,start:performance.now(),duration:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
+ $('warp').classList.add('on');refreshMode();
+ $('locationLabel').textContent=i<0?(english?'Entire galaxy':'銀河全景'):placeName(i);
+ document.querySelectorAll('.destination').forEach(b=>b.classList.toggle('active',Number(b.dataset.place)===i));
+ toast(i<0?(english?'Returning to the galaxy':'銀河全景へ'):(english?'Flying to ':'航行中：')+placeName(i));
+}
+$('warpTo').addEventListener('click',()=>fly(state.choose,true));
+$('orbitTo').addEventListener('click',()=>state.orbit&&state.orbit.index===state.choose?exitOrbit():startOrbit(state.choose));
+$('freeFlight').addEventListener('click',()=>exitOrbit());$('infoClose').addEventListener('click',()=>$('info').classList.add('hide'));
+const nav=$('destinations');places.forEach((pl,i)=>{const b=document.createElement('button');b.type='button';b.className='destination';b.dataset.place=String(i);b.textContent=(i===5?'✷ ':'✦ ')+pl.name;b.addEventListener('click',()=>fly(i,true));nav.append(b)});nav.querySelector('[data-place="-1"]').addEventListener('click',()=>fly(-1));
+// Real look-around: preserve the camera's world position while changing heading.
+let lookUsed=false,lookHeld=null,lookActiveUntil=0;
+function turnCamera(dYaw,dPitch){
+ if(Math.abs(dYaw)+Math.abs(dPitch)<.000001)return;
+ state.yaw+=dYaw;
+ state.pitch=clamp(state.pitch+dPitch,-1.43,1.43);
+ if(state.orbit){
+  const o=state.orbit,p=state.pitch,y=state.yaw;
+  const forward=[Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p)];
+  state.pos=o.pivot.map((v,i)=>v-forward[i]*o.radius);
+ }
+ state.fly=null;$('warp').classList.remove('on');state.motion=1;
+ $('hero').classList.add('subdued');
+ lookUsed=true;lookActiveUntil=performance.now()+430;
+ const h=((state.yaw*180/Math.PI)%360+360)%360;
+ $('lookNumbers').textContent='YAW '+Math.round(h)+'° · TILT '+Math.round(state.pitch*180/Math.PI)+'°';
+ $('lookCue').textContent=state.orbit?(english?'ORBITING '+placeName(state.orbit.index):'★ '+placeName(state.orbit.index)+' を周回中'):(english?'LOOKING AROUND · DRAG / ARROWS':'視点回転中 · ドラッグ / 矢印');
+ $('lookCue').classList.add('used','turning');
+}
+function travelScale(){
+ // Nearby objects provide finer control; open space allows longer movement.
+ let d=100;
+ for(const place of places)d=Math.min(d,Math.hypot(...place.pos.map((v,i)=>v-state.pos[i])));
+ return clamp(d*.35,.45,4.5);
+}
+function dolly(pixels){
+ const delta=clamp(pixels,-80,80);
+ if(!delta)return;
+ if(state.orbit){
+  state.orbit.radius=clamp(state.orbit.radius*Math.exp(-delta*.012),.26,100);
+  const c=cam();state.pos=state.orbit.pivot.map((v,i)=>v-c.forward[i]*state.orbit.radius);
+ }else{shift(0,0,delta*.025*travelScale())}
+ state.motion=1;$('hero').classList.add('subdued');
+}
+let lookPointer=null;
+document.querySelectorAll('[data-look]').forEach(b=>{
+const dir=b.dataset.look;
+const d={left:[-1,0],right:[1,0],up:[0,1],down:[0,-1]}[dir];
+b.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='touch')return;
+ e.preventDefault();b.setPointerCapture(e.pointerId);
+ lookPointer=e.pointerId;lookHeld=d;b.classList.add('held');
+ turnCamera(d[0]*.095,d[1]*.095);
+});
+for(const name of ['pointerup','pointercancel','lostpointercapture']){
+ b.addEventListener(name,e=>{if(lookPointer===e.pointerId){lookHeld=null;lookPointer=null}b.classList.remove('held')});
+}
+b.addEventListener('click',e=>{if(e.detail===0)turnCamera(d[0]*.18,d[1]*.18)});
+});
+const controlPointers=new Map();let lastPinch=0,pressTime=0,pressXY=null;
+canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;canvas.setPointerCapture(e.pointerId);controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});pressTime=performance.now();pressXY={x:e.clientX,y:e.clientY};if(controlPointers.size===2){const a=[...controlPointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)} });
+canvas.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||!controlPointers.has(e.pointerId))return;const old=controlPointers.get(e.pointerId);const dx=e.clientX-old.x,dy=e.clientY-old.y;controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(controlPointers.size===1){
+const sx=clamp(2.9/Math.max(W,320),.0038,.0087);
+const sy=clamp(2.6/Math.max(H,320),.0038,.008);
+turnCamera(dx*sx,-dy*sy);
+}else if(controlPointers.size===2){const a=[...controlPointers.values()],pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastPinch)dolly((pinch-lastPinch)*1.5);lastPinch=pinch;state.motion=1}});
+canvas.addEventListener('pointerup',e=>{if(e.pointerType==='touch')return;const orig=pressXY;const quick=performance.now()-pressTime<350;controlPointers.delete(e.pointerId);if(!controlPointers.size&&quick&&orig&&Math.hypot(e.clientX-orig.x,e.clientY-orig.y)<9){const c=cam();let best=-1,dist=60;for(let i=0;i<places.length;i++){const p=proj(places[i].pos,c);if(p){const d=Math.hypot(p.x-e.clientX,p.y-e.clientY);if(d<dist){best=i;dist=d}}}if(best>=0)select(best)}pressXY=null});canvas.addEventListener('pointercancel',e=>controlPointers.delete(e.pointerId));
+canvas.addEventListener('lostpointercapture',e=>controlPointers.delete(e.pointerId));
+canvas.addEventListener('wheel',e=>{e.preventDefault();dolly(-e.deltaY*.32);state.motion=1;$('hero').classList.add('subdued')},{passive:false});
+
+// Dedicated native TouchEvent path for iOS Safari and embedded mobile browsers.
+// PointerEvents are still used for mouse/pen and keyboard users.
+const nativeTouches=new Map();let gestureStart=null,nativePinch=0,nativeTouchButton=null;
+function gestureAllowed(el){return !!(el&&el.closest&&el.closest('#sky,.marker'))}
+function preventNativePageMove(e){
+  // The help dialog remains usable; do not hijack OS gestures outside the page.
+  if(!$('help').hidden)return;
+  if(e.cancelable)e.preventDefault();
+}
+document.addEventListener('touchstart',e=>{
+  const el=e.target;
+  if(!$('help').hidden)return;
+  const look=el.closest?.('[data-look]');
+  if(look){
+    if(e.cancelable)e.preventDefault();
+    const dir={left:[-1,0],right:[1,0],up:[0,1],down:[0,-1]}[look.dataset.look];
+    const t=e.changedTouches[0];
+    nativeTouchButton={identifier:t.identifier,button:look};
+    lookHeld=dir;look.classList.add('held');turnCamera(dir[0]*.13,dir[1]*.13);
+    return;
+  }
+  if(nativeTouches.size===0&&!gestureAllowed(el))return;
+  if(e.cancelable)e.preventDefault();
+  for(const t of e.changedTouches){
+    nativeTouches.set(t.identifier,{x:t.clientX,y:t.clientY});
+  }
+  if(nativeTouches.size===1){
+    const t=e.changedTouches[0];
+    gestureStart={id:t.identifier,x:t.clientX,y:t.clientY,stamp:performance.now(),moved:false,
+      marker:el.closest?.('.marker')||null};
+  }else{
+    gestureStart=null;
+    const a=[...nativeTouches.values()];nativePinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+  }
+},{capture:true,passive:false});
+document.addEventListener('touchmove',e=>{
+  preventNativePageMove(e);
+  if(!nativeTouches.size)return;
+  for(const t of e.changedTouches){
+    const last=nativeTouches.get(t.identifier);if(!last)continue;
+    const dx=t.clientX-last.x,dy=t.clientY-last.y;
+    nativeTouches.set(t.identifier,{x:t.clientX,y:t.clientY});
+    if(nativeTouches.size===1){
+      if(gestureStart&&Math.hypot(t.clientX-gestureStart.x,t.clientY-gestureStart.y)>7){
+        gestureStart.moved=true;
+        if(gestureStart.marker)touchedMarkerMovedUntil=performance.now()+800;
+      }
+      // 70px of finger travel ~= 30 degrees on a typical phone.
+      const sx=clamp(7.1/Math.max(W,320),.007,.014);
+      const sy=clamp(6.4/Math.max(H,320),.006,.012);
+      turnCamera(dx*sx,-dy*sy);
+    }
+  }
+  if(nativeTouches.size>=2){
+    const a=[...nativeTouches.values()];const p=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+    if(nativePinch>0)dolly((p-nativePinch)*1.45);
+    nativePinch=p;state.motion=1;
+  }
+},{capture:true,passive:false});
+function nativeEnd(e){
+  if(nativeTouchButton){
+    for(const t of e.changedTouches){
+      if(nativeTouchButton.identifier===t.identifier){
+        nativeTouchButton.button.classList.remove('held');nativeTouchButton=null;lookHeld=null;break;
+      }
+    }
+  }
+  for(const t of e.changedTouches){
+    if(nativeTouches.has(t.identifier)&&gestureStart&&t.identifier===gestureStart.id){
+      if(!gestureStart.moved&&performance.now()-gestureStart.stamp<450){
+        let i=gestureStart.marker?mark.indexOf(gestureStart.marker):-1;
+        if(i<0){const c=cam();let nearest=52;for(let k=0;k<places.length;k++){
+          const p=proj(places[k].pos,c);if(p){const d=Math.hypot(p.x-t.clientX,p.y-t.clientY);if(d<nearest){nearest=d;i=k}}
+        }}
+        if(i>=0)select(i);
+      }
+    }
+    nativeTouches.delete(t.identifier);
+  }
+  if(!nativeTouches.size){gestureStart=null;nativePinch=0}
+  else if(nativeTouches.size===1){gestureStart=null;nativePinch=0}
+}
+document.addEventListener('touchend',nativeEnd,{capture:true,passive:false});
+document.addEventListener('touchcancel',nativeEnd,{capture:true,passive:false});
+document.addEventListener('gesturestart',preventNativePageMove,{passive:false});
+document.addEventListener('gesturechange',preventNativePageMove,{passive:false});
+
+function shift(right,up,front){
+ const c=cam();for(let i=0;i<3;i++)state.pos[i]+=right*c.right[i]+up*c.up[i]+front*c.forward[i];
+ if(state.orbit)exitOrbit(true);
+ state.fly=null;$('warp').classList.remove('on');
+}
+addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON'&&e.key===' ')return;const key=e.key.toLowerCase();if('wasdqe'.includes(key)&&key.length===1){state.keys.add(key);e.preventDefault()}else if(e.key==='ArrowLeft'){turnCamera(.1,0);e.preventDefault()}else if(e.key==='ArrowRight'){turnCamera(-.1,0);e.preventDefault()}else if(e.key==='ArrowUp'){turnCamera(0,-.1);e.preventDefault()}else if(e.key==='ArrowDown'){turnCamera(0,.1);e.preventDefault()}else if(key==='escape')$('help').hidden=true});addEventListener('keyup',e=>state.keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>state.keys.clear());
+let buttonMove='';document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);buttonMove=b.dataset.move;e.preventDefault()});for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,()=>buttonMove='')});
+const isEnglishDefault=!(navigator.language||'ja').toLowerCase().startsWith('ja');let english=isEnglishDefault;
+function placeName(i){return english?places[i].enName:places[i].name}
+function translate(){document.documentElement.lang=english?'en':'ja';$('langBtn').textContent=english?'日本語':'EN';$('helpBtn').textContent=english?'? How to fly':'？ 遊び方';
+$('orbitTo').textContent=state.orbit?(english?'✓ Orbiting — tap to exit':'✓ 周回中 — タップで解除'):(english?'◎ Orbit selected object':'◎ この天体を周回');
+$('freeFlight').textContent=english?'↗ Return to free flight':'↗ 自由飛行へ戻る';
+refreshMode();$('byline').textContent=english?'A universe you can actually explore.':'自由に飛べる、ひとつの宇宙。';$('heroHeading').innerHTML=english?'The universe,<strong>your next destination.</strong>':'宇宙は、<strong>君の進む方へ。</strong>';$('heroIntro').textContent=english?'Stop watching the universe. Start exploring it. Turn the camera, choose a star, and fly.':'眺めるだけの宇宙から、旅する宇宙へ。銀河を見渡し、星を選び、自由に飛んでみよう。';$('controlsCopy').textContent=english?'DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER':'ドラッグ：自由視点　・　行き先を選ぶとその星の周りへ　・　ピンチ：接近';$('lookTitle').textContent=english?'LOOK / TURN':'LOOK / 視点回転';
+$('lookCue').textContent=english?'DRAG TO LOOK AROUND':'ドラッグして自由に見回す';
+$('lookPad').setAttribute('aria-label',english?'Look around':'視点の回転操作');
+refreshMode();
+for(const b of document.querySelectorAll('[data-look]')){
+ b.setAttribute('aria-label',english?{up:'Look up',down:'Look down',left:'Look left',right:'Look right'}[b.dataset.look]:{up:'上を見る',down:'下を見る',left:'左を見る',right:'右を見る'}[b.dataset.look]);
+}
+$('helpHeading').textContent=english?'The universe is yours to explore.':'宇宙を、自由に旅しよう。';$('helpCopy').innerHTML=english?'Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.':'指でドラッグすると視点が回転します。2本指でピンチするとズーム、2本指でスライドすると移動できます。画面下の星の名前をタップすると、その星の近くまで飛び、星を中心に回り込めます。「自由飛行へ戻る」で通常の視点操作に切り替えられます。<br><br>PCならマウスとホイールに加え、W/A/S/Dキーで前後左右、Q/Eキーで上下に飛行。<br><br>この宇宙はアート作品です。星の配置・距離・惑星の形状は科学データに基づくものではありません。';$('helpClose').textContent=english?'Begin your voyage →':'旅を始める →';$('warpTo').textContent=english?'✦ Fly & orbit this star':'✦ 近づいて周回する';$('infoClose').textContent=english?'Close':'閉じる';$('flightLabel').textContent=english?'FLIGHT / MOVE':'FLIGHT / MOVE';nav.querySelector('[data-place="-1"]').textContent=english?'✧ Entire galaxy':'✧ 銀河全景';places.forEach((pl,i)=>{mark[i].textContent=placeName(i);mark[i].setAttribute('aria-label',(english?'Select ':'選択：')+placeName(i));nav.querySelector('[data-place="'+i+'"]').textContent=(i===5?'✷ ':'✦ ')+placeName(i)});if(state.choose>=0){$('infoTitle').textContent=placeName(state.choose);$('infoDesc').textContent=english?places[state.choose].descEn:places[state.choose].desc}if(state.active>=0)$('locationLabel').textContent=placeName(state.active);else $('locationLabel').textContent=english?'Exploring the galaxy':'銀河を探索中'}
+$('langBtn').addEventListener('click',()=>{english=!english;translate()});translate();
+$('helpBtn').addEventListener('click',()=>$('help').hidden=false);$('helpClose').addEventListener('click',()=>$('help').hidden=true);$('help').addEventListener('click',e=>{if(e.target===$('help'))$('help').hidden=true});
+function processKeys(dt){const m=dt*2.25*travelScale();let f=0,r=0,u=0;const k=state.keys;if(k.has('w')||buttonMove==='forward')f+=m;if(k.has('s')||buttonMove==='back')f-=m;if(k.has('d')||buttonMove==='right')r+=m;if(k.has('a')||buttonMove==='left')r-=m;if(k.has('e'))u+=m;if(k.has('q'))u-=m;if(f||r||u){shift(r,u,f);state.motion=1;$('hero').classList.add('subdued');$('locationLabel').textContent=english?'Free flying':'自由飛行中'}}
+function glRender(c,t){if(gl&&program){gl.clearColor(.003,.008,.025,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(program);gl.uniform3fv(loc.uEye,c.eye);gl.uniform3fv(loc.uRight,c.right);gl.uniform3fv(loc.uUp,c.up);gl.uniform3fv(loc.uForward,c.forward);gl.uniform1f(loc.uAspect,W/H);gl.uniform1f(loc.uDpr,scale);gl.uniform1f(loc.uPulse,Math.sin(t*.0008));gl.drawArrays(gl.POINTS,0,pointCount)}else if(ctx){ctx.fillStyle='#030a18';ctx.fillRect(0,0,W,H);for(let i=0;i<Math.min(pointCount,2300);i++){const p=proj([starPos[i*3],starPos[i*3+1],starPos[i*3+2]],c);if(!p||p.x<0||p.x>W||p.y<0||p.y>H)continue;ctx.globalAlpha=clamp(6/p.z,.1,.92);ctx.fillStyle='#b9d9ff';ctx.beginPath();ctx.arc(p.x,p.y,clamp(starSize[i]*3/p.z,.45,4),0,6.283);ctx.fill()}ctx.globalAlpha=1}}
+// Dynamic gas wisps: projected in 3D and intentionally illustrative, not scientific data.
+const cloudTypes=['101,148,255','104,75,203','243,132,144','255,184,123'];
+function makeCloud(rgb){const cv=document.createElement('canvas');cv.width=cv.height=256;const x=cv.getContext('2d'),q=x.createRadialGradient(128,128,0,128,128,125);q.addColorStop(0,'rgba('+rgb+',.86)');q.addColorStop(.22,'rgba('+rgb+',.55)');q.addColorStop(.55,'rgba('+rgb+',.22)');q.addColorStop(1,'rgba('+rgb+',0)');x.fillStyle=q;x.fillRect(0,0,256,256);return cv}
+const clouds=cloudTypes.map(makeCloud);
+const wisps=[];for(let arm=0;arm<4;arm++){for(let j=0;j<29;j++){const r=.3+j*.17;const a=arm*1.570796+r*1.05;wisps.push({p:[Math.cos(a)*r,(rand(arm*49+j*13)-.5)*.13,Math.sin(a)*r],type:(arm+j%3)%4,alpha:(1-j/32)*(.48+.14*rand(j+20)),size:.60+.23*rand(j+100)})}}
+// Glowing interactive markers and orbital companions are projected in the same camera space as the WebGL stars.
+const overlay=document.createElement('canvas');overlay.style.cssText='position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:2';document.body.insertBefore(overlay,$('markers'));const g=overlay.getContext('2d');let paintW=0,paintH=0;
+function circle(x,y,size,col,a=1){const grad=g.createRadialGradient(x-size*.14,y-size*.2,size*.08,x,y,size);grad.addColorStop(0,'rgba(255,255,255,'+(.92*a)+')');grad.addColorStop(.22,'rgba('+col+','+(.45*a)+')');grad.addColorStop(1,'rgba('+col+',0)');g.fillStyle=grad;g.beginPath();g.arc(x,y,size,0,6.283);g.fill()}
+function renderOverlay(c,t){if(paintW!==canvas.width||paintH!==canvas.height){paintW=canvas.width;paintH=canvas.height;overlay.width=paintW;overlay.height=paintH;g.setTransform(scale,0,0,scale,0,0)}g.clearRect(0,0,W,H);g.save();g.globalCompositeOperation='screen';for(const wisp of wisps){const v=proj(wisp.p,c);if(!v||v.z<.4||v.z>38||v.x< -320||v.x>W+320||v.y< -320||v.y>H+320)continue;const size=clamp(1950*wisp.size/v.z,12,500);g.globalAlpha=wisp.alpha;g.drawImage(clouds[wisp.type],v.x-size/2,v.y-size/2,size,size)}g.restore();const core=proj([0,0,0],c);if(core&&core.z<25&&core.x>-400&&core.x<W+400){circle(core.x,core.y,clamp(650/core.z,30,320),'255,161,98',.4);circle(core.x,core.y,clamp(220/core.z,5,70),'255,234,185',.65)}const markerRects=[];for(let i=0;i<places.length;i++){const pl=places[i],p=proj(pl.pos,c),b=mark[i];let visible=p&&p.x>65&&p.x<W-65&&p.y>100&&p.y<H-155&&p.z>1.65&&p.z<30;if(visible){for(const o of markerRects){if(Math.abs(o.x-p.x)<95&&Math.abs(o.y-p.y)<37){visible=false;break}}}b.hidden=!visible;if(visible){markerRects.push({x:p.x,y:p.y});b.style.left=p.x+'px';b.style.top=p.y+'px'}if(!p||p.z>55)continue;circle(p.x,p.y,clamp(200/p.z,3,65),pl.hue.map(v=>Math.floor(v*255)).join(','),.7);if(p.z<4.5&&i===state.active&&pl.planets.length){for(let j=0;j<pl.planets.length;j++){const a=t*.00018/(.7+j*.3)+j*1.75,rad=pl.planets[j]*.5,world=[pl.pos[0]+Math.cos(a)*rad,pl.pos[1]+Math.sin(a)*rad*.28,pl.pos[2]+Math.sin(a)*rad],v=proj(world,c);if(!v)continue;const size=clamp(54/v.z*(.4+j*.22),2,48);g.strokeStyle='rgba(139,186,226,.12)';g.lineWidth=1;const v2=proj([pl.pos[0]+rad,pl.pos[1],pl.pos[2]],c);if(v2){g.beginPath();g.arc(p.x,p.y,Math.abs(v2.x-p.x),0,6.283);g.stroke()}circle(v.x,v.y,size*2,j===2?'70,151,255':j%2?'210,157,105':'194,221,244',.8);const gr=g.createRadialGradient(v.x-size*.35,v.y-size*.38,size*.1,v.x,v.y,size);gr.addColorStop(0,j===2?'#d0efff':'#fff5d2');gr.addColorStop(.42,j===2?'#3579c7':'#a7867d');gr.addColorStop(1,'#050e25');g.fillStyle=gr;g.beginPath();g.arc(v.x,v.y,size,0,6.283);g.fill()}}}}
+function tick(t){let dt=Math.min(.06,Math.max(.001,(t-state.last)/1000||.016));state.last=t;if(state.fly){
+ const f=state.fly,q=clamp((t-f.start)/f.duration,0,1),e=q*q*(3-2*q);
+ state.pos=f.from.map((v,i)=>v+(f.to[i]-v)*e);
+ state.yaw=f.baseYaw+f.deltaYaw*e;
+ state.pitch=f.basePitch+f.deltaPitch*e;
+ if(q>=1){
+   const enterOrbit=f.orbitOnArrival, index=f.placeIndex;
+   state.fly=null;$('warp').classList.remove('on');
+   if(enterOrbit)startOrbit(index);
+   else toast(english?'Free flight ready':'自由飛行の準備ができました。');
+  }
+}processKeys(dt);if(lookHeld)turnCamera(lookHeld[0]*dt*1.25,lookHeld[1]*dt*1.25);
+const cue=$('lookCue');if(lookUsed&&performance.now()>lookActiveUntil){cue.classList.remove('turning');cue.textContent=state.orbit?(english?'DRAG TO ORBIT '+placeName(state.orbit.index):'★ '+placeName(state.orbit.index)+' を中心に回転'):(english?'DRAG TO LOOK AROUND':'ドラッグして自由に見回す')}
+$('nebula').style.opacity=state.orbit?'0.20':'1';const c=cam();glRender(c,t);renderOverlay(c,t);$('nebula').style.backgroundPosition=(Math.sin(state.yaw)*15)+'px '+(Math.sin(state.pitch)*15)+'px';requestAnimationFrame(tick)}requestAnimationFrame(tick);
+})();
+</script><noscript>この作品にはJavaScriptが必要です。</noscript></body></html>
