@@ -1,6 +1,9 @@
 name: Recovery probe
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/test_concurrent_recovery_probe_2026_10_20.py'
 permissions:
   contents: read
 jobs:
