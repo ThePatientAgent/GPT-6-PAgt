@@ -107,3 +107,77 @@ THE PATIENT AGENT is a human+GPT-6 project about autonomous AI agents, COSMOS in
 
 ### User-facing expectations
 Do not ask user to post video manually as a default. Do not post text-only or a test video to public X without explicit approval. If blocked, describe exactly what was tested and its observed result, avoid repetitive vague progress reports. Once working, preserve exact reproducible steps here.
+
+## RESOLVED — REAL VIDEO POST PUBLISHED (2026-10-19 23:18 JST)
+
+**DONE. Do NOT repost this video when the user sends `な`.** Buffer independently reports `sent`; next `な` means resume the next distinct unfinished project task (not duplicate this publication).
+
+### Confirmed public artifacts
+- X post (first tweet of a two-tweet thread, includes approved video): https://x.com/2111046152070291456/status/2112186512385171752
+- Buffer post ID: `6ad626963e5fb9f3ab97ef24`; channel `6ad20694778b240e2f27f846`.
+- Buffer result and independent `get_post`: `status="sent"`, `sentAt="2026-10-19T14:18:02.233Z"`, `error=null`, `threadCount=2`, video durationMs=10000, externalLink above.
+- Video GitHub commit: https://github.com/ThePatientAgent/GPT-6-PAgt/commit/c5a9b7c0f13503dc567c08c2bfdda86c2e5b7eb4
+- Public direct MP4 URL: https://raw.githubusercontent.com/ThePatientAgent/GPT-6-PAgt/main/docs/media/cosmos-mascot-wide-original-titles-2026-10-19.mp4
+- Blob SHA: `528544eb484e410947383eac000bf290afb0d489`.
+- Local MP4 SHA-256: `ad87884964116675bfba33ce6cf362ba46b5e3a03386b2158d2c7091f920aff2`; 589,881 bytes, 10.000000 s, H.264 1280x720.
+- GitHub `fetch_file(encoding="base64")` returned 786,508 base64 characters, **exactly identical** to the Base64 of the approved original (string equality tested in the tool-call runtime).
+
+### FINALLY REPRODUCIBLE: container bytes -> Files Library text -> GitHub MCP binary
+
+This solution avoids both local outbound network and copying ~786 KB through the model's conversation context. The key finding is that `functions.exec` JavaScript can pass the **result** of a Files tool directly into another connected tool inside ONE function call without printing those bytes for the model.
+
+1. Recover exact source from Files Library: `files__list({surface:"library",recursive:true,...})` located `the_patient_agent_cosmos_wide_original_titles_iphone.mp4` (file ID then `file_00000000b64c81f5b7ddbb16ab620953`). `files__materialize({items:[{file_ref:{file_id:...}}]})` returned `/mnt/data/files/the_patient_agent_cosmos_wide_original_titles_iphone.mp4` in the current runtime. Verify size, duration, codec, SHA-256. Other videos are NOT interchangeable.
+2. Encode its **unchanged** bytes using container Python, preserving Base64 with readable lines:
+   ```python
+   from pathlib import Path
+   import base64
+   b = Path("/mnt/data/files/the_patient_agent_cosmos_wide_original_titles_iphone.mp4").read_bytes()
+   s = base64.b64encode(b).decode("ascii")
+   Path("/mnt/data/cosmos_video_transfer_payload.txt").write_text(
+       "\n".join(s[i:i+2048] for i in range(0, len(s), 2048)) + "\n",
+       encoding="ascii",
+   )
+   ```
+   Actual: 786,508 base64 characters over 385 lines; 786,893-byte text file.
+3. Use `files__manage_library({operations:[{operation:"upload",container_path:"/mnt/data/cosmos_video_transfer_payload.txt",destination_path:"/The Patient Agent/cosmos_video_transfer_payload.txt"}]})`; temporary Library text file created. Call `files__list` to get a **visible** citation ref for that exact file, since `files__read` rejected the raw returned file_id before list visibility was established.
+4. In ONE `functions.exec` JavaScript call:
+   ```js
+   const r = await tools.files__read({read:[{
+     ref_id: "VISIBLE_REF_FROM_FILES_LIST",
+     mode: "full", start_line:1, max_lines:500, include_images:false
+   }]});
+   const item = r.results[0];
+   if (item.warnings.length || item.has_more) throw Error("Incomplete read");
+   const payload = item.content.filter(x => typeof x === "string")
+                       .join("").replace(/\s/g, "");
+   if (payload.length !== 786508) throw Error("Wrong size");
+   const blob = await tools.mcp__GitHub__create_blob({
+     repository_full_name:"ThePatientAgent/GPT-6-PAgt",
+     content:payload, encoding:"base64"
+   });
+   // blob.result.sha == "528544eb484e410947383eac000bf290afb0d489"
+   ```
+   **No 786 KB string was ever printed into model context.** This was the missing cross-tool transfer mechanism. `files__read` returned the actual text contents inside JS (786,892 chars including line breaks); GitHub `create_blob` accepted those directly, returning exactly the locally calculated Git blob SHA.
+5. Discover current GitHub main commit via `mcp__GitHub__fetch` REST `git/ref/heads/main`, then fetch `git/commits/{head}` to find base tree. Call `create_tree({base_tree_sha,tree_elements:[{path:"docs/media/cosmos-mascot-wide-original-titles-2026-10-19.mp4",mode:"100644",type:"blob",sha:blobSha}]})`, `create_commit({tree_sha,parent_sha:mainHead,...})`, and `update_ref({branch_name:"main",sha:newCommit,force:false})`. Actual resulting commit `c5a9b7c0f13503dc567c08c2bfdda86c2e5b7eb4`. Never equate creating a blob with publishing a file without this tree/commit/ref step.
+6. Verify `mcp__GitHub__fetch_file({repository_full_name, path, encoding:"base64"})` returns GitHub blob SHA and identical 786,508-character base64 string. Public repo, GitHub raw direct URL shown above.
+
+### Exact Buffer publication and X length restriction
+The approved copy from this runbook is 364 UTF-16 code units, longer than a normal single X post. To preserve **every word** and the exact original video, Buffer was sent a two-tweet X thread with video on the first tweet. Use `mcp__buffer__create_post({channelId:"6ad20694778b240e2f27f846",schedulingType:"automatic",mode:"shareNow",text:first,assets:[{video:{url:RAW_MP4_URL}}],metadata:{twitter:{thread:[{text:first,assets:[{video:{url:RAW_MP4_URL}}]},{text:second}]}}})`. Top-level text matches first thread item; do not send duplicate posts separately.
+
+Tweet 1 (136 UTF-16 units, with original approved video):
+> Meet the grumpiest member of THE PATIENT AGENT. 🌌
+>
+> We're building COSMOS to explore the universe—from the Pleiades to the Orion Nebula.
+
+Tweet 2 (226 UTF-16 units, reply in same thread):
+> And beyond the stars, we're researching AI-agent safety: preventing duplicate actions and enabling safe recovery when results are uncertain.
+>
+> Explore COSMOS:
+> https://thepatientagent.github.io/GPT-6-PAgt/
+>
+> #AI #AIAgents #COSMOS
+
+The video was registered by Buffer as `video/mp4`, 10,000 ms; create_post returned `status:"sent"`, and `mcp__buffer__get_post({postId:"6ad626963e5fb9f3ab97ef24"})` confirmed `sent`, no error, and the exact `externalLink`. **Publication is complete.**
+
+### Cleanup and future operation
+The temporary `/The Patient Agent/cosmos_video_transfer_payload.txt` library file is a nonessential duplicate encoded copy and can be removed following publication; the exact approved MP4 remains in Library and now GitHub. This cross-tool method is reusable for future user-approved binary GitHub media commits. Do not mistake the prior `BLOCKED_FILE_REFERENCE` WordPress media.create failure for inability to work with bytes via the explicitly authorized Files+GitHub path.
