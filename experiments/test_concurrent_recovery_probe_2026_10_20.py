@@ -1,6 +1,6 @@
 """Independent two-worker recovery probe for atomicdjt fixture at fd931767.
 
-Run only against a local copy of the collaborator's pinned fixture:
+Run against the collaborator's pinned fixture in the GitHub Actions workflow:
   python -m unittest -v test_concurrent_recovery_probe.py
 
 Requires operation_journal.py on PYTHONPATH. This is a mock-only concurrency
