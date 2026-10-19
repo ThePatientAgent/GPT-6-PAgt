@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v080 — Solar Surface</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
+<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v075-earth-moon.html"></iframe>
+<script>
+/* Isolated visual experiment. Keep v075 and v076 untouched.
+   Two independently moving surface layers create parallax on the DOM sphere.
+   Animations are compositor transforms where possible; reduced motion respected. */
+const css=`
+.solar-sun{background:radial-gradient(circle at 46% 43%,rgba(255,252,225,.27),transparent 12%),radial-gradient(circle at 49% 50%,#fff6d5 0%,#f9dfab 6%,#e7ac64 13%,#bc6b38 19%,#713720 23%,transparent 24.5%),radial-gradient(circle at 50% 50%,rgba(255,186,97,.14),rgba(231,123,49,.08) 31%,transparent 65%)!important}
+.solar-earth{isolation:isolate;overflow:hidden!important;border-radius:50%!important;
+background:radial-gradient(circle at 29% 21%,rgba(159,223,250,.24),transparent 37%),radial-gradient(circle at 40% 40%,#258eb2 0%,#12658d 42%,#073456 77%,#03111f 100%)!important;
+box-shadow:inset -18px -8px 24px rgba(0,4,17,.85),inset 5px 5px 11px rgba(184,235,251,.25),0 0 9px rgba(64,148,210,.29)!important}
+.solar-earth:before{content:"";position:absolute;inset:-4% -13%;border-radius:50%;
+background:linear-gradient(118deg,#819b78 0%,#456e5b 26%,#8e8263 48%,#476d59 68%,#84997a 100%);
+clip-path:polygon(12% 13%,22% 9%,32% 15%,38% 25%,34% 34%,43% 39%,39% 48%,45% 55%,35% 63%,31% 80%,25% 71%,24% 58%,15% 48%,18% 34%,12% 23%,12% 13%,49% 18%,62% 13%,76% 23%,88% 34%,81% 43%,74% 50%,65% 55%,60% 45%,54% 42%,48% 30%,49% 18%,67% 72%,82% 69%,91% 77%,79% 87%,68% 83%,67% 72%);
+opacity:.82;filter:blur(.55px);transform:translate3d(-5%,0,0) scale(1.06);
+animation:cosmos-v077-continental-drift 85s ease-in-out infinite alternate;will-change:transform}
+.solar-earth:after{content:"";position:absolute;inset:-7% -12%;border-radius:50%;
+background:radial-gradient(ellipse 31% 5% at 31% 28%,rgba(247,252,255,.76),transparent 97%),
+radial-gradient(ellipse 34% 6% at 62% 45%,rgba(241,250,255,.65),transparent 97%),
+radial-gradient(ellipse 35% 5% at 39% 68%,rgba(250,253,255,.6),transparent 97%),
+radial-gradient(ellipse 24% 4% at 72% 76%,rgba(242,250,254,.52),transparent 97%);
+opacity:.87;filter:blur(.55px);transform:translate3d(3%,0,0) scale(1.05);
+animation:cosmos-v077-cloud-drift 31s ease-in-out infinite alternate;will-change:transform;pointer-events:none}
+@keyframes cosmos-v077-continental-drift{0%{transform:translate3d(-7%,0,0) scale(1.06)}100%{transform:translate3d(7%,0,0) scale(1.06)}}
+@keyframes cosmos-v077-cloud-drift{0%{transform:translate3d(7%,-1%,0) scale(1.05)}100%{transform:translate3d(-7%,2%,0) scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.solar-earth:before,.solar-earth:after{animation:none!important;will-change:auto!important}}
+
+/* v079 safety rollback: .solar-sun is a large visual plane, not the physical
+   solar disk. Never attach oversized pseudo-element flames to this plane.
+   Keep the v077 sun until geometry-local flames are implemented. */
+.solar-sun:before,.solar-sun:after{content:none!important;animation:none!important}
+.solar-sun{animation:none!important;filter:none!important;overflow:hidden!important}
+
+/* v080: Sun element is 440x440 but visible disk is only ~24% radius.
+   All surface effects are strictly contained inside a centered 43%-diameter
+   disk. Never apply full-element corona / pseudo-element effects. */
+.solar-sun{overflow:visible!important}
+.solar-sun:before{content:""!important;display:block!important;position:absolute!important;
+left:28.5%!important;top:28.5%!important;width:43%!important;height:43%!important;
+border-radius:50%!important;pointer-events:none!important;
+background:repeating-conic-gradient(from 12deg,
+rgba(255,244,191,.17) 0deg 9deg,rgba(149,51,14,.15) 11deg 19deg,
+rgba(255,180,67,.11) 21deg 32deg),
+radial-gradient(circle at 32% 29%,rgba(255,255,226,.28),transparent 38%),
+radial-gradient(circle at 70% 66%,rgba(177,51,15,.23),transparent 42%)!important;
+opacity:.56!important;filter:blur(1.1px)!important;
+mix-blend-mode:soft-light!important;
+animation:cosmos-v080-surface 38s linear infinite!important}
+.solar-sun:after{content:""!important;display:block!important;position:absolute!important;
+left:27%!important;top:27%!important;width:46%!important;height:46%!important;
+border-radius:50%!important;pointer-events:none!important;
+background:conic-gradient(from 4deg,
+transparent 0deg 27deg,rgba(255,166,60,.38) 30deg,transparent 36deg 105deg,
+rgba(255,197,95,.32) 110deg,transparent 118deg 193deg,
+rgba(255,113,28,.34) 199deg,transparent 208deg 288deg,
+rgba(255,199,105,.31) 294deg,transparent 301deg 360deg)!important;
+-webkit-mask:radial-gradient(circle,transparent 0 86%,#000 90% 94%,transparent 99%)!important;
+mask:radial-gradient(circle,transparent 0 86%,#000 90% 94%,transparent 99%)!important;
+opacity:.72!important;filter:blur(1.4px)!important;
+animation:cosmos-v080-rim 9s ease-in-out infinite alternate!important}
+@keyframes cosmos-v080-surface{to{transform:rotate(360deg)}}
+@keyframes cosmos-v080-rim{from{transform:rotate(-5deg) scale(1);opacity:.55}to{transform:rotate(6deg) scale(1.06);opacity:.85}}
+@media(prefers-reduced-motion:reduce){.solar-sun:before,.solar-sun:after{animation:none!important}}
+`;
+document.getElementById('cosmos').addEventListener('load',function(){try{const d=this.contentDocument;if(!d)return;const s=d.createElement('style');s.textContent=css;d.head.appendChild(s)}catch(e){console.error('COSMOS v080 enhancement unavailable',e)}});
+</script></body></html>
