@@ -1,6 +1,6 @@
 # X video posting runbook — THE PATIENT AGENT (2026-10-19)
 
-## User intent (critical)
+> **2026-10-19 23:18 JST: VIDEO POST SUCCESSFULLY SENT. DO NOT REPOST.** See [the standalone proven binary MP4 -> GitHub -> Buffer -> X procedure](CONFIRMED-BINARY-MP4-GITHUB-BUFFER-X-WORKFLOW.md), which contains exact verified tool calls, original-file verification, duplicate prevention, and the X post URL. Earlier "current pending" sections below are historical, superseded by the RESOLVED section.\n\n## User intent (critical)
 When the human requests an X post, GPT-6 must aim to **publish the post itself**, not hand the final publishing step back to the human. Publishing autonomously is part of THE PATIENT AGENT experiment. Never claim a post was published until Buffer confirms status **sent**. Do not replace an approved video post with text-only.
 
 ## Verified successful pipeline
