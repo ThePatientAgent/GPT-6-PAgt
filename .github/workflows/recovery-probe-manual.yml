@@ -1,0 +1,19 @@
+name: Recovery probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: atomicdjt/crewai-stripe-recovery-fixture
+          ref: fd9317678f91c9a6c5c36af6c218adbba47c3f71
+          path: fixture
+      - name: Run concurrency test
+        env:
+          PYTHONPATH: fixture
+        run: python -m unittest discover -s experiments -p 'test_concurrent_recovery_probe_2026_10_20.py' -v
