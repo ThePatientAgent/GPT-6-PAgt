@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v097 — Saturn Projection Alignment</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
+<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v075-earth-moon.html"></iframe>
+<script>
+/* Isolated visual experiment. Keep v075 and v076 untouched.
+   Two independently moving surface layers create parallax on the DOM sphere.
+   Animations are compositor transforms where possible; reduced motion respected. */
+const css=`
+.solar-sun{background:radial-gradient(circle at 46% 43%,rgba(255,252,225,.27),transparent 12%),radial-gradient(circle at 49% 50%,#fff6d5 0%,#f9dfab 6%,#e7ac64 13%,#bc6b38 19%,#713720 23%,transparent 24.5%),radial-gradient(circle at 50% 50%,rgba(255,186,97,.14),rgba(231,123,49,.08) 31%,transparent 65%)!important}
+.solar-earth{isolation:isolate;overflow:hidden!important;border-radius:50%!important;
+background:radial-gradient(circle at 29% 21%,rgba(159,223,250,.24),transparent 37%),radial-gradient(circle at 40% 40%,#258eb2 0%,#12658d 42%,#073456 77%,#03111f 100%)!important;
+box-shadow:inset -18px -8px 24px rgba(0,4,17,.85),inset 5px 5px 11px rgba(184,235,251,.25),0 0 9px rgba(64,148,210,.29)!important}
+.solar-earth:before{content:"";position:absolute;inset:-4% -13%;border-radius:50%;
+background:linear-gradient(118deg,#819b78 0%,#456e5b 26%,#8e8263 48%,#476d59 68%,#84997a 100%);
+clip-path:polygon(12% 13%,22% 9%,32% 15%,38% 25%,34% 34%,43% 39%,39% 48%,45% 55%,35% 63%,31% 80%,25% 71%,24% 58%,15% 48%,18% 34%,12% 23%,12% 13%,49% 18%,62% 13%,76% 23%,88% 34%,81% 43%,74% 50%,65% 55%,60% 45%,54% 42%,48% 30%,49% 18%,67% 72%,82% 69%,91% 77%,79% 87%,68% 83%,67% 72%);
+opacity:.82;filter:blur(.55px);transform:translate3d(-5%,0,0) scale(1.06);
+animation:cosmos-v077-continental-drift 85s ease-in-out infinite alternate;will-change:transform}
+.solar-earth:after{content:"";position:absolute;inset:-7% -12%;border-radius:50%;
+background:radial-gradient(ellipse 31% 5% at 31% 28%,rgba(247,252,255,.76),transparent 97%),
+radial-gradient(ellipse 34% 6% at 62% 45%,rgba(241,250,255,.65),transparent 97%),
+radial-gradient(ellipse 35% 5% at 39% 68%,rgba(250,253,255,.6),transparent 97%),
+radial-gradient(ellipse 24% 4% at 72% 76%,rgba(242,250,254,.52),transparent 97%);
+opacity:.87;filter:blur(.55px);transform:translate3d(3%,0,0) scale(1.05);
+animation:cosmos-v077-cloud-drift 31s ease-in-out infinite alternate;will-change:transform;pointer-events:none}
+@keyframes cosmos-v077-continental-drift{0%{transform:translate3d(-7%,0,0) scale(1.06)}100%{transform:translate3d(7%,0,0) scale(1.06)}}
+@keyframes cosmos-v077-cloud-drift{0%{transform:translate3d(7%,-1%,0) scale(1.05)}100%{transform:translate3d(-7%,2%,0) scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.solar-earth:before,.solar-earth:after{animation:none!important;will-change:auto!important}}
+
+/* v082: quiet, bounded photosphere. No conic gradients or pseudo-elements.
+   Original projection remains unchanged; the solar surface is a central disk. */
+.solar-sun{animation:none!important;filter:none!important;overflow:visible!important;
+background:
+radial-gradient(ellipse 8% 6% at 46% 44%,rgba(255,249,201,.29),transparent 95%),
+radial-gradient(ellipse 5% 3% at 53% 54%,rgba(135,49,20,.23),transparent 95%),
+radial-gradient(ellipse 9% 4% at 48% 57%,rgba(169,65,21,.20),transparent 95%),
+radial-gradient(ellipse 4% 8% at 43% 49%,rgba(255,229,136,.22),transparent 95%),
+radial-gradient(circle 72px at 50% 50%,#fff3c7 0%,#f8d48b 21%,#f2b55c 46%,#db7c32 70%,#a34c24 88%,#6d301a 99%,transparent 100%),
+radial-gradient(circle 91px at 50% 50%,rgba(255,146,51,.12) 0%,rgba(255,113,31,.07) 72%,transparent 100%)!important}
+.solar-sun:before,.solar-sun:after{content:none!important;display:none!important}
+
+/* v090: a single animated photosphere canvas, confined to the v082 disk.
+   Plasma texture is computed in solar-local coordinates, so it tracks the
+   existing 440px sprite projection and its zoom automatically. */
+.solar-sun .cosmos-v090-surface{position:absolute;left:148px;top:148px;width:144px;height:144px;border-radius:50%;pointer-events:none;opacity:.87}
+@media(prefers-reduced-motion:reduce){.solar-sun .cosmos-v090-surface{opacity:.7}}
+
+/* v096: canvas-rendered Saturn is attached to the projected Saturn label.
+   Existing legacy Saturn art is retained until the new projection is verified. */
+.cosmos-v096-saturn{position:absolute;width:156px;height:108px;pointer-events:none;z-index:7;transform:translate(-50%,-50%);opacity:0;filter:drop-shadow(0 0 5px rgba(224,194,137,.18))}
+`;
+document.getElementById('cosmos').addEventListener('load',function(){try{const d=this.contentDocument;if(!d)return;const s=d.createElement('style');s.textContent=css;d.head.appendChild(s);const satLabel=[...d.querySelectorAll('.solar-planet-label')].find(e=>e.textContent.trim()==='SATURN');if(satLabel){const layer=d.createElement('canvas');layer.className='cosmos-v096-saturn';layer.width=312;layer.height=216;satLabel.parentElement.appendChild(layer);const g=layer.getContext('2d');if(g){const W=312,H=216,cx=156,cy=108;function ring(front){g.save();g.translate(cx,cy);g.rotate(-.28);g.scale(1,.36);for(let k=0;k<28;k++){const radius=80+k*2.2;if(radius>132)break;const gap=(k===9||k===10||k===21);if(gap)continue;g.beginPath();g.ellipse(0,0,radius,radius,0,front?0:Math.PI,front?Math.PI:2*Math.PI);g.strokeStyle=k%5===0?'rgba(106,89,74,.68)':k%3===0?'rgba(248,227,176,.78)':'rgba(199,175,135,.68)';g.lineWidth=k%4===0?2.1:1.3;g.stroke()}g.restore()}ring(false);const rad=49;const img=g.createImageData(rad*2,rad*2);for(let y=0;y<rad*2;y++)for(let x=0;x<rad*2;x++){const nx=(x-rad+.5)/rad,ny=(y-rad+.5)/rad,rr=nx*nx+ny*ny;if(rr>=1)continue;const z=Math.sqrt(1-rr),lat=ny+.032*Math.sin(nx*15);const stripe=Math.sin(lat*48+1.1*Math.sin(lat*18))*.10+Math.sin(lat*97)*.037;const illumination=Math.max(.12,.29+.72*(z*.79-nx*.45-ny*.12));const i=(y*rad*2+x)*4;img.data[i]=Math.min(255,(211+stripe*120)*illumination);img.data[i+1]=Math.min(255,(185+stripe*95)*illumination);img.data[i+2]=Math.min(255,(142+stripe*70)*illumination);img.data[i+3]=255}g.putImageData(img,cx-rad,cy-rad);ring(true);let prior=0;function follow(t){if(!layer.isConnected)return;if(t-prior>70){prior=t;const sats=d.querySelectorAll('.local-satellite');const oldSat=sats[1],oldRing=d.querySelector('.solar-saturn-ring');if(oldSat){const op=Number(d.defaultView.getComputedStyle(satLabel).opacity)||0;const oldOpacity=Number(oldSat.style.opacity)||0;const rect=oldSat.getBoundingClientRect(),parentRect=layer.parentElement.getBoundingClientRect();const size=rect.width;const show=op>.06&&oldOpacity>.06&&size>6;layer.style.left=(rect.left-parentRect.left+rect.width/2)+'px';layer.style.top=(rect.top-parentRect.top+rect.height/2)+'px';layer.style.width=(size*312/98)+'px';layer.style.height=(size*216/98)+'px';layer.style.zIndex=oldSat.style.zIndex||'4';layer.style.opacity=show?Math.min(.98,oldOpacity):0;oldSat.style.visibility=show?'hidden':'';if(oldRing)oldRing.style.visibility=show?'hidden':''}}d.defaultView.requestAnimationFrame(follow)}d.defaultView.requestAnimationFrame(follow)}}const sun=d.querySelector('.solar-sun');if(sun&&!sun.querySelector('.cosmos-v090-surface')){const cv=d.createElement('canvas');cv.className='cosmos-v090-surface';cv.width=144;cv.height=144;sun.appendChild(cv);const ctx=cv.getContext('2d',{alpha:true});if(ctx){const image=ctx.createImageData(144,144);const pixels=image.data;let last=0;const reduced=d.defaultView.matchMedia('(prefers-reduced-motion: reduce)');function draw(t){if(!cv.isConnected)return;if(t-last>65){last=t;const tm=reduced.matches?0:t*.00065;for(let y=0;y<144;y++){for(let x=0;x<144;x++){const dx=(x-71.5)/71.5,dy=(y-71.5)/71.5,r2=dx*dx+dy*dy,idx=(y*144+x)*4;if(r2>=.98){pixels[idx+3]=0;continue}const z=Math.sqrt(1-r2);const wx=dx+.045*Math.sin(dy*12+tm*1.7)+.025*Math.cos(dx*17-tm*1.2),wy=dy+.045*Math.cos(dx*11-tm*1.4)+.025*Math.sin(dy*19+tm);const gx=wx*17,gy=wy*17;const ix=Math.floor(gx),iy=Math.floor(gy);let nearest=10,second=10,phase=0;for(let oy=-1;oy<=1;oy++){for(let ox=-1;ox<=1;ox++){const cx=ix+ox,cy=iy+oy;const seed=Math.sin(cx*127.1+cy*311.7)*43758.5453;const seed2=Math.sin(cx*269.5+cy*183.3)*12451.716;const birth=(seed-Math.floor(seed))*6.28318;const age=tm*1.15+birth;const life=.5+.5*Math.sin(age);const growth=.56+.50*life;const jx=(seed-Math.floor(seed)-.5)*.72+.10*Math.sin(age*.67),jy=(seed2-Math.floor(seed2)-.5)*.72+.10*Math.cos(age*.81);const ddx=(gx-(cx+.5+jx))/growth,ddy=(gy-(cy+.5+jy))/growth;const dist=(ddx*ddx+ddy*ddy)+.24*(1-life);if(dist<nearest){second=nearest;nearest=dist;phase=seed}else if(dist<second){second=dist}}}const wall=Math.exp(-Math.max(0,second-nearest)*7);const cell=Math.exp(-nearest*1.65);const fine=Math.sin(wx*77+Math.sin(wy*51+tm*2)*1.8+tm*3.3)*Math.sin(wy*83-wx*23-tm*2.8);const slow=Math.sin(wx*9+Math.cos(wy*11+tm)*1.6+tm*.7);const turbulence=(cell*.8-wall*.75+fine*.16+slow*.16-.18);const limb=Math.pow(z,.52);const hot=Math.max(0,turbulence*.85+.5);const dark=Math.max(0,-turbulence*1.3);const edge=Math.min(1,(1-r2)*24);pixels[idx]=Math.min(255,197+49*limb+17*hot-29*dark);pixels[idx+1]=Math.min(255,91+99*limb+63*hot-42*dark);pixels[idx+2]=Math.min(255,31+54*limb+51*hot-19*dark);pixels[idx+3]=Math.round(edge*(.38+.33*limb)*255)}}ctx.putImageData(image,0,0)}d.defaultView.requestAnimationFrame(draw)}d.defaultView.requestAnimationFrame(draw)}}}catch(e){console.error('COSMOS v077 enhancement unavailable',e)}});
+</script></body></html>
