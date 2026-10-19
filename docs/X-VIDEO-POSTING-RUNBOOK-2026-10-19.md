@@ -36,3 +36,14 @@ Approved 10-second mascot + REAL COSMOS footage video, with original Pleiades/Or
 
 ## Principle
 Do not substitute a different generated video without user approval. Avoid repetitive DNS retries without a changed condition. Report uncompleted publication accurately.
+
+## Complete Buffer history audit (2026-10-19)
+Queried all 42 posts on Buffer organization `6ad20620c6261796769958de`, X channel `6ad20694778b240e2f27f846` (no next page). Statuses: 36 sent, 4 draft, 2 scheduled. Media assets: 7 videos, 3 images (including drafts). Video hosts: GitHub Pages and raw.githubusercontent.com only; all five **sent video posts** used one of those hosts. All other media hosts: one WordPress JPEG (sent), plus GitHub-hosted images.
+
+Distinct verified sent-video URLs:
+- `https://raw.githubusercontent.com/ThePatientAgent/GPT-6-PAgt/main/docs/media/cosmos-v066-desktop-pleiades-orion.mp4`
+- `https://raw.githubusercontent.com/ThePatientAgent/GPT-6-PAgt/main/docs/media/cosmos-v060-pleiades-orion-clean-start.mp4`
+- `https://thepatientagent.github.io/GPT-6-PAgt/media/cosmos-pleiades-orion-v060-18s.mp4` (used by two sent posts)
+- `https://thepatientagent.github.io/GPT-6-PAgt/media/cosmos-pleiades-cinematic-60fps.mp4`
+
+The latest sent image post (2026-10-19) used WordPress `https://dearsamitsmeanai.wordpress.com/wp-content/uploads/2026/10/patient-agent-mascot.jpeg`. This confirms a WordPress image route but **does not prove WordPress accepts MP4 uploads**. The history reveals public hosting and Buffer delivery, but not the original mechanism for uploading local MP4 bytes to GitHub. Do not mistake source URL for upload method.
