@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v089 — Magnetic Loops</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
+<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v075-earth-moon.html"></iframe>
+<script>
+/* Isolated visual experiment. Keep v075 and v076 untouched.
+   Two independently moving surface layers create parallax on the DOM sphere.
+   Animations are compositor transforms where possible; reduced motion respected. */
+const css=`
+.solar-sun{background:radial-gradient(circle at 46% 43%,rgba(255,252,225,.27),transparent 12%),radial-gradient(circle at 49% 50%,#fff6d5 0%,#f9dfab 6%,#e7ac64 13%,#bc6b38 19%,#713720 23%,transparent 24.5%),radial-gradient(circle at 50% 50%,rgba(255,186,97,.14),rgba(231,123,49,.08) 31%,transparent 65%)!important}
+.solar-earth{isolation:isolate;overflow:hidden!important;border-radius:50%!important;
+background:radial-gradient(circle at 29% 21%,rgba(159,223,250,.24),transparent 37%),radial-gradient(circle at 40% 40%,#258eb2 0%,#12658d 42%,#073456 77%,#03111f 100%)!important;
+box-shadow:inset -18px -8px 24px rgba(0,4,17,.85),inset 5px 5px 11px rgba(184,235,251,.25),0 0 9px rgba(64,148,210,.29)!important}
+.solar-earth:before{content:"";position:absolute;inset:-4% -13%;border-radius:50%;
+background:linear-gradient(118deg,#819b78 0%,#456e5b 26%,#8e8263 48%,#476d59 68%,#84997a 100%);
+clip-path:polygon(12% 13%,22% 9%,32% 15%,38% 25%,34% 34%,43% 39%,39% 48%,45% 55%,35% 63%,31% 80%,25% 71%,24% 58%,15% 48%,18% 34%,12% 23%,12% 13%,49% 18%,62% 13%,76% 23%,88% 34%,81% 43%,74% 50%,65% 55%,60% 45%,54% 42%,48% 30%,49% 18%,67% 72%,82% 69%,91% 77%,79% 87%,68% 83%,67% 72%);
+opacity:.82;filter:blur(.55px);transform:translate3d(-5%,0,0) scale(1.06);
+animation:cosmos-v077-continental-drift 85s ease-in-out infinite alternate;will-change:transform}
+.solar-earth:after{content:"";position:absolute;inset:-7% -12%;border-radius:50%;
+background:radial-gradient(ellipse 31% 5% at 31% 28%,rgba(247,252,255,.76),transparent 97%),
+radial-gradient(ellipse 34% 6% at 62% 45%,rgba(241,250,255,.65),transparent 97%),
+radial-gradient(ellipse 35% 5% at 39% 68%,rgba(250,253,255,.6),transparent 97%),
+radial-gradient(ellipse 24% 4% at 72% 76%,rgba(242,250,254,.52),transparent 97%);
+opacity:.87;filter:blur(.55px);transform:translate3d(3%,0,0) scale(1.05);
+animation:cosmos-v077-cloud-drift 31s ease-in-out infinite alternate;will-change:transform;pointer-events:none}
+@keyframes cosmos-v077-continental-drift{0%{transform:translate3d(-7%,0,0) scale(1.06)}100%{transform:translate3d(7%,0,0) scale(1.06)}}
+@keyframes cosmos-v077-cloud-drift{0%{transform:translate3d(7%,-1%,0) scale(1.05)}100%{transform:translate3d(-7%,2%,0) scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.solar-earth:before,.solar-earth:after{animation:none!important;will-change:auto!important}}
+
+/* v082: quiet, bounded photosphere. No conic gradients or pseudo-elements.
+   Original projection remains unchanged; the solar surface is a central disk. */
+.solar-sun{animation:none!important;filter:none!important;overflow:visible!important;
+background:
+radial-gradient(ellipse 8% 6% at 46% 44%,rgba(255,249,201,.29),transparent 95%),
+radial-gradient(ellipse 5% 3% at 53% 54%,rgba(135,49,20,.23),transparent 95%),
+radial-gradient(ellipse 9% 4% at 48% 57%,rgba(169,65,21,.20),transparent 95%),
+radial-gradient(ellipse 4% 8% at 43% 49%,rgba(255,229,136,.22),transparent 95%),
+radial-gradient(circle 72px at 50% 50%,#fff3c7 0%,#f8d48b 21%,#f2b55c 46%,#db7c32 70%,#a34c24 88%,#6d301a 99%,transparent 100%),
+radial-gradient(circle 91px at 50% 50%,rgba(255,146,51,.12) 0%,rgba(255,113,31,.07) 72%,transparent 100%)!important}
+.solar-sun:before,.solar-sun:after{content:none!important;display:none!important}
+
+/* v088: curved plasma arcs drawn with thin luminous SVG paths.
+   No polygons, radial spokes or whole-sprite animation. */
+.solar-sun .cosmos-v088-arcs{position:absolute;inset:0;width:440px;height:440px;pointer-events:none;overflow:visible}
+.solar-sun .cosmos-v088-arc{fill:none;stroke-linecap:round;stroke-linejoin:round;transform-origin:220px 220px;filter:drop-shadow(0 0 2px rgba(255,111,25,.8))}
+.solar-sun .cosmos-v088-arc.outer{stroke:#f66c25;stroke-width:3;opacity:.7;stroke-dasharray:140;stroke-dashoffset:140;animation:cosmos-v088-flow 6s ease-in-out infinite}
+.solar-sun .cosmos-v088-arc.inner{stroke:#ffdf83;stroke-width:1.3;opacity:.75;stroke-dasharray:140;stroke-dashoffset:140;animation:cosmos-v088-flow 6s ease-in-out infinite}
+.solar-sun .cosmos-v088-arc.p2{animation-delay:-2.7s;animation-duration:7.4s}
+.solar-sun .cosmos-v088-arc.p3{animation-delay:-4.1s;animation-duration:5.8s}
+@keyframes cosmos-v088-flow{0%{stroke-dashoffset:140;opacity:0}30%{stroke-dashoffset:50;opacity:.85}65%{stroke-dashoffset:0;opacity:.8}100%{stroke-dashoffset:-140;opacity:0}}
+@media(prefers-reduced-motion:reduce){.solar-sun .cosmos-v088-arc{animation:none!important;stroke-dashoffset:0!important;opacity:.55!important}}
+
+/* v089: magnetic loops with both feet anchored on the 72px solar limb.
+   Layered strands replace isolated open-ended arcs. */
+.solar-sun .cosmos-v088-arcs{opacity:0!important}
+.solar-sun .cosmos-v089-loops{position:absolute;inset:0;width:440px;height:440px;pointer-events:none;overflow:visible}
+.solar-sun .cosmos-v089-strand{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:180;stroke-dashoffset:180;animation:cosmos-v089-stream 5.8s ease-in-out infinite;filter:drop-shadow(0 0 3px rgba(255,111,25,.65))}
+.solar-sun .cosmos-v089-strand.core{stroke:#ffe9a2;stroke-width:1.3}
+.solar-sun .cosmos-v089-strand.halo{stroke:#ff742c;stroke-width:5;opacity:.55;filter:blur(2px)}
+.solar-sun .cosmos-v089-strand.side{stroke:#ffad4d;stroke-width:1.5;opacity:.7}
+.solar-sun .cosmos-v089-strand.l2{animation-delay:-2.2s;animation-duration:7.1s}
+.solar-sun .cosmos-v089-strand.l3{animation-delay:-3.8s;animation-duration:6.4s}
+@keyframes cosmos-v089-stream{0%{stroke-dashoffset:180;opacity:.04}28%{stroke-dashoffset:95;opacity:.95}70%{stroke-dashoffset:0;opacity:.85}100%{stroke-dashoffset:-180;opacity:.05}}
+.solar-sun .cosmos-v089-foot{fill:#ffdb83;opacity:.45;filter:blur(3px);animation:cosmos-v089-foot-pulse 4s ease-in-out infinite alternate}
+@keyframes cosmos-v089-foot-pulse{from{opacity:.18;r:3}to{opacity:.85;r:6}}
+@media(prefers-reduced-motion:reduce){.solar-sun .cosmos-v089-strand,.solar-sun .cosmos-v089-foot{animation:none!important;stroke-dashoffset:0!important}}
+`;
+document.getElementById('cosmos').addEventListener('load',function(){try{const d=this.contentDocument;if(!d)return;const s=d.createElement('style');s.textContent=css;d.head.appendChild(s);const sun=d.querySelector('.solar-sun');if(sun&&!sun.querySelector('.cosmos-v088-arcs')){const ns='http://www.w3.org/2000/svg';const svg=d.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 440 440');svg.setAttribute('class','cosmos-v088-arcs');const paths=[['M 155 187 C 119 127 194 108 202 151','p1'],['M 249 151 C 266 102 328 143 281 185','p2'],['M 266 276 C 315 322 338 246 288 236','p3']];for(const [path,id] of paths){for(const kind of ['outer','inner']){const el=d.createElementNS(ns,'path');el.setAttribute('d',path);el.setAttribute('class','cosmos-v088-arc '+kind+' '+id);svg.appendChild(el)}}sun.appendChild(svg)}if(sun&&!sun.querySelector('.cosmos-v089-loops')){const ns='http://www.w3.org/2000/svg';const svg=d.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 440 440');svg.setAttribute('class','cosmos-v089-loops');const loops=[{p:'M 166 172 C 118 116 188 96 222 148',feet:[[166,172],[222,148]]},{p:'M 248 154 C 289 101 341 158 285 190',feet:[[248,154],[285,190]]},{p:'M 264 278 C 337 312 341 231 290 237',feet:[[264,278],[290,237]]}];for(let i=0;i<loops.length;i++){const l=loops[i];for(const kind of ['halo','side','core']){const path=d.createElementNS(ns,'path');path.setAttribute('d',l.p);path.setAttribute('class','cosmos-v089-strand '+kind+' l'+(i+1));if(kind==='side')path.setAttribute('transform','translate(2 -2)');svg.appendChild(path)}for(const [x,y] of l.feet){const foot=d.createElementNS(ns,'circle');foot.setAttribute('cx',x);foot.setAttribute('cy',y);foot.setAttribute('r',4);foot.setAttribute('class','cosmos-v089-foot');svg.appendChild(foot)}}sun.appendChild(svg)}}catch(e){console.error('COSMOS v077 enhancement unavailable',e)}});
+</script></body></html>
