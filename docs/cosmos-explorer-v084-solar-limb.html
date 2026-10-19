@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v084 — Solar Limb</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
+<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v075-earth-moon.html"></iframe>
+<script>
+/* Isolated visual experiment. Keep v075 and v076 untouched.
+   Two independently moving surface layers create parallax on the DOM sphere.
+   Animations are compositor transforms where possible; reduced motion respected. */
+const css=`
+.solar-sun{background:radial-gradient(circle at 46% 43%,rgba(255,252,225,.27),transparent 12%),radial-gradient(circle at 49% 50%,#fff6d5 0%,#f9dfab 6%,#e7ac64 13%,#bc6b38 19%,#713720 23%,transparent 24.5%),radial-gradient(circle at 50% 50%,rgba(255,186,97,.14),rgba(231,123,49,.08) 31%,transparent 65%)!important}
+.solar-earth{isolation:isolate;overflow:hidden!important;border-radius:50%!important;
+background:radial-gradient(circle at 29% 21%,rgba(159,223,250,.24),transparent 37%),radial-gradient(circle at 40% 40%,#258eb2 0%,#12658d 42%,#073456 77%,#03111f 100%)!important;
+box-shadow:inset -18px -8px 24px rgba(0,4,17,.85),inset 5px 5px 11px rgba(184,235,251,.25),0 0 9px rgba(64,148,210,.29)!important}
+.solar-earth:before{content:"";position:absolute;inset:-4% -13%;border-radius:50%;
+background:linear-gradient(118deg,#819b78 0%,#456e5b 26%,#8e8263 48%,#476d59 68%,#84997a 100%);
+clip-path:polygon(12% 13%,22% 9%,32% 15%,38% 25%,34% 34%,43% 39%,39% 48%,45% 55%,35% 63%,31% 80%,25% 71%,24% 58%,15% 48%,18% 34%,12% 23%,12% 13%,49% 18%,62% 13%,76% 23%,88% 34%,81% 43%,74% 50%,65% 55%,60% 45%,54% 42%,48% 30%,49% 18%,67% 72%,82% 69%,91% 77%,79% 87%,68% 83%,67% 72%);
+opacity:.82;filter:blur(.55px);transform:translate3d(-5%,0,0) scale(1.06);
+animation:cosmos-v077-continental-drift 85s ease-in-out infinite alternate;will-change:transform}
+.solar-earth:after{content:"";position:absolute;inset:-7% -12%;border-radius:50%;
+background:radial-gradient(ellipse 31% 5% at 31% 28%,rgba(247,252,255,.76),transparent 97%),
+radial-gradient(ellipse 34% 6% at 62% 45%,rgba(241,250,255,.65),transparent 97%),
+radial-gradient(ellipse 35% 5% at 39% 68%,rgba(250,253,255,.6),transparent 97%),
+radial-gradient(ellipse 24% 4% at 72% 76%,rgba(242,250,254,.52),transparent 97%);
+opacity:.87;filter:blur(.55px);transform:translate3d(3%,0,0) scale(1.05);
+animation:cosmos-v077-cloud-drift 31s ease-in-out infinite alternate;will-change:transform;pointer-events:none}
+@keyframes cosmos-v077-continental-drift{0%{transform:translate3d(-7%,0,0) scale(1.06)}100%{transform:translate3d(7%,0,0) scale(1.06)}}
+@keyframes cosmos-v077-cloud-drift{0%{transform:translate3d(7%,-1%,0) scale(1.05)}100%{transform:translate3d(-7%,2%,0) scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.solar-earth:before,.solar-earth:after{animation:none!important;will-change:auto!important}}
+
+/* v082: quiet, bounded photosphere. No conic gradients or pseudo-elements.
+   Original projection remains unchanged; the solar surface is a central disk. */
+.solar-sun{animation:none!important;filter:none!important;overflow:visible!important;
+background:
+radial-gradient(ellipse 8% 6% at 46% 44%,rgba(255,249,201,.29),transparent 95%),
+radial-gradient(ellipse 5% 3% at 53% 54%,rgba(135,49,20,.23),transparent 95%),
+radial-gradient(ellipse 9% 4% at 48% 57%,rgba(169,65,21,.20),transparent 95%),
+radial-gradient(ellipse 4% 8% at 43% 49%,rgba(255,229,136,.22),transparent 95%),
+radial-gradient(circle 72px at 50% 50%,#fff3c7 0%,#f8d48b 21%,#f2b55c 46%,#db7c32 70%,#a34c24 88%,#6d301a 99%,transparent 100%),
+radial-gradient(circle 91px at 50% 50%,rgba(255,146,51,.12) 0%,rgba(255,113,31,.07) 72%,transparent 100%)!important}
+.solar-sun:before,.solar-sun:after{content:none!important;display:none!important}
+
+/* v083: gentle convection confined to the existing 144px photosphere.
+   Avoid conic gradients, whole-sprite filters and unbounded corona. */
+.solar-sun:before{content:""!important;display:block!important;position:absolute!important;
+left:calc(50% - 70px)!important;top:calc(50% - 70px)!important;
+width:140px!important;height:140px!important;border-radius:50%!important;
+background:
+radial-gradient(ellipse 17% 11% at 30% 35%,rgba(255,241,168,.23),transparent 98%),
+radial-gradient(ellipse 13% 17% at 64% 31%,rgba(154,60,21,.18),transparent 98%),
+radial-gradient(ellipse 20% 12% at 56% 65%,rgba(255,230,135,.21),transparent 98%),
+radial-gradient(ellipse 11% 16% at 29% 71%,rgba(146,51,19,.16),transparent 98%)!important;
+opacity:.6!important;filter:blur(2px)!important;pointer-events:none!important;
+animation:cosmos-v083-convection 19s ease-in-out infinite alternate!important}
+.solar-sun:after{content:none!important;display:none!important}
+@keyframes cosmos-v083-convection{
+0%{transform:translate3d(-3px,2px,0) scale(.98);opacity:.38}
+47%{transform:translate3d(2px,-3px,0) scale(1.01);opacity:.65}
+100%{transform:translate3d(-1px,3px,0) scale(1.02);opacity:.45}}
+@media(prefers-reduced-motion:reduce){.solar-sun:before{animation:none!important}}
+
+/* v084: tiny, limb-bound prominences. The actual disk has a radius of 72px
+   within the 440px projection sprite. No full-screen flare or conic spokes.
+   Brightness and size intentionally limited to preserve the v082 silhouette. */
+.solar-sun:after{
+content:""!important;display:block!important;position:absolute!important;
+left:calc(50% - 78px)!important;top:calc(50% - 78px)!important;
+width:156px!important;height:156px!important;border-radius:50%!important;
+pointer-events:none!important;
+background:
+radial-gradient(ellipse 9px 15px at 7px 71px,rgba(255,172,65,.43),transparent 95%),
+radial-gradient(ellipse 12px 7px at 110px 9px,rgba(255,206,104,.43),transparent 95%),
+radial-gradient(ellipse 7px 13px at 148px 98px,rgba(255,130,45,.39),transparent 95%),
+radial-gradient(ellipse 14px 8px at 58px 150px,rgba(255,167,72,.37),transparent 95%)!important;
+filter:blur(1.8px)!important;opacity:.68!important;
+animation:cosmos-v084-limb 11s ease-in-out infinite alternate!important;
+}
+@keyframes cosmos-v084-limb{
+0%{transform:rotate(-3deg) scale(.98);opacity:.42}
+50%{transform:rotate(2deg) scale(1.01);opacity:.76}
+100%{transform:rotate(4deg) scale(1.02);opacity:.52}
+}
+@media(prefers-reduced-motion:reduce){.solar-sun:after{animation:none!important}}
+`;
+document.getElementById('cosmos').addEventListener('load',function(){try{const d=this.contentDocument;if(!d)return;const s=d.createElement('style');s.textContent=css;d.head.appendChild(s)}catch(e){console.error('COSMOS v084 enhancement unavailable',e)}});
+</script></body></html>
