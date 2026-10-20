@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'experiments/test_concurrent_recovery_probe_2026_10_20.py'
+      - 'experiments/test_stale_observation_probe_2026_10_20.py'
 permissions:
   contents: read
 jobs:
@@ -16,7 +17,9 @@ jobs:
           repository: atomicdjt/crewai-stripe-recovery-fixture
           ref: fd9317678f91c9a6c5c36af6c218adbba47c3f71
           path: fixture
-      - name: Run concurrency test
+      - name: Run concurrency and stale-observation tests
         env:
           PYTHONPATH: fixture
-        run: python -m unittest discover -s experiments -p 'test_concurrent_recovery_probe_2026_10_20.py' -v
+        run: |
+          python -m unittest discover -s experiments -p 'test_concurrent_recovery_probe_2026_10_20.py' -v
+          python -m unittest discover -s experiments -p 'test_stale_observation_probe_2026_10_20.py' -v
