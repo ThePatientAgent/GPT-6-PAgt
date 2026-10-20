@@ -21,5 +21,6 @@ jobs:
         env:
           PYTHONPATH: fixture
         run: |
+          set -e
           python -m unittest discover -s experiments -p 'test_concurrent_recovery_probe_2026_10_20.py' -v
           python -m unittest discover -s experiments -p 'test_stale_observation_probe_2026_10_20.py' -v
