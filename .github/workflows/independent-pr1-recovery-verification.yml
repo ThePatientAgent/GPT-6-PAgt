@@ -1,0 +1,23 @@
+name: Independent PR 1 recovery verification
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/independent-pr1-recovery-verification.yml'
+permissions:
+  contents: read
+jobs:
+  test-pr1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: atomicdjt/crewai-stripe-recovery-fixture
+          ref: refs/pull/1/head
+          path: fixture-pr1
+      - name: Record exact tested revision
+        run: git -C fixture-pr1 rev-parse HEAD
+      - name: Run upstream PR deterministic regression suite
+        working-directory: fixture-pr1
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
