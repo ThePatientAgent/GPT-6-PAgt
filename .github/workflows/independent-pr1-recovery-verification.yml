@@ -6,6 +6,7 @@ on:
       - '.github/workflows/independent-pr1-recovery-verification.yml'
       - 'experiments/test_pr1_claim_fencing_2026_10_20.py'
       - 'experiments/test_pr1_window_expiry_active_owner_2026_10_20.py'
+      - 'experiments/test_pr1_lease_takeover_late_positive_2026_10_20.py'
 permissions:
   contents: read
 jobs:
@@ -33,3 +34,8 @@ jobs:
         env:
           PYTHONPATH: fixture-pr1
         run: python -m unittest discover -s experiments -p 'test_pr1_window_expiry_active_owner_2026_10_20.py' -v
+
+      - name: Verify late positive evidence after lease takeover
+        env:
+          PYTHONPATH: fixture-pr1
+        run: python -m unittest discover -s experiments -p 'test_pr1_lease_takeover_late_positive_2026_10_20.py' -v
