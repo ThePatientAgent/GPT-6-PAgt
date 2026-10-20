@@ -1,7 +1,7 @@
-"""Characterization test: expiry while an earlier dispatch lease is active.
+"""Independent regression: original idempotency window vs active dispatch lease.
 
-This test documents current PR #1 behavior; it does not assert that the
-projection is a defect. Run against atomicdjt PR #1 operation_journal.py.
+PR #1 revision 4fc1009 preserves a live owner on refusal, then clears
+expired ownership when both the original window and lease have expired.
 """
 import os
 import tempfile
@@ -19,7 +19,7 @@ class NoGatewayCalls:
 
 
 class ActiveOwnerWindowExpiryTest(unittest.TestCase):
-    def test_expiry_changes_projection_but_preserves_active_lease(self):
+    def test_expired_window_preserves_live_owner_then_clears_expired_lease(self):
         tmp = tempfile.NamedTemporaryFile(delete=False)
         path = tmp.name
         tmp.close()
@@ -44,13 +44,30 @@ class ActiveOwnerWindowExpiryTest(unittest.TestCase):
                 "SELECT state,dispatch_owner_token,dispatch_lease_expires_at "
                 "FROM operations WHERE operation_id='window-owner'"
             ).fetchone()
-            # Characterize the currently observed code path, not an agreed invariant.
-            self.assertEqual(result.state, EffectState.UNKNOWN)
+            # A window refusal must not demote a still-active owner.
+            self.assertEqual(result.state, EffectState.DISPATCHING)
+            self.assertEqual(after["state"], EffectState.DISPATCHING.value)
             self.assertEqual(after["dispatch_owner_token"], token)
             self.assertEqual(after["dispatch_lease_expires_at"],
                              before["dispatch_lease_expires_at"])
             self.assertIsNone(first.claim_retry_dispatch(
                 "window-owner", idempotency_window_seconds=3600))
+
+            # Expire only the lease; the original idempotency window was
+            # already zero. A subsequent refusal can now project UNKNOWN.
+            first.db.execute(
+                "UPDATE operations SET dispatch_lease_expires_at=? "
+                "WHERE operation_id='window-owner'", (time.time() - 10,))
+            first.db.commit()
+            later = boundary.recover("window-owner")
+            final = first.db.execute(
+                "SELECT state,dispatch_owner_token,dispatch_lease_expires_at "
+                "FROM operations WHERE operation_id='window-owner'"
+            ).fetchone()
+            self.assertEqual(later.state, EffectState.UNKNOWN)
+            self.assertEqual(final["state"], EffectState.UNKNOWN.value)
+            self.assertIsNone(final["dispatch_owner_token"])
+            self.assertIsNone(final["dispatch_lease_expires_at"])
         finally:
             if first is not None:
                 first.db.close()
