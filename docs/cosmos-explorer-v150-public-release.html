@@ -403,7 +403,7 @@ try {
       if(glide){d.defaultView.cancelAnimationFrame(glide);glide=null;}
       const p=center();
       drag={id:t.identifier,offsetX:t.clientX-p.x,offsetY:t.clientY-p.y,x:t.clientX,y:t.clientY,last:performance.now(),vx:0,vy:0};
-      status.textContent='v150 JUPITER CAPTURED';
+      
       e.preventDefault();e.stopImmediatePropagation();
     },{capture:true,passive:false});
     d.addEventListener('touchmove',e=>{
@@ -415,16 +415,16 @@ try {
       drag.vy=.7*drag.vy+.3*(t.clientY-drag.y)/dt;
       drag.x=t.clientX;drag.y=t.clientY;drag.last=now;
       anchor(t.clientX,t.clientY);
-      status.textContent='v150 JUPITER DRAG';
+      
       e.preventDefault();e.stopImmediatePropagation();
     },{capture:true,passive:false});
     for(const name of ['touchend','touchcancel'])d.addEventListener(name,e=>{
       if(!drag||[...e.touches].some(t=>t.identifier===drag.id))return;
       const v=drag;drag=null;
       const speed=Math.hypot(v.vx,v.vy);
-      if(name==='touchcancel'||speed<.08){status.textContent='v150 Jupiter released';return;}
+      if(name==='touchcancel'||speed<.08){return;}
       let vx=Math.max(-.65,Math.min(.65,v.vx)),vy=Math.max(-.65,Math.min(.65,v.vy)),last=performance.now(),elapsed=0;
-      status.textContent='v150 Jupiter gliding';
+      
       const step=now=>{
         const dt=Math.min(32,now-last);last=now;elapsed+=dt;
         const friction=Math.pow(.90,dt/16);
@@ -432,7 +432,7 @@ try {
         jupiterImage.style.translate=ox+'px '+oy+'px';
         vx*=friction;vy*=friction;
         if(elapsed<650&&Math.hypot(vx,vy)>.025)glide=d.defaultView.requestAnimationFrame(step);
-        else{glide=null;status.textContent='v150 Jupiter settled';}
+        else{glide=null;}
       };
       glide=d.defaultView.requestAnimationFrame(step);
     },{capture:true,passive:true});
@@ -455,9 +455,9 @@ try {
       jupiterImage.src=textureUrl;
       jupiterImage.style.objectFit='fill';
       jupiterImage.style.imageRendering='auto';
-      mars.textContent='JUPITER ✓';
+      mars.textContent='JUPITER';
     };
-    probe.onerror=()=>{mars.textContent='JUPITER !';};
+    probe.onerror=()=>{mars.textContent='JUPITER';};
     probe.src=textureUrl;
     planets[2].style.filter='drop-shadow(0 0 7px rgba(219,165,117,.35))';
     planets[2].style.scale='1.32'; // independent of journey's inline transform; no per-frame work
