@@ -88,6 +88,13 @@ try {
  d.body.appendChild(menu);
 }catch(error){console.warn('v150 compact UI unavailable',error)}
 
+/* Remove any leftover Jupiter drag diagnostic badge from earlier builds. */
+try {
+ const cleanup=d.createElement('style');
+ cleanup.textContent='[style*="z-index:2147483647"][style*="monospace"]{display:none!important}';
+ d.head.appendChild(cleanup);
+}catch(e){}
+
 /* v150: replace the painted Sirius card with a luminous stellar photosphere.
    Existing world projection is preserved; only Sirius uses this treatment. */
 try{
