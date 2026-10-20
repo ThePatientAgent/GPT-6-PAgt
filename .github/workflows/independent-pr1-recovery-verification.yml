@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/independent-pr1-recovery-verification.yml'
+      - 'experiments/test_pr1_claim_fencing_2026_10_20.py'
 permissions:
   contents: read
 jobs:
@@ -21,3 +22,8 @@ jobs:
       - name: Run upstream PR deterministic regression suite
         working-directory: fixture-pr1
         run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Run our independent fencing and stale-evidence regressions
+        env:
+          PYTHONPATH: fixture-pr1
+        run: python -m unittest discover -s experiments -p 'test_pr1_claim_fencing_2026_10_20.py' -v
