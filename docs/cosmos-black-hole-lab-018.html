@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>COSMOS | Black Hole Lab</title><style>
+html,body{margin:0;height:100%;overflow:hidden;background:#02030a;color:#f0f2ff;font:14px system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}header{position:absolute;top:max(20px,env(safe-area-inset-top));left:20px;pointer-events:none}h1{font-size:18px;letter-spacing:.22em;font-weight:500;margin:0 0 7px}p{margin:0;color:#b2b8d0;font-size:12px}.controls{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;white-space:nowrap}button{background:#151b30bb;color:#eef;border:1px solid #68759a88;border-radius:24px;padding:11px 15px;font:inherit;backdrop-filter:blur(8px)}.note{position:absolute;top:max(90px,calc(env(safe-area-inset-top) + 70px));left:20px;max-width:270px;font-size:12px;line-height:1.6;color:#a8b0cd;pointer-events:none}.tag{position:absolute;right:15px;top:25px;color:#7e8eaf;font-size:10px;letter-spacing:.14em}
+</style></head><body><canvas id="c"></canvas><header><h1>COSMOS / BLACK HOLE</h1><p>Soft edges · calmer gas flow</p></header><div class="tag">LAB 018</div><div class="note">A flowing disk with upper and lower light paths around the shadow. Not a scientific ray-tracing simulation.</div><div class="controls"><button id="motion">Pause motion</button><button id="quality">Quality: Auto</button><button id="back">COSMOS ↗</button></div>
+<script>
+(()=>{'use strict';const c=document.getElementById('c'),ctx=c.getContext('2d',{alpha:false});let W=0,H=0,D=1,stars=[],tick=0,last=0,playing=true,quality=1,raf=0;const PI=Math.PI*2;let cx=0,cy=0,r=100;const rnd=(seed)=>{let t=seed+0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296};function resize(){D=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;c.width=Math.round(W*D);c.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);cx=W/2;cy=H*.51;r=Math.min(W*.16,H*.205,155);stars=[];const count=Math.min(800,Math.floor(W*H/950));for(let i=0;i<count;i++)stars.push({x:rnd(i*73+5)*W,y:rnd(i*119+11)*H,a:.15+rnd(i*31+9)*.75,z:.35+rnd(i*41+3)*1.1});}function background(){ctx.fillStyle='#02040d';ctx.fillRect(0,0,W,H);const haze=ctx.createRadialGradient(cx,cy,r*.9,cx,cy,r*5);haze.addColorStop(0,'#2a1430');haze.addColorStop(.35,'#0a0a21');haze.addColorStop(1,'#02040d');ctx.fillStyle=haze;ctx.fillRect(0,0,W,H);for(const s of stars){let dx=s.x-cx,dy=s.y-cy,dist=Math.hypot(dx,dy),sx=s.x,sy=s.y;if(dist<r*3.4&&dist>r*.94){let deflect=r*r*.45/(dist*dist+.1);sx+=dx*deflect;sy+=dy*deflect;}if(dist<r*1.04)continue;ctx.globalAlpha=s.a;ctx.fillStyle='#d9e6ff';ctx.fillRect(sx,sy,s.z,s.z)}ctx.globalAlpha=1;}
+function bandPath(radius,flatten,phase,extent,alpha,width,hue){
+ctx.beginPath();ctx.ellipse(0,0,radius,radius*flatten,0,phase,phase+extent);
+ctx.strokeStyle='hsla('+hue+',100%,73%,'+alpha+')';ctx.lineWidth=width;ctx.stroke();
+}
+function disk(front){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(-.22);
+const n=quality===.5?48:quality===1?72:92;
+for(let i=0;i<n;i++){
+const t=(i+.5)/n,rad=r*(1.12+1.52*t),tilt=.32;
+const segments=quality===.5?60:90;
+ctx.beginPath();
+for(let k=0;k<=segments;k++){
+const theta=Math.PI*(front?0:1)+Math.PI*k/segments;
+const x=rad*Math.cos(theta),y=rad*tilt*Math.sin(theta);
+const seamFade=Math.pow(Math.abs(Math.sin(theta)),.65);
+const warped=!front ? -r*(.65+.25*(1-t))*Math.exp(-Math.pow(x/(r*(1.26+.50*t)),2))*seamFade : 0;
+const yy=y+warped;
+const edgeSoft=Math.pow(Math.abs(Math.sin(theta)),.24);
+if(k===0)ctx.moveTo(x,yy);else ctx.lineTo(x,yy);
+}
+const bright=.55+.45*Math.cos(t*13+tick*.42)**2;
+const alpha=(.085+.13*(1-t))*(.92+.08*Math.sin(i*2.17+tick*.4)**2);
+const light=ctx.createLinearGradient(-rad,0,rad,0);
+light.addColorStop(0,'rgba(255,243,195,'+(alpha*1.65)+')');
+light.addColorStop(.45,'rgba(255,187,98,'+alpha+')');
+light.addColorStop(1,'rgba(236,103,52,'+(alpha*.55)+')');
+ctx.strokeStyle=light;
+ctx.globalAlpha=.7+.3*Math.sin(i*.67+tick*.21)**2;
+ctx.lineWidth=4.1+4*(1-t);ctx.stroke();ctx.globalAlpha=1;
+}
+const strands=quality===.5?24:quality===1?38:55;
+for(let i=0;i<strands;i++){
+const t=(i+.5)/strands,rad=r*(1.16+1.45*t);
+const angle=i*2.399963+tick*(.72/Math.pow(rad/r,1.25));
+const sweep=front?1.2:.72;
+const start=front?0:Math.PI;
+const phase=start+(angle%Math.PI);
+ctx.beginPath();
+for(let k=0;k<=13;k++){
+const theta=phase+sweep*k/13;
+if(theta<start||theta>start+Math.PI)continue;
+const x=rad*Math.cos(theta),y=rad*.32*Math.sin(theta);
+const bend=front?0:-r*(.65+.25*(1-t))*Math.exp(-Math.pow(x/(r*(1.26+.50*t)),2))*Math.pow(Math.abs(Math.sin(theta)),.65);
+if(k===0)ctx.moveTo(x,y+bend);else ctx.lineTo(x,y+bend);
+}
+ctx.strokeStyle='rgba(255,211,130,'+(.025+.075*(1-t))+')';ctx.lineWidth=3.2;ctx.stroke();
+}
+ctx.restore();
+}
+function hole(){
+const halo=ctx.createRadialGradient(cx,cy,r*.82,cx,cy,r*1.72);
+halo.addColorStop(0,'rgba(255,186,108,.08)');
+halo.addColorStop(.22,'rgba(255,154,71,.18)');
+halo.addColorStop(1,'rgba(0,0,0,0)');
+ctx.fillStyle=halo;ctx.beginPath();ctx.arc(cx,cy,r*1.72,0,PI);ctx.fill();
+ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx,cy,r*.94,0,PI);ctx.fill();
+ctx.strokeStyle='rgba(255,224,173,.72)';ctx.lineWidth=Math.max(1.4,r*.024);ctx.stroke();
+ctx.save();ctx.translate(cx,cy);ctx.rotate(-.22);
+const lowerGlow=ctx.createLinearGradient(-r,0,r,0);
+lowerGlow.addColorStop(0,'rgba(255,238,187,.50)');
+lowerGlow.addColorStop(.5,'rgba(255,177,94,.38)');
+lowerGlow.addColorStop(1,'rgba(245,106,57,.24)');
+ctx.beginPath();ctx.ellipse(0,0,r*1.08,r*1.17,0,.13,Math.PI-.13);
+ctx.strokeStyle=lowerGlow;ctx.lineWidth=Math.max(4,r*.12);ctx.globalAlpha=.35;ctx.stroke();ctx.globalAlpha=1;
+ctx.restore();
+}
+function frame(now){if(!document.hidden){const dt=Math.min(.04,(now-last)/1000||.016);last=now;if(playing)tick+=dt*1.65;background();disk(false);disk(true);hole();}raf=requestAnimationFrame(frame)}document.getElementById('motion').onclick=e=>{playing=!playing;e.target.textContent=playing?'Pause motion':'Resume motion'};document.getElementById('quality').onclick=e=>{quality=quality===1?.5:quality===.5?1.5:1;e.target.textContent='Quality: '+(quality===1?'Auto':quality===.5?'Eco':'High')};document.getElementById('back').onclick=()=>location.href='./';addEventListener('resize',resize,{passive:true});document.addEventListener('visibilitychange',()=>last=performance.now());resize();raf=requestAnimationFrame(frame)})();
+</script></body></html>
