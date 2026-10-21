@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>COSMOS | Black Hole Lab</title><style>
+html,body{margin:0;height:100%;overflow:hidden;background:#02030a;color:#f0f2ff;font:14px system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}header{position:absolute;top:max(20px,env(safe-area-inset-top));left:20px;pointer-events:none}h1{font-size:18px;letter-spacing:.22em;font-weight:500;margin:0 0 7px}p{margin:0;color:#b2b8d0;font-size:12px}.controls{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;white-space:nowrap}button{background:#151b30bb;color:#eef;border:1px solid #68759a88;border-radius:24px;padding:11px 15px;font:inherit;backdrop-filter:blur(8px)}.note{position:absolute;top:max(90px,calc(env(safe-area-inset-top) + 70px));left:20px;max-width:270px;font-size:12px;line-height:1.6;color:#a8b0cd;pointer-events:none}.tag{position:absolute;right:15px;top:25px;color:#7e8eaf;font-size:10px;letter-spacing:.14em}
+</style></head><body><canvas id="c"></canvas><header><h1>COSMOS / BLACK HOLE</h1><p>Advected plasma streams · living accretion flow</p></header><div class="tag">LAB 030</div><div class="note">A flowing disk with upper and lower light paths around the shadow. Not a scientific ray-tracing simulation.</div><div class="controls"><button id="motion">Pause motion</button><button id="quality">Quality: Auto</button><button id="back">COSMOS ↗</button></div>
+<script>
+(()=>{'use strict';const c=document.getElementById('c'),ctx=c.getContext('2d',{alpha:false});let W=0,H=0,D=1,stars=[],tick=0,last=0,playing=true,quality=1,raf=0;const PI=Math.PI*2;let cx=0,cy=0,r=100;const rnd=(seed)=>{let t=seed+0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296};function resize(){D=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;c.width=Math.round(W*D);c.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);cx=W/2;cy=H*.51;r=Math.min(W*.16,H*.205,155);stars=[];const count=Math.min(800,Math.floor(W*H/950));for(let i=0;i<count;i++)stars.push({x:rnd(i*73+5)*W,y:rnd(i*119+11)*H,a:.15+rnd(i*31+9)*.75,z:.35+rnd(i*41+3)*1.1});}function background(){ctx.fillStyle='#02040d';ctx.fillRect(0,0,W,H);const haze=ctx.createRadialGradient(cx,cy,r*.9,cx,cy,r*5);haze.addColorStop(0,'#2a1430');haze.addColorStop(.35,'#0a0a21');haze.addColorStop(1,'#02040d');ctx.fillStyle=haze;ctx.fillRect(0,0,W,H);for(const s of stars){let dx=s.x-cx,dy=s.y-cy,dist=Math.hypot(dx,dy),sx=s.x,sy=s.y;if(dist<r*3.4&&dist>r*.94){let deflect=r*r*.45/(dist*dist+.1);sx+=dx*deflect;sy+=dy*deflect;}if(dist<r*1.04)continue;ctx.globalAlpha=s.a;ctx.fillStyle='#d9e6ff';ctx.fillRect(sx,sy,s.z,s.z)}ctx.globalAlpha=1;}
+
+// v030: physically suggestive advection; luminous clumps travel along lensing streamlines, while near-side gas circulates.
+const smooth=(x)=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
+function beamGradient(y,alpha){
+const g=ctx.createLinearGradient(-r*3.35,y,r*3.35,y);
+g.addColorStop(0,'rgba(255,222,153,0)');
+g.addColorStop(.12,'rgba(255,245,200,'+(alpha*.62)+')');
+g.addColorStop(.30,'rgba(255,251,223,'+Math.min(.95,alpha*1.45)+')');
+g.addColorStop(.48,'rgba(255,207,116,'+(alpha*1.03)+')');
+g.addColorStop(.76,'rgba(255,130,55,'+(alpha*.7)+')');
+g.addColorStop(.92,'rgba(229,81,38,'+(alpha*.3)+')');
+g.addColorStop(1,'rgba(204,63,35,0)');
+return g;
+}
+
+// Soft, wide emission envelopes. Local transforms keep their shapes elliptical.
+function gasBloom(x,y,wx,hy,alpha,warm){
+ctx.save();ctx.translate(x,y);ctx.scale(wx,hy);
+const g=ctx.createRadialGradient(0,0,0,0,0,1);
+const tint=warm?'255,115,53':'255,224,158';
+g.addColorStop(0,'rgba('+tint+','+alpha+')');
+g.addColorStop(.38,'rgba('+tint+','+(alpha*.55)+')');
+g.addColorStop(1,'rgba('+tint+',0)');
+ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,1,0,PI);ctx.fill();ctx.restore();
+}
+
+const wrap01=x=>x-Math.floor(x);
+function streamY(u,upper,depth){
+const profile=upper?Math.exp(-Math.pow(u/1.24,2)):Math.exp(-Math.pow(Math.abs(u)/1.29,2.55));
+return upper?-(.055+(1.13+.27*depth)*profile):(.13+(1.03+.34*depth)*profile);
+}
+// Traveling glowing knots with trailing filaments: visible transport, not a static flicker.
+function movingStreams(upper){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(-.08);
+const amount=quality===.5?49:quality===1?86:124;
+const sign=upper?-1:1;
+for(let i=0;i<amount;i++){
+const depth=(i*.754877666)%1;
+const speed=(.047+.021*depth)*sign;
+const u=-2.85+5.7*wrap01(i*.61803398875+tick*speed);
+const fade=smooth((2.85-Math.abs(u))/.57);
+if(fade<.008)continue;
+const length=.14+.22*((i*.56984029)%1);
+const glimmer=.62+.38*Math.sin(i*2.31+tick*.65)**2;
+ctx.beginPath();
+for(let k=0;k<=9;k++){
+const p=k/9,trace=u-sign*length*p;
+const drift=.012*Math.sin(trace*17+i*1.7+tick*.52)*(1-p);
+const x=r*trace;
+const y=r*(streamY(trace,upper,depth)+drift);
+if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+}
+const strength=(upper?.21:.29)*fade*glimmer;
+ctx.strokeStyle=u<-.35?'rgba(255,246,198,'+strength+')':u<.65?'rgba(255,200,104,'+(strength*.93)+')':'rgba(255,121,62,'+(strength*.77)+')';
+ctx.lineWidth=r*(.014+.030*(1-depth));ctx.stroke();
+const headY=r*streamY(u,upper,depth);
+ctx.beginPath();ctx.ellipse(r*u,headY,r*(.036+.023*depth),r*(.025+.018*depth),-.08,0,PI);
+ctx.fillStyle=u<0?'rgba(255,239,180,'+(strength*.35)+')':'rgba(255,141,71,'+(strength*.29)+')';
+ctx.fill();
+}
+ctx.restore();
+}
+function upperLensing(){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(-.08);
+const count=quality===.5?21:quality===1?32:44;
+for(let j=count-1;j>=0;j--){
+const t=j/(count-1),h=1.08+.33*(1-t);
+ctx.beginPath();
+const N=quality===.5?62:92;
+for(let k=0;k<=N;k++){
+const x=r*(-3.22+6.44*k/N);
+const u=x/r;
+const y=-r*(.055+h*Math.exp(-Math.pow(u/1.24,2)))+
+r*(.021*Math.sin(u*10.7+tick*.53+j*1.37)+.009*Math.sin(u*25-tick*.82+j*.64))*Math.exp(-u*u/3);
+if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+}
+ctx.lineWidth=r*(.026+.042*(1-t));
+ctx.strokeStyle=beamGradient(0,.030+.073*(1-t)*(.82+.18*Math.sin(j*1.83+tick*.48)**2));ctx.stroke();
+}
+// Short, gently flickering filaments break the overly perfect upper contour.
+const wisps=quality===.5?24:quality===1?40:55;
+for(let i=0;i<wisps;i++){
+const u0=-2.55+5.1*wrap01(i*.61803398875-tick*.050);
+const h=1.12+.25*((i*.754877666)%1);
+ctx.beginPath();
+for(let k=0;k<=8;k++){
+const u=u0+.34*k/8;
+const y=-r*(.055+h*Math.exp(-Math.pow(u/1.24,2)))
++r*.024*Math.sin(u*10.7+tick*.53+i*1.13)*Math.exp(-u*u/3);
+if(k===0)ctx.moveTo(r*u,y);else ctx.lineTo(r*u,y);
+}
+ctx.lineWidth=r*.014;
+ctx.strokeStyle=u0<0?'rgba(255,244,193,.16)':'rgba(255,145,73,.12)';
+ctx.stroke();
+}
+// Diffuse emissions interrupt the clean arch silhouette without redrawing it.
+const specks=quality===.5?60:quality===1?110:155;
+for(let i=0;i<specks;i++){
+const u=-2.35+4.7*wrap01(i*.61803398875-tick*(.046+.012*((i*.754877666)%1)));
+const profile=Math.exp(-Math.pow(u/1.24,2));
+const center=-r*(.055+1.23*profile);
+const y=center+r*.12*(((i*.754877666)%1)-.5);
+const alpha=(.013+.05*Math.sin(i*1.89+tick*.32)**2)*smooth((2.35-Math.abs(u))/.55);
+ctx.beginPath();ctx.ellipse(r*u,y,r*(.042+.065*((i*.56984)%1)),r*.033,-.08,0,PI);
+ctx.fillStyle=u<0?'rgba(255,235,178,'+alpha+')':'rgba(255,133,64,'+(alpha*.78)+')';
+ctx.fill();
+}
+ctx.restore();
+movingStreams(true);
+}
+function belowLensing(){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(-.08);
+const count=quality===.5?25:quality===1?39:53;
+for(let j=0;j<count;j++){
+const t=j/(count-1),h=.96+.46*t;
+ctx.beginPath();
+const N=quality===.5?64:94;
+for(let k=0;k<=N;k++){
+const u=-3.24+6.48*k/N;
+const profile=Math.exp(-Math.pow(Math.abs(u)/1.29,2.55));
+const y=r*(.13+h*profile)+r*(.022*Math.sin(u*12+tick*.49+j*.71)+.01*Math.sin(u*20-tick*.42+j*.94))*profile;
+if(k===0)ctx.moveTo(r*u,y);else ctx.lineTo(r*u,y);
+}
+ctx.strokeStyle=beamGradient(0,(.048+.17*(1-t))*(.8+.2*Math.sin(j*1.37+tick*.22)**2));
+ctx.lineWidth=r*(.033+.060*(1-t));ctx.stroke();
+}
+// Wispy plasma in the broad underside: distributed along the same curved field.
+const flecks=quality===.5?130:quality===1?240:350;
+for(let i=0;i<flecks;i++){
+const u=-2.75+5.5*wrap01(i*.61803398875+tick*(.045+.016*((i*.754877666)%1)));
+const profile=Math.exp(-Math.pow(Math.abs(u)/1.29,2.55));
+const spread=((i*.754877666)%1)-.5;
+const y=r*(.13+(1.16+spread*.43)*profile);
+const edge=smooth((2.75-Math.abs(u))/.68);
+const shimmer=.5+.5*Math.sin(i*2.73+tick*.57)**2;
+const alpha=(.018+.09*shimmer)*edge*Math.pow(profile,.47);
+const size=r*(.027+.075*((i*.56984)%1));
+ctx.beginPath();ctx.ellipse(r*u,y,size*1.8,size*.47,-.08,0,PI);
+ctx.fillStyle=u<-.2?'rgba(255,240,185,'+alpha+')':u<.5?'rgba(255,192,99,'+(alpha*.95)+')':'rgba(255,123,62,'+(alpha*.80)+')';
+ctx.fill();
+}
+ctx.restore();
+movingStreams(false);
+}
+function disk(front){
+if(!front){upperLensing();return;}
+ctx.save();ctx.translate(cx,cy);ctx.rotate(-.08);
+ctx.beginPath();ctx.rect(-W,-H,2*W,2*H);ctx.arc(0,0,r*.99,0,Math.PI*2,true);ctx.clip('evenodd');
+// Large translucent clouds make the right half a volume, not a flat strip.
+const clouds=quality===.5?7:quality===1?11:15;
+for(let j=0;j<clouds;j++){
+const f=(j+.5)/clouds;
+const movingF=wrap01(f+tick*.041);
+const x=r*(.85+2.35*movingF);
+const y=r*(.22+.17*Math.sin(j*2.4+tick*.24));
+const alpha=(.18+.10*Math.sin(j*1.73+tick*.45)**2)*(1-.42*movingF)*smooth(Math.min(movingF,1-movingF)*9);
+gasBloom(x,y,r*(.55+.22*Math.sin(j*1.23)**2),r*(.32+.18*Math.sin(j*2.17)**2),alpha,true);
+}
+const N=quality===.5?32:quality===1?49:66;
+const M=quality===.5?72:quality===1?96:118;
+for(let j=0;j<N;j++){
+const t=(j+.5)/N;
+ctx.beginPath();
+for(let k=0;k<=M;k++){
+const u=-3.30+6.60*k/M;
+const roll=r*(.052*Math.sin(u*3.8-tick*.95+t*8)*Math.exp(-u*u/9));
+const spread=r*(t-.5)*(.43+.14*Math.exp(-u*u/3)+.43*smooth((u-.16)/1.65));
+const y=r*.23+spread+roll;
+if(k===0)ctx.moveTo(r*u,y);else ctx.lineTo(r*u,y);
+}
+ctx.strokeStyle=beamGradient(0,.026+.028*Math.sin(t*21+tick*.65)**2);
+ctx.lineWidth=r*(.057+.037*Math.sin(t*17+tick*.15)**2);ctx.stroke();
+}
+const cells=quality===.5?550:quality===1?1030:1470;
+for(let i=0;i<cells;i++){
+const u=-3.36+6.72*wrap01(i*.61803398875+tick*(.033+.013*((i*.754877666)%1)));
+const edge=smooth((3.36-Math.abs(u))/.55);
+const depth=((i*.754877666)%1)-.5;
+const swirl=.046*Math.sin(u*4.1+i*.27-tick*(.6+.3/(1+Math.abs(u))));
+const right=smooth((u-.18)/1.85);
+const y=r*(.23+depth*(.55+.53*right)+swirl+.012*Math.sin(i*.87+tick*.38)*right);
+const x=r*(u+.016*Math.sin(tick*.63+i*1.37));
+const intensity=(.30+.70*Math.sin(u*8.2+i*.87-tick*1.3)**2)*edge;
+const size=r*(.046+.059*((i*.56984029)%1))*(1+.26*right);
+ctx.beginPath();ctx.ellipse(x,y,size*1.9,size*.52,-.08,0,Math.PI*2);
+ctx.fillStyle=u<-.38?'rgba(255,239,189,'+(.021+.043*intensity)+')':
+ u<.6?'rgba(255,193,105,'+(.016+.039*intensity)+')':
+ 'rgba(255,118,58,'+(.035+.072*intensity)+')';
+ctx.fill();
+}
+ctx.restore();
+}
+function hole(){
+const halo=ctx.createRadialGradient(cx,cy,r*.86,cx,cy,r*1.62);
+halo.addColorStop(0,'rgba(255,175,78,.06)');
+halo.addColorStop(.33,'rgba(255,139,56,.13)');
+halo.addColorStop(1,'rgba(0,0,0,0)');
+ctx.fillStyle=halo;ctx.beginPath();ctx.arc(cx,cy,r*1.62,0,PI);ctx.fill();
+ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx,cy,r*.99,0,PI);ctx.fill();
+}
+function frame(now){if(!document.hidden){const dt=Math.min(.04,(now-last)/1000||.016);last=now;if(playing)tick+=dt*1.75;background();disk(false);hole();belowLensing();disk(true);}raf=requestAnimationFrame(frame)}document.getElementById('motion').onclick=e=>{playing=!playing;e.target.textContent=playing?'Pause motion':'Resume motion'};document.getElementById('quality').onclick=e=>{quality=quality===1?.5:quality===.5?1.5:1;e.target.textContent='Quality: '+(quality===1?'Auto':quality===.5?'Eco':'High')};document.getElementById('back').onclick=()=>location.href='./';addEventListener('resize',resize,{passive:true});document.addEventListener('visibilitychange',()=>last=performance.now());resize();raf=requestAnimationFrame(frame)})();
+</script></body></html>
