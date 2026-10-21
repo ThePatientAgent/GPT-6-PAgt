@@ -1,0 +1,202 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#02040d"><title>COSMOS | Black Hole Lab 033 - Photon Rivers</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02040d;color:#e9ecf6;font:14px system-ui,-apple-system,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none}header{position:absolute;top:max(20px,env(safe-area-inset-top));left:20px;pointer-events:none;text-shadow:0 2px 8px #02040d}h1{font-size:17px;letter-spacing:.18em;font-weight:500;margin:0 0 6px}header p{margin:0;color:#b8bbc9;font-size:12px}.tag{position:absolute;right:16px;top:max(22px,env(safe-area-inset-top));color:#b6a1a4;font-size:10px;letter-spacing:.14em}.note{position:absolute;top:max(95px,calc(env(safe-area-inset-top) + 72px));left:20px;max-width:270px;color:#9097ad;font-size:11px;line-height:1.6;pointer-events:none}.controls{position:absolute;bottom:max(22px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;white-space:nowrap}button{background:#161b2cc4;color:#edf1ff;border:1px solid #73809b77;border-radius:24px;padding:11px 15px;font:inherit;backdrop-filter:blur(9px)}.still{border:1px solid #7d819077;border-radius:20px;padding:10px 14px;font-size:12px;color:#c1c5d2;background:#111827b6}.status{position:absolute;bottom:calc(max(22px,env(safe-area-inset-bottom)) + 65px);width:100%;text-align:center;font-size:11px;color:#9299ad;pointer-events:none}</style>
+</head><body><canvas id="c"></canvas><header><h1>COSMOS / BLACK HOLE</h1><p>Photon rivers · Cinematic accretion still</p></header><div class="tag">LAB 033</div><div class="note">A static cinematic study of luminous, gravity-bent accretion gas. Motion comes after the shape is complete.</div><div class="status" id="status">Rendering the still image…</div><div class="controls"><span class="still">STILL STUDY</span><button id="quality">Detail: High</button><button id="back">COSMOS ↗</button></div>
+<script>
+(()=>{'use strict';const c=document.getElementById('c'),ctx=c.getContext('2d',{alpha:false});let W,H,D,cx,cy,r,quality=1;const TAU=Math.PI*2,rot=-.08,C=Math.cos(rot),S=Math.sin(rot);const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
+function rnd(n){let a=Math.imul(n|0,0x9E3779B1);a=Math.imul(a^(a>>>16),0x85EBCA6B);return ((a^(a>>>13))>>>0)/4294967296}
+function hash(ix,iy,seed){let a=Math.imul(ix,374761393)^Math.imul(iy,668265263)^Math.imul(seed,1274126177);a=Math.imul(a^(a>>>13),1274126177);return ((a^(a>>>16))>>>0)/4294967295}
+function noise(x,y,seed){const a=Math.floor(x),b=Math.floor(y);let fx=smooth(x-a),fy=smooth(y-b);const p=hash(a,b,seed),q=hash(a+1,b,seed),m=hash(a,b+1,seed),n=hash(a+1,b+1,seed);return (p+(q-p)*fx)*(1-fy)+(m+(n-m)*fx)*fy;}
+function background(){ctx.fillStyle='#02040d';ctx.fillRect(0,0,W,H);const fog=ctx.createRadialGradient(cx,cy,r*.6,cx,cy,r*5);fog.addColorStop(0,'#271426');fog.addColorStop(.30,'#100a19');fog.addColorStop(1,'#02040d');ctx.fillStyle=fog;ctx.fillRect(0,0,W,H);const count=Math.min(1800,Math.floor(W*H/510));for(let i=0;i<count;i++){const x=rnd(i*113+7)*W,y=rnd(i*271+31)*H,dist=Math.hypot(x-cx,y-cy);if(dist<r*1.2)continue;const size=.3+rnd(i*53+1)*1.22,alpha=.06+rnd(i*89+17)*.6;ctx.fillStyle='rgba(210,225,255,'+alpha+')';ctx.fillRect(x,y,size,size);}}
+function glowTexture(){
+const scale=quality===.5?.67:quality===1?1:1.45;
+const w=Math.ceil(W*scale),h=Math.ceil(r*5*scale),startY=Math.round((cy-r*2.5)*scale);
+const off=document.createElement('canvas');off.width=w;off.height=h;
+const oc=off.getContext('2d',{willReadFrequently:false});const im=oc.createImageData(w,h),a=im.data;
+for(let j=0;j<h;j++){
+ const dy=(startY+j)/scale-cy;
+ for(let i=0;i<w;i++){
+  const dx=i/scale-cx;
+  const u=(dx*C+dy*S)/r,v=(-dx*S+dy*C)/r,au=Math.abs(u);
+  if(au>3.58||Math.abs(v)>2.47)continue;
+  const left=smooth((-u+.28)/1.65),right=smooth((u+.14)/1.9);
+  const fade=smooth((3.59-au)/.66);
+  const top=-.10-1.43*Math.exp(-Math.pow(u/1.37,2));
+  const lower=.13+1.30*Math.exp(-Math.pow(au/1.29,2.5));
+  const front=.21-.10*smooth((au-.65)/2.12);
+  const n0=noise(u*4.5+v*.8,v*6.5,23);
+  const n1=noise(u*15+v*2.7,v*14.0,45);
+  const n2=noise(u*36-v*8,v*35,69);
+  const n3=noise(u*7.5-v*3.5,v*14.3,99);
+  const warp=.038*Math.sin(u*6.9+v*12+n1*3.5)+.019*Math.sin(u*18-v*9+n2*3);
+  const vv=v+warp;
+  const grain=.26+.92*(.38*n0+.29*n1+.21*n2+.12*n3);
+  const shear=.67+.33*Math.sin(u*14+vv*18+n0*7)**2;
+  const upper=Math.exp(-Math.pow((vv-top)/(.21+.14*Math.exp(-u*u/2)),2))*1.77;
+  const upperHaze=Math.exp(-Math.pow((vv-top+.22)/(.43+.14*Math.exp(-u*u/2)),2))*.45;
+  const lowerBeam=Math.exp(-Math.pow((vv-lower)/(.17+.10*Math.exp(-u*u/2)),2))*1.67;
+  const lowerHaze=Math.exp(-Math.pow((vv-lower)/.36,2))*.27;
+  const thick=.28+.19*right;
+  const frontBeam=Math.exp(-Math.pow((vv-front)/thick,2))*1.54;
+  const frontHaze=Math.exp(-Math.pow((vv-front)/(.45+.16*right),2))*.17;
+  const hot=(.82+.70*n1)*Math.exp(-Math.pow((u+1.21)/.82,2)-Math.pow((vv-.11)/.29,2));
+  const turbulence=(.42+.85*grain)*(.62+.58*shear);
+  let luminous=(upper+upperHaze+lowerBeam+lowerHaze+frontBeam+frontHaze)*turbulence*fade+hot;
+  // Fine lightning-like lanes within the broad plasma volume.
+  const strands=Math.pow(Math.max(0,Math.sin(u*22.3+vv*26+n2*7)),13);
+  luminous+=strands*(upper*.35+lowerBeam*.21+frontBeam*.27);
+  const d=Math.hypot(u,v);
+  if(d<.99)luminous=0;
+  const rim=Math.exp(-Math.pow((d-1.018)/.024,2))*(.48+.43*left)*(.54+.46*(v<0?.7:1));
+  luminous+=rim*1.75;
+  if(luminous<.005)continue;
+  const amp=Math.min(.995,1-Math.exp(-luminous*1.13));
+  const lum=Math.min(1,luminous*.59);
+  const whiteHot=smooth((luminous-.75)/2.25);
+  const R=255,G=Math.min(255,82+112*left+65*lum+33*whiteHot),B=Math.min(255,19+105*left+72*lum+48*whiteHot);
+  const idx=(j*w+i)*4;a[idx]=R;a[idx+1]=G;a[idx+2]=B;a[idx+3]=Math.round(amp*255);
+ }
+}
+oc.putImageData(im,0,0);ctx.drawImage(off,0,startY/scale,w/scale,h/scale);
+}
+function fiberTrails(){ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.globalCompositeOperation='screen';const wisps=quality===.5?150:quality===1?290:410;
+for(let i=0;i<wisps;i++){const p=rnd(i*127+21),kind=i%3;let base=-2.88+5.76*p;let depth=rnd(i*43+13);const width=.08+.24*rnd(i*71+5);ctx.beginPath();for(let k=0;k<=13;k++){let u=base+(k/13-.5)*width*1.8;let v;
+if(kind===0){v=-.07-(1.16+depth*.28)*Math.exp(-Math.pow(u/1.26,2));}
+else if(kind===1){v=.11+(1.07+.32*depth)*Math.exp(-Math.pow(Math.abs(u)/1.25,2.6));}
+else{v=.23+(depth-.5)*(.5+.34*smooth((u-.25)/1.5));}
+v+=.008*Math.sin(u*12+i*1.7);if(!k)ctx.moveTo(r*u,r*v);else ctx.lineTo(r*u,r*v);}
+const left=base<0;ctx.strokeStyle=left?'rgba(255,242,194,'+(.04+.09*rnd(i*83+9))+')':'rgba(255,139,66,'+(.03+.07*rnd(i*83+9))+')';ctx.lineWidth=.4+1.5*rnd(i*97+15);ctx.stroke();}
+ctx.globalCompositeOperation='source-over';ctx.restore();}
+function luminousArcs(){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.globalCompositeOperation='screen';
+const count=quality===.5?30:quality===1?60:86;
+for(let side=0;side<2;side++){
+ for(let j=0;j<count;j++){
+ const t=(j+.5)/count;
+ ctx.beginPath();const seg=quality===.5?78:148;
+ for(let k=0;k<=seg;k++){
+ const u=-3.48+6.96*k/seg,shape=Math.exp(-Math.pow(Math.abs(u)/(side===0?1.28:1.18),side===0?2:2.4));
+ const contour=side===0?(-.08-(1.12+.43*t)*shape):(.13+(1.05+.37*t)*shape);
+ const warp=.018*Math.sin(u*12+j*1.31)+.009*Math.sin(u*27+j*.43);
+ const v=contour+warp*shape;
+ if(k===0)ctx.moveTo(r*u,r*v);else ctx.lineTo(r*u,r*v);
+ }
+ const g=ctx.createLinearGradient(-r*3.5,0,r*3.5,0);
+ const power=(side===0?.11:.10)*(.22+.78*Math.sin(Math.PI*t)**2)*(1+.26*Math.sin(j*2.91)**2);
+ g.addColorStop(0,'rgba(255,225,165,0)');
+ g.addColorStop(.16,'rgba(255,231,172,'+(power*.7)+')');
+ g.addColorStop(.29,'rgba(255,249,213,'+(power*1.65)+')');
+ g.addColorStop(.43,'rgba(255,231,153,'+(power*1.3)+')');
+ g.addColorStop(.60,'rgba(255,186,86,'+power+')');
+ g.addColorStop(.78,'rgba(255,118,49,'+(power*.90)+')');
+ g.addColorStop(1,'rgba(244,85,45,0)');
+ ctx.strokeStyle=g;ctx.lineWidth=r*(.013+.022*Math.sin(Math.PI*t));ctx.stroke();
+ }
+}
+ctx.globalCompositeOperation='source-over';ctx.restore();
+}
+function plasmaBraids(){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.globalCompositeOperation='screen';
+const count=quality===.5?235:quality===1?540:760;
+for(let i=0;i<count;i++){
+ const phase=rnd(i*151+25),band=rnd(i*67+11),side=i%3;
+ const base=-3.25+6.5*phase,span=.12+.43*rnd(i*117+45);
+ const width=.4+1.6*rnd(i*19+7),power=(.045+.22*rnd(i*29+39)) * smooth((3.25-Math.abs(base))/.60);
+ ctx.beginPath();
+ for(let k=0;k<=14;k++){
+ const u=base+span*(k/14-.5),au=Math.abs(u);
+ let v;
+ if(side===0){v=-.08-(1.12+.43*band)*Math.exp(-Math.pow(au/1.28,2));}
+ else if(side===1){v=.13+(1.05+.37*band)*Math.exp(-Math.pow(au/1.18,2.4));}
+ else {v=.18+.48*(band-.5)+.09*Math.sin(u*1.5+band*10);}
+ v+=.018*Math.sin(u*18+i*1.14)+.006*Math.sin(u*38+i*.47);
+ if(k===0)ctx.moveTo(r*u,r*v);else ctx.lineTo(r*u,r*v);
+ }
+ ctx.strokeStyle=base<-.22?'rgba(255,244,201,'+power+')':base<.8?'rgba(255,205,130,'+(power*.86)+')':'rgba(255,113,53,'+(power*.68)+')';
+ ctx.lineWidth=width;ctx.stroke();
+}
+ctx.globalCompositeOperation='source-over';ctx.restore();
+}
+function shadow(){
+ const outer=ctx.createRadialGradient(cx,cy,r*.82,cx,cy,r*1.29);
+ outer.addColorStop(0,'rgba(255,194,102,0)');outer.addColorStop(.46,'rgba(255,187,91,.14)');outer.addColorStop(1,'rgba(255,161,73,0)');
+ ctx.fillStyle=outer;ctx.beginPath();ctx.arc(cx,cy,r*1.29,0,TAU);ctx.fill();
+ ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx,cy,r*.976,0,TAU);ctx.fill();
+ ctx.save();ctx.shadowColor='rgba(255,198,119,.84)';ctx.shadowBlur=r*.13;
+ ctx.beginPath();ctx.arc(cx,cy,r*.991,0,TAU);
+ ctx.strokeStyle='rgba(255,211,149,.63)';ctx.lineWidth=Math.max(1.1,r*.016);ctx.stroke();ctx.restore();
+}
+function foregroundPlasma(){
+// Stationary pixel-textured front-facing section of the accretion disk.
+const scale=quality===.5?.70:quality===1?1:1.35;
+const w=Math.ceil(W*scale), h=Math.ceil(r*1.48*scale);
+const y0=cy-r*.48;
+const off=document.createElement('canvas');off.width=w;off.height=h;
+const oc=off.getContext('2d'),im=oc.createImageData(w,h),a=im.data;
+for(let j=0;j<h;j++){
+ const Y=y0+j/scale,dy=Y-cy;
+ for(let i=0;i<w;i++){
+ const dx=i/scale-cx;
+ const u=(dx*C+dy*S)/r,v=(-dx*S+dy*C)/r,au=Math.abs(u);
+ if(au>3.65)continue;
+ const envelope=smooth((3.63-au)/.7),vCenter=.21-.11*smooth((au-.8)/1.95);
+ const nv1=noise(u*13.7+v*5.6,v*21.4,132),nv2=noise(u*36-v*11,v*39,85);
+ const bent=.025*Math.sin(u*12+v*16+nv1*3)+.012*Math.sin(u*31-v*24);
+ const d=(v-vCenter+bent)/(.14+.045*smooth((au-.6)/1.8));
+ const flame=Math.exp(-d*d);
+ const haze=Math.exp(-Math.pow(d/2.3,2))*.12;
+ const lanes=Math.pow(Math.max(0,Math.sin(u*24+v*32+nv2*8)),8);
+ const grain=.30+.46*nv1+.27*nv2;
+ let lum=(flame*(.56+.40*grain)+haze+lanes*flame*.45)*envelope;
+ const hot=Math.exp(-Math.pow((u+.95)/.88,2))*.57;
+ lum*=.57+.28*hot;
+ if(lum<.012)continue;
+ const alpha=Math.min(.87,(1-Math.exp(-lum*1.95)));
+ const left=smooth((.20-u)/1.6),warm=smooth((u+.1)/1.8);
+ const rr=255,gg=Math.min(255,100+111*left+39*hot+38*lum),bb=Math.min(255,27+122*left+54*hot+28*lum-12*warm);
+ const idx=(j*w+i)*4;a[idx]=rr;a[idx+1]=gg;a[idx+2]=bb;a[idx+3]=Math.round(alpha*255);
+ }
+}
+oc.putImageData(im,0,0);ctx.drawImage(off,0,y0,w/scale,h/scale);
+}
+function nearBand(){
+ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.globalCompositeOperation='screen';
+const beams=quality===.5?38:quality===1?73:95;
+for(let j=0;j<beams;j++){
+ const t=(j+.5)/beams;
+ ctx.beginPath();const n=quality===.5?90:160;
+ for(let k=0;k<=n;k++){
+  const u=-3.65+7.3*k/n,au=Math.abs(u);
+  const base=.21-.11*smooth((au-.8)/1.95);
+  const thick=.38+.22*smooth((au-1.1)/1.6);
+  const v=base+(t-.5)*thick+.020*Math.sin(u*7.2+t*20)*Math.exp(-u*u/11)+.009*Math.sin(u*21+j*.83);
+  if(k===0)ctx.moveTo(r*u,r*v);else ctx.lineTo(r*u,r*v);
+ }
+ const g=ctx.createLinearGradient(-r*3.7,0,r*3.7,0);
+ const power=.027+.089*Math.exp(-Math.pow((t-.51)/.31,2));
+ g.addColorStop(0,'rgba(255,238,190,0)');
+ g.addColorStop(.18,'rgba(255,231,182,'+(power*.50)+')');
+ g.addColorStop(.31,'rgba(255,248,215,'+(power*1.40)+')');
+ g.addColorStop(.44,'rgba(255,244,192,'+(power*1.33)+')');
+ g.addColorStop(.61,'rgba(255,192,95,'+(power*1.1)+')');
+ g.addColorStop(.82,'rgba(255,129,55,'+(power*.86)+')');
+ g.addColorStop(1,'rgba(245,91,45,0)');
+ ctx.strokeStyle=g;ctx.lineWidth=r*(.027+.029*Math.sin(t*Math.PI));ctx.stroke();
+}
+const veins=quality===.5?210:quality===1?420:650;
+for(let i=0;i<veins;i++){
+ const u=-3.38+6.76*rnd(i*61+13),depth=rnd(i*89+21)-.5;
+ const length=.09+.58*rnd(i*77+9),base=.21-.11*smooth((Math.abs(u)-.8)/1.95)+depth*.39;
+ ctx.beginPath();
+ for(let k=0;k<=11;k++){
+  const uu=u+(k/11-.5)*length, vv=base+.023*Math.sin(uu*18+i*1.9)+.012*Math.sin(uu*39+i*.6);
+  if(k===0)ctx.moveTo(r*uu,r*vv);else ctx.lineTo(r*uu,r*vv);
+ }
+ const power=.06+.19*rnd(i*43+1);
+ ctx.strokeStyle=u<-.15?'rgba(255,249,218,'+power+')':u<.9?'rgba(255,206,124,'+(power*.86)+')':'rgba(255,142,59,'+(power*.72)+')';
+ ctx.lineWidth=.48+1.60*rnd(i*71+5);ctx.stroke();
+}
+ctx.globalCompositeOperation='source-over';ctx.restore();
+}
+function render(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,1.5);c.width=Math.round(W*D);c.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);cx=W*.5;cy=H*.51;r=Math.min(W*.172,H*.18,165);background();glowTexture();luminousArcs();fiberTrails();plasmaBraids();shadow();foregroundPlasma();nearBand();document.getElementById('status').textContent='Photon rivers · Static study · Motion intentionally disabled';}
+const q=document.getElementById('quality');q.onclick=()=>{quality=quality===1?1.5:quality===1.5?.5:1;q.textContent='Detail: '+(quality===1?'High':quality===1.5?'Ultra':'Eco');render()};document.getElementById('back').onclick=()=>location.href='./';addEventListener('resize',()=>render(),{passive:true});render();})();
+</script></body></html>
