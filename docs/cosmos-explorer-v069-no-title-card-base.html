@@ -582,7 +582,7 @@ tourHoleLayer.hidden=true;
 tourHoleLayer.setAttribute('role','dialog');
 tourHoleLayer.setAttribute('aria-label','Black hole: third stop of the COSMOS guided tour');
 tourHoleLayer.innerHTML=`
- <div class="cosmos-hole-visit-heading"><span>DESTINATION 3 / 6</span><strong>BLACK HOLE</strong><small>THE LIGHT BENDS AROUND THE DARK</small></div>
+
  <iframe id="cosmos-hole-visit-frame" title="Animated black hole with physical light-path rendering" allow="fullscreen" loading="eager"></iframe>
  <div class="cosmos-hole-visit-actions">
   <button id="cosmos-hole-visit-stop" type="button">✕ STOP TOUR</button>
@@ -632,6 +632,7 @@ background:linear-gradient(90deg,transparent,#9ab8dbad,transparent)}
 @media(prefers-reduced-motion:reduce){#cosmos-tour-blackhole-v061{animation:none!important;transition:none!important}#cosmos-tour-curtain-v066{transition:none!important}#cosmos-hole-visit-frame{transition:none!important}}
 `;
 holeCSS.textContent+="\n/* Consistent cinematic caption, visible above the embedded black-hole renderer. */\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading{z-index:10!important;top:calc(68px + env(safe-area-inset-top))!important;left:18px!important;opacity:1!important;visibility:visible!important;animation:none!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading strong{font-size:19px!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-actions{display:none!important;}\n";
+holeCSS.textContent+="\n/* Same caption component as every other destination, above black-hole iframe. */\nbody.touring #tourCard{z-index:1000002!important;}\n#cosmos-tour-blackhole-v061.cosmos-hole-open{transition:opacity 1100ms cubic-bezier(.22,.65,.30,1),visibility 0s;}\n";
 document.head.appendChild(holeCSS);
 document.body.appendChild(tourHoleLayer);
 const tourHoleFrame=tourHoleLayer.querySelector('#cosmos-hole-visit-frame');
@@ -660,21 +661,26 @@ function tourHoleDepart(){
  if(tourHoleDeparting||!tourActive)return;
  tourHoleDeparting=true;
  const destination=tourStops[tourStage];
- // Keep the animated black hole visible while the destination camera moves.
- tourWords();
+ // Animate the underlying journey while the black hole remains visible.
  fly(destination,true);
  const journey=++tourHoleTravelToken;
  const began=performance.now();
- function finish(){
-  if(journey!==tourHoleTravelToken)return;
-  tourHoleHide();
-  tourHoleDeparting=false;
-  tourOrbitAt=-1;
+ function reveal(){
+  if(journey!==tourHoleTravelToken||!tourActive)return;
+  // Cross-dissolve the actual scenes rather than replacing one frame instantly.
+  tourWords();
+  tourHoleLayer.classList.remove('cosmos-hole-open');
+  tourHoleSchedule(()=>{
+   if(journey!==tourHoleTravelToken||!tourActive)return;
+   tourHoleHide();
+   tourHoleDeparting=false;
+   tourOrbitAt=-1;
+  },1200);
  }
  function watch(now){
   if(journey!==tourHoleTravelToken||!tourActive||!tourHoleDeparting)return;
-  if(!state.fly&&state.orbit&&state.orbit.index===destination){finish();return;}
-  if(now-began>4500){finish();return;}
+  if(!state.fly&&state.orbit&&state.orbit.index===destination){reveal();return;}
+  if(now-began>4500){reveal();return;}
   tourHoleTravelRAF=requestAnimationFrame(watch);
  }
  tourHoleTravelRAF=requestAnimationFrame(watch);
