@@ -1383,6 +1383,12 @@ if(demo==='pleiades'||demo==='orion')requestAnimationFrame(()=>fly(demo==='pleia
 if(new URLSearchParams(location.search).get('cinema')==='1')toggleCinema(true);
 // v164: auto-start the existing tested tour after the first frame.
 // Preserve explicit demo URLs and the existing reduced-motion guard.
+// v066 QA shortcut: the preview can demonstrate the third-to-fourth handoff
+// without making the visitor watch the first two stops every test run.
+if(demo==='handoff')requestAnimationFrame(()=>{
+ if(!tourActive)tourBegin();
+ if(tourActive){tourStage=2;tourNext();}
+});
 if(!demo)requestAnimationFrame(()=>{if(!tourActive)tourBegin();});
 })();
 </script><noscript>この作品にはJavaScriptが必要です。</noscript></body></html>
