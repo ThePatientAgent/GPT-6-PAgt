@@ -614,7 +614,7 @@ holeCSS.textContent=`
    Prevent the previous Orion viewpoint from flashing before the Solar System arrives. */
 #cosmos-tour-curtain-v066{position:fixed;inset:0;z-index:1000001;display:grid;place-items:center;
 background:radial-gradient(ellipse 48% 35% at 50% 52%,rgba(31,38,66,.32),transparent 76%),#010309;
-opacity:0;pointer-events:none;transition:opacity .68s ease-in-out;will-change:opacity}
+opacity:0;pointer-events:none;transition:opacity .24s ease-in-out;will-change:opacity}
 #cosmos-tour-curtain-v066[hidden]{display:none!important}
 #cosmos-tour-curtain-v066.visible{opacity:1;pointer-events:auto}
 #cosmos-tour-curtain-v066:before{content:'';position:absolute;inset:0;pointer-events:none;
@@ -680,7 +680,7 @@ function tourHoleDepart(){
      const cameraReady=!state.fly&&!!state.orbit&&state.orbit.index===destination;
      if(cameraReady){
        if(!settledAt)settledAt=now;
-       if(now-settledAt>=260){reveal();return;}
+       if(now-settledAt>=80){reveal();return;}
      }else settledAt=0;
      if(now-startAt>6500){
        // Fail visibly rather than trap the user in permanent darkness.
@@ -701,17 +701,17 @@ function tourHoleDepart(){
      tourHoleCurtain.classList.add('arriving');
      tourHoleSchedule(()=>{
        if(journey===tourHoleTravelToken&&tourHoleDeparting)tourHoleCurtain.classList.remove('visible');
-     },180);
+     },50);
      tourHoleSchedule(()=>{
        if(journey!==tourHoleTravelToken||!tourHoleDeparting)return;
        tourHoleCurtain.hidden=true;
        tourHoleCurtain.classList.remove('arriving');
        tourHoleDeparting=false;
        tourOrbitAt=-1; // start the Solar System dwell only after reveal
-     },980);
+     },330);
    }
    tourHoleTravelRAF=requestAnimationFrame(arrive);
- },760);
+ },280);
 }
 function tourHoleShow(){
  clearTimeout(tourHoleLoadFallback);
