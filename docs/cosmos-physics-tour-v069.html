@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v069 — Arrival-Synced Seamless Tour · Preview</title>
 <style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
-<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v069-arrival-synced-tour-base.html?sky=eco"></iframe>
+<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v069-no-title-card-base.html?sky=eco"></iframe>
 <script>
 // QA only: ?handoff=1 begins at Orion to exercise Orion → Black Hole → Solar System.
 // No query parameter keeps the complete six-stop tour.
 if(new URLSearchParams(location.search).get('handoff')==='1'){
  const host=document.getElementById('cosmos');
- host.src='./cosmos-explorer-v069-arrival-synced-tour-base.html?sky=eco&handoff=1';
+ host.src='./cosmos-explorer-v069-no-title-card-base.html?sky=eco&handoff=1';
 }
 </script>
 <script>
