@@ -589,10 +589,13 @@ holeCSS.textContent=`
 #cosmos-tour-blackhole-v061[hidden]{display:none!important}
 /* v066: keep the black hole fully visible until the solar-system flight
    completes behind it; only then reveal the destination by crossfading. */
-#cosmos-tour-blackhole-v061.cosmos-hole-fade-to-universe{
+#cosmos-tour-blackhole-v061.cosmos-hole-transition-ready{
  animation:none!important;
- opacity:0;
+ opacity:1;
  transition:opacity 1.15s ease-in-out!important;
+}
+#cosmos-tour-blackhole-v061.cosmos-hole-transition-ready.cosmos-hole-fade-to-universe{
+ opacity:0;
  pointer-events:none;
 }
 /* v064: Keep the iframe at full viewport size; the embedded tour-only renderer fits the scene at 60%
@@ -614,14 +617,14 @@ const tourHoleFrame=tourHoleLayer.querySelector('#cosmos-hole-visit-frame');
 function tourHoleShow(){
  tourHoleStart=performance.now();
  tourHoleDepartureAt=-1;tourHoleFadeAt=-1;
- tourHoleLayer.classList.remove('cosmos-hole-fade-to-universe');
+ tourHoleLayer.classList.remove('cosmos-hole-transition-ready','cosmos-hole-fade-to-universe');
  tourHoleLayer.hidden=false;
  tourHoleFrame.src='./cosmos-black-hole-tour-extended-v065.html?tour=3';
 }
 function tourHoleHide(){
  tourHoleStart=-1;tourHoleDepartureAt=-1;tourHoleFadeAt=-1;
  tourHoleLayer.hidden=true;
- tourHoleLayer.classList.remove('cosmos-hole-fade-to-universe');
+ tourHoleLayer.classList.remove('cosmos-hole-transition-ready','cosmos-hole-fade-to-universe');
  if(tourHoleFrame.getAttribute('src'))tourHoleFrame.removeAttribute('src');
 }
 // Advance the actual camera while the third scene still covers the sky.
@@ -631,6 +634,9 @@ function tourHoleDepart(){
  if(!tourActive||tourStage!==2||tourHoleDepartureAt>=0)return;
  tourHoleDepartureAt=performance.now();
  tourHoleFadeAt=-1;
+ // Settle the entry animation at unchanged opacity now so CSS can
+ // interpolate opacity smoothly when the destination finally arrives.
+ tourHoleLayer.classList.add('cosmos-hole-transition-ready');
  // Stop the atlas RAF during the overlapping 3D flight when possible.
  // The final frame stays visible for the cinematic handoff.
  try{
