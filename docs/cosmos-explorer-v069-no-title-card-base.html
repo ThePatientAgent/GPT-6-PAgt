@@ -631,6 +631,7 @@ background:linear-gradient(90deg,transparent,#9ab8dbad,transparent)}
 
 @media(prefers-reduced-motion:reduce){#cosmos-tour-blackhole-v061{animation:none!important;transition:none!important}#cosmos-tour-curtain-v066{transition:none!important}#cosmos-hole-visit-frame{transition:none!important}}
 `;
+holeCSS.textContent+="\n/* Consistent cinematic caption, visible above the embedded black-hole renderer. */\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading{z-index:10!important;top:calc(68px + env(safe-area-inset-top))!important;left:18px!important;opacity:1!important;visibility:visible!important;animation:none!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading strong{font-size:19px!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-actions{display:none!important;}\n";
 document.head.appendChild(holeCSS);
 document.body.appendChild(tourHoleLayer);
 const tourHoleFrame=tourHoleLayer.querySelector('#cosmos-hole-visit-frame');
@@ -658,60 +659,25 @@ function tourHoleClearCurtain(){
 function tourHoleDepart(){
  if(tourHoleDeparting||!tourActive)return;
  tourHoleDeparting=true;
- const journey=++tourHoleTravelToken;
  const destination=tourStops[tourStage];
- // Preserve the black-hole image until the travel curtain becomes opaque.
- tourHoleCurtain.hidden=false;
- tourHoleCurtain.classList.remove('arriving');
- requestAnimationFrame(()=>{
-   if(journey===tourHoleTravelToken&&tourHoleDeparting)tourHoleCurtain.classList.add('visible');
- });
- tourHoleSchedule(()=>{
-   if(journey!==tourHoleTravelToken||!tourActive||!tourHoleDeparting)return;
-   tourHoleHide();
-   tourWords();
-   // The underlying camera travels while covered. Never uncover on a
-   // fixed timer: mobile Safari may need longer than the nominal 1650 ms.
-   fly(destination,true);
-   const startAt=performance.now();
-   let settledAt=0;
-   function arrive(now){
-     if(journey!==tourHoleTravelToken||!tourActive||!tourHoleDeparting)return;
-     const cameraReady=!state.fly&&!!state.orbit&&state.orbit.index===destination;
-     if(cameraReady){
-       if(!settledAt)settledAt=now;
-       if(now-settledAt>=80){reveal();return;}
-     }else settledAt=0;
-     if(now-startAt>6500){
-       // Fail visibly rather than trap the user in permanent darkness.
-       tourHoleCurtain.classList.remove('visible');
-       tourHoleSchedule(()=>{
-         if(journey!==tourHoleTravelToken)return;
-         tourEnd();
-         toast(english?'Travel interrupted. Explore freely.':'移動が中断されました。自由に探索できます。');
-       },750);
-       return;
-     }
-     tourHoleTravelRAF=requestAnimationFrame(arrive);
-   }
-   function reveal(){
-     tourHoleTravelRAF=0;
-     if(journey!==tourHoleTravelToken||!tourHoleDeparting)return;
-     // A restrained warm glow bridges the dark accretion disk and the Sun.
-     tourHoleCurtain.classList.add('arriving');
-     tourHoleSchedule(()=>{
-       if(journey===tourHoleTravelToken&&tourHoleDeparting)tourHoleCurtain.classList.remove('visible');
-     },50);
-     tourHoleSchedule(()=>{
-       if(journey!==tourHoleTravelToken||!tourHoleDeparting)return;
-       tourHoleCurtain.hidden=true;
-       tourHoleCurtain.classList.remove('arriving');
-       tourHoleDeparting=false;
-       tourOrbitAt=-1; // start the Solar System dwell only after reveal
-     },330);
-   }
-   tourHoleTravelRAF=requestAnimationFrame(arrive);
- },280);
+ // Keep the animated black hole visible while the destination camera moves.
+ tourWords();
+ fly(destination,true);
+ const journey=++tourHoleTravelToken;
+ const began=performance.now();
+ function finish(){
+  if(journey!==tourHoleTravelToken)return;
+  tourHoleHide();
+  tourHoleDeparting=false;
+  tourOrbitAt=-1;
+ }
+ function watch(now){
+  if(journey!==tourHoleTravelToken||!tourActive||!tourHoleDeparting)return;
+  if(!state.fly&&state.orbit&&state.orbit.index===destination){finish();return;}
+  if(now-began>4500){finish();return;}
+  tourHoleTravelRAF=requestAnimationFrame(watch);
+ }
+ tourHoleTravelRAF=requestAnimationFrame(watch);
 }
 function tourHoleShow(){
  clearTimeout(tourHoleLoadFallback);
@@ -738,8 +704,8 @@ function tourHoleHide(){
  if(!tourHoleLayer.hidden)tourHoleLayer.hidden=true;
  if(tourHoleFrame.hasAttribute('src'))tourHoleFrame.removeAttribute('src');
 }
-tourHoleLayer.querySelector('#cosmos-hole-visit-stop').addEventListener('click',()=>tourEnd());
-tourHoleLayer.querySelector('#cosmos-hole-visit-next').addEventListener('click',()=>{if(!tourActive)return;tourStage++;tourNext()});
+
+
 
 function tourWords(){
  tourToggle.textContent=tourActive?(english?'✕ STOP TOUR':'✕ ツアー終了'):(english?'▶ CINEMATIC TOUR':'▶ 宇宙を巡るツアー');
@@ -785,7 +751,7 @@ tourToggle.addEventListener('click',()=>tourActive?tourEnd():tourBegin());
 // Capture before camera/control handlers: a drag, tap, pinch or navigation wins instantly.
 const tourInterrupt=e=>{
  if(!tourActive)return;
- if(e.target?.closest?.('#tourToggle,#cosmos-hole-visit-stop,#cosmos-hole-visit-next'))return;
+ if(e.target?.closest?.('#tourToggle'))return;
  tourEnd();
 };
 document.addEventListener('pointerdown',tourInterrupt,true);
@@ -798,7 +764,7 @@ function tourTick(t,dt){
    // Wait for the iframe load to ensure visitors see at least one full animation cycle.
    if(tourHoleStart===-2)return; // viewer sees Orion until the black-hole document is ready
    if(tourHoleStart<0)return;
-   if(t-tourHoleStart>=8200){tourStage++;tourNext();}
+   if(t-tourHoleStart>=5400){tourStage++;tourNext();}
    return;
  }
  if(state.fly||!state.orbit||state.orbit.index!==idx){tourOrbitAt=-1;return;}
