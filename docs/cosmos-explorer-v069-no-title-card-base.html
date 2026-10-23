@@ -556,7 +556,7 @@ function fly(i,orbitOnArrival=true){
  $('warp').classList.add('on');refreshMode();
  $('locationLabel').textContent=i<0?(english?'Entire galaxy':'銀河全景'):placeName(i);
  document.querySelectorAll('.destination').forEach(b=>b.classList.toggle('active',Number(b.dataset.place)===i));
- toast(i<0?(english?'Returning to the galaxy':'銀河全景へ'):(english?'Flying to ':'航行中：')+placeName(i));
+ if(!(tourActive&&tourHoleDeparting))toast(i<0?(english?'Returning to the galaxy':'銀河全景へ'):(english?'Flying to ':'航行中：')+placeName(i));
 }
 $('warpTo').addEventListener('click',()=>fly(state.choose,true));
 $('orbitTo').addEventListener('click',()=>state.orbit&&state.orbit.index===state.choose?exitOrbit():startOrbit(state.choose));
@@ -574,6 +574,7 @@ let tourHoleEnteringAt=-1;
 let tourHoleDeparting=false;
 let tourHoleTravelToken=0;
 let tourHoleTravelRAF=0;
+let tourSolarApproach=null; // native Solar System dolly, composited with black-hole exit
 let tourHoleTimers=[];
 let tourHoleLoadFallback=0;
 const tourHoleLayer=document.createElement('section');
@@ -632,7 +633,7 @@ background:linear-gradient(90deg,transparent,#9ab8dbad,transparent)}
 @media(prefers-reduced-motion:reduce){#cosmos-tour-blackhole-v061{animation:none!important;transition:none!important}#cosmos-tour-curtain-v066{transition:none!important}#cosmos-hole-visit-frame{transition:none!important}}
 `;
 holeCSS.textContent+="\n/* Consistent cinematic caption, visible above the embedded black-hole renderer. */\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading{z-index:10!important;top:calc(68px + env(safe-area-inset-top))!important;left:18px!important;opacity:1!important;visibility:visible!important;animation:none!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading strong{font-size:19px!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-actions{display:none!important;}\n";
-holeCSS.textContent+="\n/* Same caption component as every other destination, above black-hole iframe. */\nbody.touring #tourCard{z-index:1000002!important;}\n#cosmos-tour-blackhole-v061{transition:opacity 1550ms ease-in-out,visibility 0s linear 1550ms!important;}\n#cosmos-tour-blackhole-v061.cosmos-hole-open{transition:opacity 850ms ease-in-out,visibility 0s!important;}\n";
+holeCSS.textContent+="\n/* Same caption component as every other destination, above black-hole iframe. */\nbody.touring #tourCard{z-index:1000002!important;}\n#cosmos-tour-blackhole-v061{transition:opacity 1150ms ease-in-out,visibility 0s linear 1150ms!important;}\n#cosmos-tour-blackhole-v061.cosmos-hole-open{transition:opacity 850ms ease-in-out,visibility 0s!important;}\n";
 document.head.appendChild(holeCSS);
 document.body.appendChild(tourHoleLayer);
 const tourHoleFrame=tourHoleLayer.querySelector('#cosmos-hole-visit-frame');
@@ -651,6 +652,7 @@ function tourHoleClearCurtain(){
  ++tourHoleTravelToken; // invalidate callbacks from an interrupted journey
  if(tourHoleTravelRAF)cancelAnimationFrame(tourHoleTravelRAF);
  tourHoleTravelRAF=0;
+ tourSolarApproach=null;
  for(const id of tourHoleTimers)clearTimeout(id);
  tourHoleTimers=[];
  tourHoleDeparting=false;
@@ -662,19 +664,34 @@ function tourHoleDepart(){
  tourHoleDeparting=true;
  const journey=++tourHoleTravelToken;
  const destination=tourStops[tourStage];
- // Start the camera flight first; let the journey become visible during the dissolve.
+ // Travel while the black-hole footage remains fully visible. Never uncover Orion.
  fly(destination,true);
- tourHoleSchedule(()=>{
-  if(journey!==tourHoleTravelToken||!tourActive)return;
-  tourWords();
-  tourHoleLayer.classList.remove('cosmos-hole-open');
- },240);
- tourHoleSchedule(()=>{
-  if(journey!==tourHoleTravelToken||!tourActive)return;
-  tourHoleHide();
-  tourHoleDeparting=false;
-  tourOrbitAt=-1;
- },2050);
+ function revealWhenReady(now){
+  if(journey!==tourHoleTravelToken||!tourActive||!tourHoleDeparting)return;
+  if(!state.fly&&state.orbit&&state.orbit.index===destination){
+   tourHoleTravelRAF=0;
+   // Frame the complete Solar System first, then make one gentle continuous approach.
+   // This makes the next scene grow from a real distant viewpoint, not pop into frame.
+   const orbit=state.orbit,finishRadius=orbit.radius;
+   const beginRadius=Math.max(finishRadius+1.8,4.5);
+   const forward=[Math.sin(state.yaw)*Math.cos(state.pitch),Math.sin(state.pitch),Math.cos(state.yaw)*Math.cos(state.pitch)];
+   orbit.radius=beginRadius;
+   state.pos=orbit.pivot.map((v,j)=>v-forward[j]*beginRadius);
+   tourSolarApproach={index:destination,start:now,duration:1650,from:beginRadius,to:finishRadius};
+   // No black curtain or standalone caption: the same tour card changes as the scenes dissolve.
+   tourWords();
+   tourHoleLayer.classList.remove('cosmos-hole-open');
+   tourHoleSchedule(()=>{
+    if(journey!==tourHoleTravelToken||!tourActive)return;
+    tourHoleHide();
+    tourHoleDeparting=false;
+    tourOrbitAt=-1;
+   },1800);
+   return;
+  }
+  tourHoleTravelRAF=requestAnimationFrame(revealWhenReady);
+ }
+ tourHoleTravelRAF=requestAnimationFrame(revealWhenReady);
 }
 function tourHoleShow(){
  clearTimeout(tourHoleLoadFallback);
@@ -761,7 +778,8 @@ function tourTick(t,dt){
    // Wait for the iframe load to ensure visitors see at least one full animation cycle.
    if(tourHoleStart===-2)return; // viewer sees Orion until the black-hole document is ready
    if(tourHoleStart<0)return;
-   if(t-tourHoleStart>=5400){tourStage++;tourNext();}
+   // Begin the hidden camera trip during the last seconds of the black-hole scene.
+   if(t-tourHoleStart>=3900){tourStage++;tourNext();}
    return;
  }
  if(state.fly||!state.orbit||state.orbit.index!==idx){tourOrbitAt=-1;return;}
@@ -1358,6 +1376,20 @@ function tick(t){
   const f=state.fly,q=clamp((t-f.start)/f.duration,0,1),e=q*q*(3-2*q);
   state.pos=f.from.map((v,i)=>v+(f.to[i]-v)*e);state.yaw=f.baseYaw+f.deltaYaw*e;state.pitch=f.basePitch+f.deltaPitch*e;
   if(q>=1){const enterOrbit=f.orbitOnArrival,index=f.placeIndex;state.fly=null;$('warp').classList.remove('on');if(enterOrbit)startOrbit(index);else toast(english?'Free flight ready':'自由飛行の準備ができました。');}
+ }
+ // Solar System introduction: native camera moves smoothly from a wide orbital view.
+ // Reuse the existing render loop; no extra WebGL pass, DOM layer or requestAnimationFrame.
+ if(tourSolarApproach){
+  const a=tourSolarApproach;
+  if(!tourActive||!state.orbit||state.orbit.index!==a.index){tourSolarApproach=null;}
+  else{
+   const q=clamp((t-a.start)/a.duration,0,1),ease=q*q*(3-2*q);
+   const radius=a.from+(a.to-a.from)*ease;
+   const forward=[Math.sin(state.yaw)*Math.cos(state.pitch),Math.sin(state.pitch),Math.cos(state.yaw)*Math.cos(state.pitch)];
+   state.orbit.radius=radius;
+   state.pos=state.orbit.pivot.map((v,j)=>v-forward[j]*radius);
+   if(q>=1)tourSolarApproach=null;
+  }
  }
  processKeys(dt);if(lookHeld)turnCamera(lookHeld[0]*dt*1.25,lookHeld[1]*dt*1.25);
   tourTick(t,dt);
