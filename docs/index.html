@@ -1,30 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v065 — Living Universe | Official Release</title>
 <style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
-<body><div id="cosmos-boot-shield" aria-hidden="true"></div><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v069-no-title-card-base.html?sky=eco&revision=restore-visibility-20261023"></iframe>
-<style>
-/* Hide the original, unenhanced iframe during its first paint. */
-#cosmos-boot-shield{display:none!important}
-#cosmos{visibility:visible!important}
-#cosmos-boot-shield.cosmos-ready{opacity:0}
-</style>
-<script>
-(()=>{'use strict';
-const frame=document.getElementById('cosmos');
-const shield=document.getElementById('cosmos-boot-shield');
-function reveal(){
- if(!shield||shield.classList.contains('cosmos-ready'))return;
- document.body.classList.add('cosmos-boot-ready');
- shield.classList.add('cosmos-ready');
- shield.addEventListener('transitionend',()=>shield.remove(),{once:true});
-}
-frame.addEventListener('load',()=>{
- // Allow other iframe-load listeners to inject their final styles before reveal.
- // Wait for both DOM enhancement and the first settled camera frames.
- requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(reveal,550)));
-});
-})();
-</script>
+<body><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v069-no-title-card-base.html?sky=eco&revision=solar-dolly-cbd2c4"></iframe>
 <script>
 /* Isolated visual experiment. Keep v075 and v076 untouched.
    Two independently moving surface layers create parallax on the DOM sphere.
@@ -99,9 +76,6 @@ try {
  body.cosmos-clean-ui.touring #tourToggle{top:14px!important;left:auto!important;right:14px!important;bottom:auto!important}
  #cosmos-v150-menu{position:fixed;z-index:2147483646;top:calc(12px + env(safe-area-inset-top));left:12px;border:1px solid #82b8e88a;border-radius:99px;background:#061629dc;color:#e6f4ff;padding:9px 14px;font:12px system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
  body.touring #cosmos-v150-menu{opacity:0;pointer-events:none}
- /* Guided film is automatic: hide manual buttons at every scene, including the loop boundary. */
- #cosmos-v150-menu{display:none!important}
- body.cosmos-clean-ui #tourToggle{display:none!important}
  `;
  d.head.appendChild(compact);
  d.body.classList.add('cosmos-clean-ui');
@@ -473,7 +447,7 @@ window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(e.
 if(new URLSearchParams(location.search).get('scene')==='black-hole')openBlackHole();
 })();
 </script><style>
-#cosmos-bh-open-v057{display:none!important}
+#cosmos-bh-open-v057[hidden]{display:none!important}
 </style>
 <script>
 (()=>{'use strict';
