@@ -566,6 +566,7 @@ const nav=$('destinations');places.forEach((pl,i)=>{const b=document.createEleme
 // v043 opt-in 6-stop cinematic flight. The user starts it; any interaction stops it.
 const tourStops=[4,3,6,0,1,5];
 let tourActive=false,tourStage=0,tourOrbitAt=-1;
+let tourStageEnteredAt=0; // fail-safe for stalls at the final galaxy scene
 const tourToggle=$('tourToggle');
 // v061: third destination is the approved, precomputed black-hole Canvas scene.
 // Keep the existing five real 3D tour stops untouched.
@@ -742,6 +743,7 @@ function tourEnd(){
 }
 function tourNext(){
  tourOrbitAt=-1;
+ tourStageEnteredAt=performance.now();
  if(tourHoleDeparting)return;
  if(tourStage>=tourStops.length){
   // The loop must clear the previous orbit and return to the opening wide view.
@@ -790,6 +792,12 @@ function tourTick(t,dt){
    // Begin the hidden camera trip during the last seconds of the black-hole scene.
    if(t-tourHoleStart>=3900){tourStage++;tourNext();}
    return;
+ }
+ // The final scene may never enter orbit on some mobile GPUs. Do not let it stall the film.
+ if(tourStage===tourStops.length-1 && t-tourStageEnteredAt>11500){
+  tourStage=0;
+  tourNext();
+  return;
  }
  if(state.fly||!state.orbit||state.orbit.index!==idx){tourOrbitAt=-1;return;}
  if(tourOrbitAt<0)tourOrbitAt=t;
