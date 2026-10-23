@@ -770,6 +770,26 @@ function tourBegin(){
  document.body.classList.add('touring');$('help').hidden=true;
  tourNext();
 }
+// Host-visible restart hook: the wrapper can recover from mobile tour stalls.
+window.cosmosRestartTour=function(){
+ try{
+  tourHoleClearCurtain();
+  tourHoleHide();
+  tourActive=false;
+  tourHoleDeparting=false;
+  exitOrbit(true);
+  state.fly=null;
+  state.pos=initialPos.slice();
+  state.yaw=initialYaw;
+  state.pitch=initialPitch;
+  tourStage=0;
+  tourOrbitAt=-1;
+  tourStageEnteredAt=0;
+  document.body.classList.remove('touring');
+  tourBegin();
+  return tourActive;
+ }catch(error){console.error('COSMOS tour restart failed',error);return false;}
+};
 tourToggle.addEventListener('click',()=>tourActive?tourEnd():tourBegin());
 // Capture before camera/control handlers: a drag, tap, pinch or navigation wins instantly.
 const tourInterrupt=e=>{
