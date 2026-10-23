@@ -552,7 +552,7 @@ function fly(i,orbitOnArrival=true){
  const newYaw=Math.atan2(direction[0],direction[2]);
  const newPitch=Math.asin(clamp(direction[1]/n,-1,1));
  const shortestYaw=Math.atan2(Math.sin(newYaw-state.yaw),Math.cos(newYaw-state.yaw));
- state.fly={from,to,start:performance.now(),duration:(tourActive&&(i===4||i===3))?2900:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
+ state.fly={from,to,start:performance.now(),duration:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
  $('warp').classList.add('on');refreshMode();
  $('locationLabel').textContent=i<0?(english?'Entire galaxy':'銀河全景'):placeName(i);
  document.querySelectorAll('.destination').forEach(b=>b.classList.toggle('active',Number(b.dataset.place)===i));
@@ -566,7 +566,6 @@ const nav=$('destinations');places.forEach((pl,i)=>{const b=document.createEleme
 // v043 opt-in 6-stop cinematic flight. The user starts it; any interaction stops it.
 const tourStops=[4,3,6,0,1,5];
 let tourActive=false,tourStage=0,tourOrbitAt=-1;
-let tourStageEnteredAt=0; // fail-safe for stalls at the final galaxy scene
 const tourToggle=$('tourToggle');
 // v061: third destination is the approved, precomputed black-hole Canvas scene.
 // Keep the existing five real 3D tour stops untouched.
@@ -743,16 +742,8 @@ function tourEnd(){
 }
 function tourNext(){
  tourOrbitAt=-1;
- tourStageEnteredAt=performance.now();
  if(tourHoleDeparting)return;
- if(tourStage>=tourStops.length){
-  // The loop must clear the previous orbit and return to the opening wide view.
-  // A fresh flight then leads naturally into Pleiades instead of stopping.
-  tourStage=0;tourOrbitAt=-1;
-  exitOrbit(true);
-  state.pos=initialPos.slice();
-  state.fly=null;
- }
+ if(tourStage>=tourStops.length){tourEnd();return;}
  // One-time vignette: advance the native camera during a short covered interval.
  if(!tourHoleLayer.hidden && tourStops[tourStage]!==6){tourHoleDepart();return;}
  tourHoleHide();
@@ -770,26 +761,6 @@ function tourBegin(){
  document.body.classList.add('touring');$('help').hidden=true;
  tourNext();
 }
-// Host-visible restart hook: the wrapper can recover from mobile tour stalls.
-window.cosmosRestartTour=function(){
- try{
-  tourHoleClearCurtain();
-  tourHoleHide();
-  tourActive=false;
-  tourHoleDeparting=false;
-  exitOrbit(true);
-  state.fly=null;
-  state.pos=initialPos.slice();
-  state.yaw=initialYaw;
-  state.pitch=initialPitch;
-  tourStage=0;
-  tourOrbitAt=-1;
-  tourStageEnteredAt=0;
-  document.body.classList.remove('touring');
-  tourBegin();
-  return tourActive;
- }catch(error){console.error('COSMOS tour restart failed',error);return false;}
-};
 tourToggle.addEventListener('click',()=>tourActive?tourEnd():tourBegin());
 // Capture before camera/control handlers: a drag, tap, pinch or navigation wins instantly.
 const tourInterrupt=e=>{
@@ -802,8 +773,6 @@ document.addEventListener('touchstart',tourInterrupt,{capture:true,passive:true}
 document.addEventListener('keydown',e=>{if(tourActive&&e.key!=='Tab')tourEnd()},true);
 function tourTick(t,dt){
  if(!tourActive||document.visibilityState!=='visible'||tourHoleDeparting)return;
- // Recover from any invalid stage rather than silently ending the film.
- if(tourStage>=tourStops.length){tourStage=0;tourNext();return;}
  const idx=tourStops[tourStage];
  if(idx===6){
    // Wait for the iframe load to ensure visitors see at least one full animation cycle.
@@ -812,12 +781,6 @@ function tourTick(t,dt){
    // Begin the hidden camera trip during the last seconds of the black-hole scene.
    if(t-tourHoleStart>=3900){tourStage++;tourNext();}
    return;
- }
- // The final scene may never enter orbit on some mobile GPUs. Do not let it stall the film.
- if(tourStage===tourStops.length-1 && t-tourStageEnteredAt>11500){
-  tourStage=0;
-  tourNext();
-  return;
  }
  if(state.fly||!state.orbit||state.orbit.index!==idx){tourOrbitAt=-1;return;}
  if(tourOrbitAt<0)tourOrbitAt=t;
@@ -1410,7 +1373,7 @@ function viewChanged(c){const v=[...c.eye,state.yaw,state.pitch];let changed=!pr
 function tick(t){
  const dt=Math.min(.06,Math.max(.001,(t-state.last)/1000||.016));state.last=t;
  if(state.fly){
-  const f=state.fly,q=clamp((t-f.start)/f.duration,0,1),e=(tourActive&&(f.placeIndex===4||f.placeIndex===3))?(q*q*q*(q*(q*6-15)+10)):(q*q*(3-2*q));
+  const f=state.fly,q=clamp((t-f.start)/f.duration,0,1),e=q*q*(3-2*q);
   state.pos=f.from.map((v,i)=>v+(f.to[i]-v)*e);state.yaw=f.baseYaw+f.deltaYaw*e;state.pitch=f.basePitch+f.deltaPitch*e;
   if(q>=1){const enterOrbit=f.orbitOnArrival,index=f.placeIndex;state.fly=null;$('warp').classList.remove('on');if(enterOrbit)startOrbit(index);else toast(english?'Free flight ready':'自由飛行の準備ができました。');}
  }
