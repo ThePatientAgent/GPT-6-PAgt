@@ -552,7 +552,7 @@ function fly(i,orbitOnArrival=true){
  const newYaw=Math.atan2(direction[0],direction[2]);
  const newPitch=Math.asin(clamp(direction[1]/n,-1,1));
  const shortestYaw=Math.atan2(Math.sin(newYaw-state.yaw),Math.cos(newYaw-state.yaw));
- state.fly={from,to,start:performance.now(),duration:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
+ state.fly={from,to,start:performance.now(),duration:(tourActive&&(i===4||i===3))?2900:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
  $('warp').classList.add('on');refreshMode();
  $('locationLabel').textContent=i<0?(english?'Entire galaxy':'銀河全景'):placeName(i);
  document.querySelectorAll('.destination').forEach(b=>b.classList.toggle('active',Number(b.dataset.place)===i));
@@ -743,7 +743,10 @@ function tourEnd(){
 function tourNext(){
  tourOrbitAt=-1;
  if(tourHoleDeparting)return;
- if(tourStage>=tourStops.length){tourEnd();return;}
+ if(tourStage>=tourStops.length){
+  // Seamlessly restart the six-stop film; reset only at the completed boundary.
+  tourStage=0;tourOrbitAt=-1;
+ }
  // One-time vignette: advance the native camera during a short covered interval.
  if(!tourHoleLayer.hidden && tourStops[tourStage]!==6){tourHoleDepart();return;}
  tourHoleHide();
@@ -1373,7 +1376,7 @@ function viewChanged(c){const v=[...c.eye,state.yaw,state.pitch];let changed=!pr
 function tick(t){
  const dt=Math.min(.06,Math.max(.001,(t-state.last)/1000||.016));state.last=t;
  if(state.fly){
-  const f=state.fly,q=clamp((t-f.start)/f.duration,0,1),e=q*q*(3-2*q);
+  const f=state.fly,q=clamp((t-f.start)/f.duration,0,1),e=(tourActive&&(f.placeIndex===4||f.placeIndex===3))?(q*q*q*(q*(q*6-15)+10)):(q*q*(3-2*q));
   state.pos=f.from.map((v,i)=>v+(f.to[i]-v)*e);state.yaw=f.baseYaw+f.deltaYaw*e;state.pitch=f.basePitch+f.deltaPitch*e;
   if(q>=1){const enterOrbit=f.orbitOnArrival,index=f.placeIndex;state.fly=null;$('warp').classList.remove('on');if(enterOrbit)startOrbit(index);else toast(english?'Free flight ready':'自由飛行の準備ができました。');}
  }
