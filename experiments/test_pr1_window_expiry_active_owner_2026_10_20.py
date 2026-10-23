@@ -68,6 +68,54 @@ class ActiveOwnerWindowExpiryTest(unittest.TestCase):
             self.assertEqual(final["state"], EffectState.UNKNOWN.value)
             self.assertIsNone(final["dispatch_owner_token"])
             self.assertIsNone(final["dispatch_lease_expires_at"])
+            # A cleared lease must never become permission to retry after the
+            # original provider idempotency window has already expired.
+            self.assertIsNone(second.claim_retry_dispatch(
+                "window-owner", idempotency_window_seconds=0))
+        finally:
+            if first is not None:
+                first.db.close()
+            if second is not None:
+                second.db.close()
+            os.unlink(path)
+
+
+    def test_valid_late_positive_after_window_refusal_is_not_dropped(self):
+        """A real prior owner's positive receipt may arrive after retry refusal."""
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        path = tmp.name
+        tmp.close()
+        first = second = None
+        try:
+            first = OperationJournal(path)
+            second = OperationJournal(path)
+            first.begin(amount=500, currency="usd", operation_id="late-positive")
+            owner_token = first.begin_dispatch("late-positive", lease_seconds=300)
+            self.assertIsNotNone(owner_token)
+
+            # Independently observe that the original retry window is over
+            # while the previous dispatch still has a live owner.
+            boundary = PaymentIntentBoundary(
+                second, NoGatewayCalls(), idempotency_window_seconds=0)
+            refused = boundary.recover("late-positive")
+            self.assertEqual(refused.state, EffectState.DISPATCHING)
+
+            # The original owner now supplies a correlated positive result.
+            # The refusal must not erase this evidence or permit redispatch.
+            positive = first.observe(
+                "late-positive", state=EffectState.INTENT_CREATED,
+                lookup_method="original_owner_late_positive",
+                authority="provider", provider_reference="pi_late_positive",
+                promote_provider_reference=True, owner_token=owner_token,
+                raw={"id": "pi_late_positive", "correlated": True},
+            )
+            self.assertEqual(positive.state, EffectState.INTENT_CREATED)
+            self.assertEqual(positive.provider_reference, "pi_late_positive")
+            observed = second.get("late-positive")
+            self.assertEqual(observed.state, EffectState.INTENT_CREATED)
+            self.assertEqual(observed.provider_reference, "pi_late_positive")
+            self.assertIsNone(second.claim_retry_dispatch(
+                "late-positive", idempotency_window_seconds=0))
         finally:
             if first is not None:
                 first.db.close()
