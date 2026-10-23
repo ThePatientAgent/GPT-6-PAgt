@@ -1,12 +1,11 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020612"><title>COSMOS v065 — Living Universe | Official Release</title>
 <style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612}iframe{display:block;width:100%;height:100%;border:0}</style></head>
-<body><div id="cosmos-boot-shield" aria-hidden="true"></div><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v069-no-title-card-base.html?sky=eco&revision=watchdog-581fde0"></iframe>
+<body><div id="cosmos-boot-shield" aria-hidden="true"></div><iframe id="cosmos" title="COSMOS interactive universe" allow="fullscreen" src="./cosmos-explorer-v069-no-title-card-base.html?sky=eco&revision=restore-visibility-20261023"></iframe>
 <style>
 /* Hide the original, unenhanced iframe during its first paint. */
-#cosmos-boot-shield{position:fixed;inset:0;background:#020612;z-index:2147483645;pointer-events:none;opacity:1;transition:opacity 850ms ease}
-#cosmos{visibility:hidden}
-body.cosmos-boot-ready #cosmos{visibility:visible}
+#cosmos-boot-shield{display:none!important}
+#cosmos{visibility:visible!important}
 #cosmos-boot-shield.cosmos-ready{opacity:0}
 </style>
 <script>
@@ -24,41 +23,6 @@ frame.addEventListener('load',()=>{
  // Wait for both DOM enhancement and the first settled camera frames.
  requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(reveal,550)));
 });
-})();
-</script>
-<script>
-/* v170: Parent-level watchdog is independent of the child's animation loop.
-   On iOS, a scene can stop advancing without the child reaching tourNext(). */
-(()=>{
- const host=document.getElementById('cosmos');
- let finalSince=0,resetPending=false;
- const check=()=>{
-  try{
-   const win=host.contentWindow,doc=host.contentDocument;
-   if(!win||!doc||!doc.body)return;
-   const name=doc.getElementById('tourName')?.textContent||'';
-   const finalScene=/galactic center|銀河中心/i.test(name);
-   const touring=doc.body.classList.contains('touring');
-   const now=Date.now();
-   if(finalScene){
-    if(!finalSince)finalSince=now;
-    if(now-finalSince>11000&&!resetPending){
-     resetPending=true;
-     const ok=typeof win.cosmosRestartTour==='function'&&win.cosmosRestartTour();
-     if(!ok){host.src=host.src.replace(/([?&])watchdog=\\d+/, '$1watchdog=0')+(host.src.includes('?')?'&':'?')+'watchdog='+now;}
-     finalSince=0;
-     setTimeout(()=>{resetPending=false;},2500);
-    }
-   }else{finalSince=0;}
-   // An unexpected end should not leave the display on a stopped manual scene.
-   if(!touring&&!finalScene&&doc.readyState==='complete'&&typeof win.cosmosRestartTour==='function'&&!resetPending){
-    const since=Number(doc.body.dataset.cosmosStoppedSince||0);
-    if(!since)doc.body.dataset.cosmosStoppedSince=String(now);
-    else if(now-since>4500){resetPending=true;win.cosmosRestartTour();setTimeout(()=>{resetPending=false;},2500);}
-   }else delete doc.body.dataset.cosmosStoppedSince;
-  }catch(e){console.warn('COSMOS loop watchdog',e)}
- };
- setInterval(check,1000);
 })();
 </script>
 <script>
