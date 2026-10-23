@@ -744,8 +744,12 @@ function tourNext(){
  tourOrbitAt=-1;
  if(tourHoleDeparting)return;
  if(tourStage>=tourStops.length){
-  // Seamlessly restart the six-stop film; reset only at the completed boundary.
+  // The loop must clear the previous orbit and return to the opening wide view.
+  // A fresh flight then leads naturally into Pleiades instead of stopping.
   tourStage=0;tourOrbitAt=-1;
+  exitOrbit(true);
+  state.pos=initialPos.slice();
+  state.fly=null;
  }
  // One-time vignette: advance the native camera during a short covered interval.
  if(!tourHoleLayer.hidden && tourStops[tourStage]!==6){tourHoleDepart();return;}
@@ -776,6 +780,8 @@ document.addEventListener('touchstart',tourInterrupt,{capture:true,passive:true}
 document.addEventListener('keydown',e=>{if(tourActive&&e.key!=='Tab')tourEnd()},true);
 function tourTick(t,dt){
  if(!tourActive||document.visibilityState!=='visible'||tourHoleDeparting)return;
+ // Recover from any invalid stage rather than silently ending the film.
+ if(tourStage>=tourStops.length){tourStage=0;tourNext();return;}
  const idx=tourStops[tourStage];
  if(idx===6){
    // Wait for the iframe load to ensure visitors see at least one full animation cycle.
