@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#01030a"><title>COSMOS — Cinema Grade Preview</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01030a}
+iframe{position:fixed;inset:0;width:100%;height:100%;border:0}
+#grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");mix-blend-mode:screen}
+#frame{position:fixed;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 110px 18px rgba(0,0,0,.37)}
+@media(max-width:700px){#frame{box-shadow:inset 0 0 55px 6px rgba(0,0,0,.3)}}
+@media(prefers-reduced-motion:reduce){#grain{display:none}}
+</style></head>
+<body><iframe id="cosmos" title="COSMOS cinematic experimental tour" src="./index.html"></iframe><div id="grain"></div><div id="frame"></div>
+<script>
+const frame=document.getElementById('cosmos');
+frame.addEventListener('load',()=>{
+try{
+ const wrapper=frame.contentDocument;
+ const inner=wrapper.getElementById('cosmos');
+ if(!inner)return;
+ function grade(){
+   try{
+     const d=inner.contentDocument;
+     if(!d||d.getElementById('cinema-grade-v1'))return;
+     const s=d.createElement('style');s.id='cinema-grade-v1';
+     s.textContent=`
+/* Cinema-grade preview: additive, non-destructive. Native navigation untouched. */
+#vignette{background:radial-gradient(ellipse at 50% 45%,transparent 29%,rgba(0,3,13,.19) 68%,rgba(0,2,9,.76) 112%)!important}
+#nebula{filter:saturate(1.14) contrast(1.09)!important}
+#warp.on{opacity:.84!important;filter:drop-shadow(0 0 15px rgba(121,188,255,.3))}
+#hybridLayer{filter:saturate(1.10) contrast(1.06)}
+@media(prefers-reduced-motion:reduce){#warp.on{animation:none!important}}
+`;
+     d.head.appendChild(s);
+   }catch(e){}
+ }
+ inner.addEventListener('load',grade);grade();
+}catch(e){}
+});
+</script></body></html>
