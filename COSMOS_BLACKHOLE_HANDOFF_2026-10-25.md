@@ -1,6 +1,33 @@
 # COSMOS black hole — continuation checkpoint
 Updated 2026-10-25 JST.
 
+## V13 radiance — current checkpoint
+User accepted V12's shape: 「うんよくなった」, then requested a much more spectacular appearance: 「でももっと派手にしないと地味ね」.
+Preserve the accepted core geometry and approved 0.60 framing.
+
+V13:
+- Direct scene: docs/cosmos-black-hole-radiance-v013.html.
+- Tour wrapper: docs/cosmos-cinema-blackhole-v13-radiance-20261025.html.
+- Stronger hue-preserving exposure (3.4), warm gold radiance at two diffusion scales.
+- Original sharp plasma pixels stay at their original coordinates. No disk stretch or inverse coordinate warp.
+- Protect actual dark interior pixels; spread source-derived light into surrounding space.
+- Extend the original sharp frame to 620×420 BEFORE diffusion. This avoids magnifying already-blurred wing slices.
+- Bake all 48 complete 620×420 frames once into a 3720×3360 atlas. Sharp image and radiance share the same frame and playback clock.
+- One playback canvas; original six-second cycle and interpolation remain.
+- Keep V12 untouched as the user-approved shape baseline. The common published index and universe engine are preserved.
+- ?light=0 shows the original animation.
+
+Validation:
+- Both embedded scripts pass node --check.
+- Local cloud Chrome: all 48 frames prepared, ready=true, renderer=canvas2d-radiant-plasma, geometry=identity, radiance=source-synchronous.
+- Preparation measured 1113.4 ms in that browser; playback phase advanced from 0.13 to 15.65; canvas count is one.
+- Screenshots showed a substantially stronger warm-gold corona with a black interior and stable ring.
+- iPhone appearance and preparation time are unverified.
+Verify Pages deployment before giving the new direct preview.
+
+The V12/V11 records below are historical context.
+
+
 ## V12 correction — current checkpoint
 The user rejected V11: 「歪んで変になってる」.
 V11's inverse y-coordinate map stretched the plasma around a hard shadow mask and distorted the image. Do not restore or recommend the V11 warp as a successful result.

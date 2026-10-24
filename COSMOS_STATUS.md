@@ -1,15 +1,15 @@
 # COSMOS — technical and artistic checkpoint
 Updated 2026-10-25 JST.
 
-## Current continuation — V12 distortion correction, 2026-10-25
-The user rejected V11 as distorted. Its spatial plasma warp is removed.
-V12 preserves every source pixel coordinate and applies only a hue-preserving exposure curve.
-Read [COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md](COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md), starting with the V12 correction.
-Direct preview: docs/cosmos-black-hole-shape-light-v012.html.
-Tour preview: docs/cosmos-cinema-blackhole-v12-shape-20261025.html.
-V11 preview entries redirect to V12. The shared release and original atlas stay intact.
-Local cloud-browser checks: 48 frames ready, original contour, advancing animation; 224.2 ms preparation. iPhone is unverified.
-The old universe baseline below is historical context.
+## Current continuation — V13 radiance, 2026-10-25
+User approved V12's restored shape and requested a much more spectacular appearance.
+V13 keeps the sharp image geometry and adds stronger warm-gold radiance from the same animated source frames.
+Direct: docs/cosmos-black-hole-radiance-v013.html.
+Tour: docs/cosmos-cinema-blackhole-v13-radiance-20261025.html.
+Read the V13 section in [COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md](COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md).
+V12 remains the accepted baseline; the shared release is unchanged.
+Local browser verified 48 frames, one playback canvas, advancing animation, stable ring and dark center; preparation 1113.4 ms. iPhone is unverified.
+Historical universe baseline follows.
 
 ## Stable baseline
 v060 "Galactic Context", GitHub path docs/cosmos-explorer-v060-galactic-context.html, commit 0a8248d7a96d7f1b49e38c74a51d779b17d9c448.
