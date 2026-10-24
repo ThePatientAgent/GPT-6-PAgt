@@ -8,7 +8,7 @@ V11 prepares all 48 plasma frames once and plays one synchronized canvas; it rep
 New experiment: docs/cosmos-cinema-blackhole-v11-native-20261025.html.
 Direct scene: docs/cosmos-black-hole-native-plasma-v011.html.
 The shared release docs/index.html and v069 engine remain intact.
-Local cloud browser verified 48-frame preparation, advancing animation and the manual route; automatic third-stop source redirection was observed.
+Public previews verified in the cloud browser: all 48 frames ready, advancing animation, and the complete automatic third-stop display. Code commit dfd9aa5 passed Python tests and Pages deployment. Third-stop preparation measured 349.4 ms; this is not an iPhone measurement.
 iPhone appearance/performance are unverified. The old checkpoint below is historical context.
 
 
