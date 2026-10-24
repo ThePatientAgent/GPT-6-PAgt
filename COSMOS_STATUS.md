@@ -1,17 +1,15 @@
 # COSMOS — technical and artistic checkpoint
 Updated 2026-10-25 JST.
 
-## Current continuation — 2026-10-25
-Resume black-hole work from the V10 sharpness experiment, not the historical v060 universe baseline below.
-Read [COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md](COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md) for the complete current state.
-V11 prepares all 48 plasma frames once and plays one synchronized canvas; it replaces the 100 ms brightness overlay used in V10.
-New experiment: docs/cosmos-cinema-blackhole-v11-native-20261025.html.
-Direct scene: docs/cosmos-black-hole-native-plasma-v011.html.
-The shared release docs/index.html and v069 engine remain intact.
-Public previews verified in the cloud browser: all 48 frames ready, advancing animation, and the complete automatic third-stop display. Code commit dfd9aa5 passed Python tests and Pages deployment. Third-stop preparation measured 349.4 ms; this is not an iPhone measurement.
-iPhone appearance/performance are unverified. The old checkpoint below is historical context.
-
-
+## Current continuation — V12 distortion correction, 2026-10-25
+The user rejected V11 as distorted. Its spatial plasma warp is removed.
+V12 preserves every source pixel coordinate and applies only a hue-preserving exposure curve.
+Read [COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md](COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md), starting with the V12 correction.
+Direct preview: docs/cosmos-black-hole-shape-light-v012.html.
+Tour preview: docs/cosmos-cinema-blackhole-v12-shape-20261025.html.
+V11 preview entries redirect to V12. The shared release and original atlas stay intact.
+Local cloud-browser checks: 48 frames ready, original contour, advancing animation; 224.2 ms preparation. iPhone is unverified.
+The old universe baseline below is historical context.
 
 ## Stable baseline
 v060 "Galactic Context", GitHub path docs/cosmos-explorer-v060-galactic-context.html, commit 0a8248d7a96d7f1b49e38c74a51d779b17d9c448.

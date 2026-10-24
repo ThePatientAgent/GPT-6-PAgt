@@ -1,6 +1,33 @@
 # COSMOS black hole — continuation checkpoint
 Updated 2026-10-25 JST.
 
+## V12 correction — current checkpoint
+The user rejected V11: 「歪んで変になってる」.
+V11's inverse y-coordinate map stretched the plasma around a hard shadow mask and distorted the image. Do not restore or recommend the V11 warp as a successful result.
+
+V12 removes the coordinate map, reference shadow mask, spatial interpolation and per-channel gamma.
+Only a pointwise, hue-preserving exposure curve is applied: each output pixel reads the RGB at the same source pixel.
+Pure black stays black. The original 48-frame atlas, 6-second interpolation cycle, 620×420 extended framing and approved 0.60 presentation remain in use.
+No shifted copies, dilation or separate light overlay are added. V12 fixes distortion; it does not claim to increase physical disk thickness.
+
+Current files:
+- docs/cosmos-black-hole-shape-light-v012.html
+- docs/cosmos-cinema-blackhole-v12-shape-20261025.html
+The two V11 preview entry files redirect to these corrected counterparts, preserving search parameters and fragments.
+The shared release index.html and universe engine are unchanged.
+
+V12 checks:
+- Both embedded scripts pass node --check.
+- Local cloud browser: all 48 frames prepared, ready=true, renderer=canvas2d-shape-locked, geometry=identity, phase=0.40.
+- Preparation measured 224.2 ms in that browser. iPhone Safari remains unverified.
+- The rendered ring has the original contour. Source-coordinate warping code is absent.
+- ?light=0 on the direct V12 scene is the unmodified source animation.
+
+Verify Pages deployment before providing the new preview URL. Await real-device feedback; do not present the rejected V11 image as the reference.
+
+The V11 record below is historical and superseded by this correction.
+
+
 ## Current goal
 Continue the late October black-hole experiment from the user's feedback 「ブレてる！」.
 Make the luminous accretion band visibly thicker while keeping the approved 0.60 framing, dark shadow, animation and tour continuity.
