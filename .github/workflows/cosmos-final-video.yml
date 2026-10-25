@@ -15,70 +15,78 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install Playwright
+      - name: Install Playwright and encoder
         run: |
           python -m pip install playwright==1.58.0
-          python -m playwright install ffmpeg
-      - name: Record real COSMOS five-stop tour
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Render real COSMOS tour frame by frame at a fixed simulation clock
         run: |
-          mkdir -p /tmp/cosmos-record docs/media
+          mkdir -p /tmp/cosmos-frames docs/media
           python - <<'PY'
-          import time, os
+          import time
+          from datetime import datetime
+          from pathlib import Path
           from playwright.sync_api import sync_playwright
           site='https://thepatientagent.github.io/GPT-6-PAgt/?capture=cosmos-final-20261025'
+          out=Path('/tmp/cosmos-frames')
           with sync_playwright() as p:
-            browser=p.chromium.launch(channel='chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader'])
-            context=browser.new_context(viewport={'width':360,'height':640},device_scale_factor=1,
-              is_mobile=True,has_touch=True,reduced_motion='no-preference',
-              record_video_dir='/tmp/cosmos-record',record_video_size={'width':360,'height':640})
+            browser=p.chromium.launch(channel='chrome',headless=True,
+              args=['--no-sandbox','--disable-dev-shm-usage','--enable-webgl',
+                    '--use-gl=angle','--use-angle=swiftshader'])
+            context=browser.new_context(viewport={'width':360,'height':640},
+              device_scale_factor=1,is_mobile=True,has_touch=True,
+              reduced_motion='no-preference')
             page=context.new_page()
             page.on('pageerror',lambda e:print('PAGE ERROR:',str(e),flush=True))
+            # Virtual frame stepping decouples smooth camera travel from runner CPU speed.
+            # No Playwright real-time screen recorder or FFmpeg duplicate frames.
+            page.clock.install()
+            page.clock.pause_at(datetime.now())
             page.goto(site,wait_until='domcontentloaded',timeout=90000)
-            start_record=time.monotonic()
             inner=page.frame_locator('#cosmos')
-            inner.locator('body.touring').wait_for(state='attached',timeout=60000)
-            print('RECORDING STARTED',inner.locator('#tourStep').inner_text(),flush=True)
-            tour_elapsed=time.monotonic()-start_record
-            print('STARTUP SECONDS',tour_elapsed,flush=True)
-            with open('/tmp/cosmos-record/startup.txt','w') as f:f.write(str(tour_elapsed))
-            names=[]
-            end=time.monotonic()+85
-            while time.monotonic()<end:
-              try:
-                stage=inner.locator('#tourStep').inner_text(timeout=3000)
-                name=inner.locator('#tourName').inner_text(timeout=3000)
-                key=stage+' '+name
-                if not names or key!=names[-1]:
-                  names.append(key);print('TOUR:',key,flush=True)
-                if len(names)>=5 and not inner.locator('body.touring').count():break
-              except Exception as e:print('MONITOR:',str(e)[:120],flush=True)
-              if len(names)>=5 and time.monotonic()+5>=end:break
-              time.sleep(1.0)
-              if len(names)>=5:
-                time.sleep(6)
-                break
-            print('VISITED',names,flush=True)
-            assert len(names)>=5, 'Did not observe all five tour stops'
-            video=page.video
-            context.close()
-            video.save_as('/tmp/cosmos-record/cosmos-raw.webm')
-            browser.close()
+            for attempt in range(250):
+              if inner.locator('body.touring').count():break
+              page.clock.run_for(100)
+            else:raise RuntimeError('Tour never started after virtual startup')
+            print('V6: capturing from first tour scene, with NO top page frames',flush=True)
+            observed=[]
+            started=time.monotonic()
+            captured=0
+            for i in range(1500):
+              page.clock.run_for(33)
+              if i%12==0:
+                try:
+                  touring=inner.locator('body.touring').count()>0
+                  stage=inner.locator('#tourStep').inner_text(timeout=2000)
+                  name=inner.locator('#tourName').inner_text(timeout=2000)
+                  key=stage+' '+name
+                  if not observed or key!=observed[-1]:
+                    observed.append(key);print('V6 STOP:',key,flush=True)
+                  if not touring and len(observed)>=5:break
+                except Exception as e:
+                  print('V6 CHECK:',str(e)[:150],flush=True)
+              page.screenshot(path=str(out/f'{i:05d}.jpg'),type='jpeg',quality=93,
+                animations='allow',timeout=30000)
+              captured+=1
+              if i%150==0:
+                print('V6 FRAMES:',captured,'wall seconds',round(time.monotonic()-started,1),flush=True)
+            print('V6 RESULT:',captured,'frames, stops',observed,flush=True)
+            assert len(observed)>=5,'Did not observe five destinations'
+            assert captured>=650,'Incomplete video'
+            context.close();browser.close()
           PY
-      - name: Encode video for X
+      - name: Encode exact-timing 30fps MP4
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          START=$(python -c "print(round(float(open('/tmp/cosmos-record/startup.txt').read())+1.0,2))")
-          echo "Trimming startup: ${START}s"
-          ffmpeg -hide_banner -loglevel error -y -ss "$START" -i /tmp/cosmos-record/cosmos-raw.webm -vf "crop=360:640:0:0,fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
-          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
+          ffmpeg -hide_banner -loglevel error -y -framerate 30 -start_number 0 -i /tmp/cosmos-frames/%05d.jpg -vf "scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -r 30 -movflags +faststart -an docs/media/cosmos-final-five-stop-frameclock-v6.mp4
+          ffprobe -v error -show_entries stream=avg_frame_rate,nb_frames -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-frameclock-v6.mp4
       - uses: actions/upload-artifact@v4
         with:
-          name: cosmos-final-tour-startup-v5-mp4
-          path: docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
+          name: cosmos-final-tour-frameclock-v6-mp4
+          path: docs/media/cosmos-final-five-stop-frameclock-v6.mp4
       - name: Publish MP4 to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
-          git commit -m "Remove measured startup time from COSMOS V5"
+          git add docs/media/cosmos-final-five-stop-frameclock-v6.mp4
+          git commit -m "Publish COSMOS V6 deterministic 30fps frames"
           git push
