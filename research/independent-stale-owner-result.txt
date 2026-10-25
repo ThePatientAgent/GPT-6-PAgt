@@ -1,0 +1,15 @@
+0115ad983a0da544bd1f50c4e7b6792b22325f2b
+test_stale_positive_cannot_release_new_owner_lease (__main__.IndependentLatePositiveTests.test_stale_positive_cannot_release_new_owner_lease) ... FAIL
+
+======================================================================
+FAIL: test_stale_positive_cannot_release_new_owner_lease (__main__.IndependentLatePositiveTests.test_stale_positive_cannot_release_new_owner_lease)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/GPT-6-PAgt/GPT-6-PAgt/research/test_independent_stale_positive.py", line 33, in test_stale_positive_cannot_release_new_owner_lease
+    self.assertEqual(row["dispatch_owner_token"],token_new,
+AssertionError: None != 'fb04486826f04983b06566031a306751' : STALE OWNER RELEASED THE NEW WORKER LEASE
+
+----------------------------------------------------------------------
+Ran 1 test in 0.081s
+
+FAILED (failures=1)
