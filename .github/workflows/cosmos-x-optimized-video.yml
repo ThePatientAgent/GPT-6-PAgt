@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Encode COSMOS tour with persistent diagnostic report
+      - name: Encode COSMOS tour and persist diagnostics
         shell: bash
         run: |
           set -uo pipefail
@@ -28,27 +28,55 @@ jobs:
             echo "date_utc=$(date -u +%FT%TZ)"
           } > "$report"
           status=0
-          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
-            echo 'ERROR: ffmpeg/ffprobe unavailable' >> "$report"
+          ffmpeg_bin=$(command -v ffmpeg || true)
+          ffprobe_bin=$(command -v ffprobe || true)
+          if [ -z "$ffmpeg_bin" ]; then
+            echo 'Installing ffmpeg via apt-get' >> "$report"
+            if sudo apt-get update -qq >/tmp/cosmos-apt.log 2>&1 && sudo apt-get install -y -qq ffmpeg >>/tmp/cosmos-apt.log 2>&1; then
+              echo 'apt-get ffmpeg installation succeeded' >> "$report"
+            else
+              echo 'apt-get ffmpeg installation failed, attempting pip fallback' >> "$report"
+              tail -n 12 /tmp/cosmos-apt.log >> "$report"
+            fi
+            ffmpeg_bin=$(command -v ffmpeg || true)
+            ffprobe_bin=$(command -v ffprobe || true)
+          fi
+          if [ -z "$ffmpeg_bin" ]; then
+            if python -m pip install --user -q imageio-ffmpeg >/tmp/cosmos-pip.log 2>&1; then
+              ffmpeg_bin=$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())' || true)
+              echo 'Using imageio_ffmpeg fallback binary' >> "$report"
+            else
+              echo 'pip imageio-ffmpeg installation failed' >> "$report"
+              tail -n 12 /tmp/cosmos-pip.log >> "$report"
+            fi
+          fi
+          if [ -z "$ffmpeg_bin" ] || [ ! -x "$ffmpeg_bin" ]; then
+            echo 'RESULT=FAILURE: ffmpeg could not be installed' >> "$report"
             status=10
           elif [ ! -s "$src" ]; then
-            echo 'ERROR: input MP4 missing or empty' >> "$report"
+            echo 'RESULT=FAILURE: source MP4 missing or empty' >> "$report"
             status=11
           else
-            echo 'SOURCE METADATA:' >> "$report"
-            ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate -of default=noprint_wrappers=1 "$src" >> "$report" 2>&1 || true
-            ffmpeg -nostdin -y -hide_banner -loglevel warning -i "$src" -map 0:v:0 -an -vf "fps=60,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -threads 2 -preset veryfast -profile:v high -level:v 4.2 -b:v 3000k -maxrate 3500k -bufsize 7000k -g 120 -movflags +faststart "$output" > /tmp/cosmos-encode.log 2>&1 || status=$?
+            echo "ffmpeg_binary=$ffmpeg_bin" >> "$report"
+            if [ -n "$ffprobe_bin" ]; then
+              echo 'SOURCE METADATA:' >> "$report"
+              "$ffprobe_bin" -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate -of default=noprint_wrappers=1 "$src" >> "$report" 2>&1 || true
+            fi
+            "$ffmpeg_bin" -nostdin -y -hide_banner -loglevel warning -i "$src" -map 0:v:0 -an -vf "fps=60,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -threads 2 -preset veryfast -profile:v high -level:v 4.2 -b:v 3000k -maxrate 3500k -bufsize 7000k -g 120 -movflags +faststart "$output" > /tmp/cosmos-encode.log 2>&1 || status=$?
             if [ "$status" -eq 0 ] && [ -s "$output" ]; then
               echo 'RESULT=SUCCESS' >> "$report"
-              ffprobe -v error -show_entries format=duration,size:stream=codec_name,profile,width,height,r_frame_rate -of default=noprint_wrappers=1 "$output" >> "$report" 2>&1 || true
+              ls -lh "$output" >> "$report"
+              if [ -n "$ffprobe_bin" ]; then
+                "$ffprobe_bin" -v error -show_entries format=duration,size:stream=codec_name,profile,width,height,r_frame_rate -of default=noprint_wrappers=1 "$output" >> "$report" 2>&1 || true
+              fi
             else
               echo "RESULT=FAILURE encode_exit_code=$status" >> "$report"
-              tail -n 50 /tmp/cosmos-encode.log >> "$report" 2>/dev/null || true
+              tail -n 60 /tmp/cosmos-encode.log >> "$report" 2>/dev/null || true
             fi
           fi
           echo "RESULT_CODE=$status" >> "$report"
           cat "$report"
-      - name: Publish video and diagnostics even after encoding error
+      - name: Publish video and diagnostics
         if: always()
         shell: bash
         run: |
@@ -59,6 +87,6 @@ jobs:
           if [ -s docs/media/cosmos-real-tour-x-optimized-60fps.mp4 ]; then
             git add docs/media/cosmos-real-tour-x-optimized-60fps.mp4
           fi
-          git commit -m "Report COSMOS X encode result and publish optimized video" || exit 0
+          git commit -m "Report COSMOS X encode and publish optimized video" || exit 0
           git pull --rebase origin main
           git push origin HEAD:main
