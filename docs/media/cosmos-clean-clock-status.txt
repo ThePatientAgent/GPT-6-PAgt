@@ -1,9 +1,12 @@
-RUN_ID=40188623909
-CAPTURE=STARTED\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\nTARGET_FPS=30\nTARGET_DURATION=36\nVIEWPORT=540x960\nCAPTURE_EXIT_CODE=1
-CAPTURE_LOG_TAIL:
-Traceback (most recent call last):
-  File "<stdin>", line 35, in <module>
-TypeError: Clock.pause_at() missing 1 required positional argument: 'time'
+RUN_ID=40188765067
+CAPTURE=STARTED\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\nTARGET_FPS=30\nTARGET_DURATION=36\nVIEWPORT=540x960\nCAPTURE=FINISHED\nREAL_ELAPSED_SECONDS=197.108\nTOTAL_FRAMES=1080\nACTUAL_SCREENSHOTS=1080\nCLOCK_MODE=deterministic_33_33_34ms\nCLOCK_ADVANCE_SECONDS=36\nEXACT_DUPLICATES=210\ncodec_name=h264
+width=540
+height=960
+avg_frame_rate=30/1
+nb_frames=1080
+duration=36.000000
+size=8355990
+CAPTURE_EXIT_CODE=0
 XVFB_LOG_TAIL:
 Errors from xkbcomp are not fatal to the X server
 The XKEYBOARD keymap compiler (xkbcomp) reports:
