@@ -803,7 +803,7 @@ function tourTick(t,dt){
  const dwell=idx===3?2300:4200;
  if(elapsed<dwell){
   // Roughly 125 degrees of parallax across a whole orbit dwell, no new renderer.
-  turnCamera((idx===3?.0024:idx===4?.0045:.0125)*clamp(dt/.0167,0,2.5),
+  turnCamera((idx===3?.0024:idx===4?.0022:.0125)*clamp(dt/.0167,0,2.5),
     Math.sin(elapsed/850)*.0013*clamp(dt/.0167,0,2.5));
  }else{
   tourStage++;
@@ -1385,7 +1385,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
  localGlow.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(glowSize/440).toFixed(3)+')';
  localGlow.style.opacity=(alpha*.45).toFixed(2);
  if(index===0){
-  const sunSize=clamp(mainScale*1.075,95,W<700?355:550);
+  const sunSize=clamp(mainScale*1.6125,142.5,W<700?532.5:825);
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
   solarSun.style.opacity=(alpha*.98).toFixed(2);
  }else solarSun.style.opacity='0';
