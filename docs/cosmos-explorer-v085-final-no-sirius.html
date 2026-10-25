@@ -107,14 +107,14 @@ body.cinema #cinemaToggle:hover,body.cinema #cinemaToggle:focus-visible{opacity:
 #tourToggle[aria-pressed="true"]{background:#07182dd9;border-color:#a8b9ca80;
  box-shadow:0 0 16px #0007;color:#dbf1ff}
 #tourCard{position:fixed;z-index:31;pointer-events:none;left:50%;bottom:25%;
- width:min(84vw,440px);transform:translateX(-50%) translateY(9px);
- padding:14px 22px;text-align:center;border:1px solid #9fdefa55;border-radius:16px;
- background:linear-gradient(110deg,#041529b5,#1027439e);backdrop-filter:blur(7px);
+ width:min(66vw,300px);transform:translateX(-50%) translateY(9px);
+ padding:7px 11px;text-align:center;border:1px solid #9fdefa55;border-radius:16px;
+ background:linear-gradient(110deg,#041529b5,#1027439e);
  box-shadow:0 10px 35px #0006;opacity:0;visibility:hidden;
  transition:opacity .25s ease,transform .25s ease,visibility .25s}
 body.touring #tourCard{opacity:1;visibility:visible;transform:translateX(-50%)}
 #tourStep{display:block;color:#97eaff;font-size:10px;letter-spacing:.2em;font-weight:700}
-#tourName{display:block;color:#fff;font-size:clamp(20px,4vw,32px);font-weight:800;
+#tourName{display:block;color:#fff;font-size:clamp(15px,3vw,21px);font-weight:800;
  margin:4px 0;text-shadow:0 0 18px #87daff70}
 #tourHint{display:block;color:#b8d0e9;font-size:11px}
 body.touring header,body.touring #hudTag,body.touring #hero,body.touring #info,
@@ -1507,7 +1507,7 @@ function tick(t){
     // Disabled by default: test-only ?sky=eco can compare this tradeoff.
     const prioritizeStars=balancedSkyOn && focusIndex===4 && proximity>.52;
     if(!prioritizeStars || t-lastWebglFrame>=33){glRender(c,t);lastWebglFrame=t;}
-    if(t-lastHybridFrame>=(focusIndex===3?33:16)){updateHybrid(c,t);lastHybridFrame=t;}
+    if(t-lastHybridFrame>=(focusIndex===3?16:16)){updateHybrid(c,t);lastHybridFrame=t;}
    }else{
     if(t-lastWebglFrame>=200){glRender(c,t);lastWebglFrame=t;}
     if(t-lastHybridFrame>=(focusIndex===4?33:(focusIndex===3?33:220))){updateHybrid(c,t);lastHybridFrame=t;}
