@@ -1,0 +1,39 @@
+name: Independent recovery fixture verification
+on:
+  push:
+    paths:
+      - .github/workflows/recovery-fixture-independent-verify.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pinned upstream revision and execute deterministic tests
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p research
+          report=research/recovery-fixture-independent-verification.txt
+          echo "SOURCE_REPOSITORY=atomicdjt/crewai-stripe-recovery-fixture" > "$report"
+          echo "TARGET=main at workflow execution time; recorded SHA below" >> "$report"
+          git clone --quiet --depth 1 https://github.com/atomicdjt/crewai-stripe-recovery-fixture.git /tmp/fixture
+          cd /tmp/fixture
+          git rev-parse HEAD | sed 's/^/TESTED_COMMIT=/' >> "$GITHUB_WORKSPACE/$report"
+          python -m unittest discover -s tests -v > /tmp/fixture-test.log 2>&1
+          status=$?
+          cd "$GITHUB_WORKSPACE"
+          echo "TEST_EXIT_CODE=$status" >> "$report"
+          cat /tmp/fixture-test.log >> "$report"
+          exit 0
+      - name: Commit verification evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/recovery-fixture-independent-verification.txt
+          git diff --cached --quiet || (git commit -m "Record independent recovery fixture test results" && git push)
