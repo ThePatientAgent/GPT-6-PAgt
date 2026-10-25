@@ -1,0 +1,8 @@
+0115ad983a0da544bd1f50c4e7b6792b22325f2b
+test_conflicting_provider_positive_preserves_first_reference (__main__.IndependentConflictingPositive.test_conflicting_provider_positive_preserves_first_reference) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+OK
+TEST_EXIT_CODE=0
