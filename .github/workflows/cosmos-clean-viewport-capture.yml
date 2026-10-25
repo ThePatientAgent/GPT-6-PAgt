@@ -66,8 +66,7 @@ jobs:
                   state="attached",timeout=90000)
               # Pause immediately after the live tour starts. Time then advances
               # exactly 33/33/34ms per frame regardless of screenshot CPU cost.
-              now_ms=page.evaluate("Date.now()")
-              page.clock.pause_at(__import__("datetime").datetime.fromtimestamp(now_ms/1000, __import__("datetime").timezone.utc))
+              page.clock.pause_at()
               for i in range(total):
                   page.clock.run_for(34 if i%3==2 else 33)
                   data=page.screenshot(type="jpeg",quality=84,timeout=15000,
