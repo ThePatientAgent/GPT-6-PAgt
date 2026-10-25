@@ -1,7 +1,25 @@
-run_id=40184445673
+run_id=40184841815
 run_attempt=1
 source=docs/media/cosmos-real-tour-live-60fps.mp4
 target=docs/media/cosmos-real-tour-x-optimized-60fps.mp4
-date_utc=2026-10-25T10:21:45Z
-ERROR: ffmpeg/ffprobe unavailable
-RESULT_CODE=10
+date_utc=2026-10-25T10:27:30Z
+Installing ffmpeg via apt-get
+apt-get ffmpeg installation succeeded
+ffmpeg_binary=/usr/bin/ffmpeg
+SOURCE METADATA:
+codec_name=h264
+width=720
+height=1280
+r_frame_rate=60/1
+duration=36.000000
+size=16195593
+RESULT=SUCCESS
+-rw-r--r-- 1 runner runner 11M Oct 25 10:27 docs/media/cosmos-real-tour-x-optimized-60fps.mp4
+codec_name=h264
+profile=High
+width=720
+height=1280
+r_frame_rate=60/1
+duration=36.000000
+size=10947150
+RESULT_CODE=0
