@@ -430,7 +430,7 @@ function openBlackHole(){
  lastFocus=document.activeElement;
  layer.setAttribute('aria-hidden','false');
  cosmos.style.visibility='hidden';
- frame.src='./cosmos-black-hole-tour-extended-v065.html?tour=3';
+ frame.src='./cosmos-black-hole-radiance-v013.html?tour=3';
  closeButton.focus({preventScroll:true});
 }
 function closeBlackHole(){
@@ -472,5 +472,40 @@ hostFrame.addEventListener('load',()=>{
    syncTourUI();
  }catch(e){manual.hidden=false}
 });
+})();
+</script>
+<script id="cosmos-v151-accepted-radiance">
+/* COSMOS V13 approved: redirect only guided-tour black-hole destination (3/6).
+   The native V13 renderer owns both plasma geometry and synchronized radiance;
+   do not reimplement its animation, rescale frames or add a separate light layer.
+   Pleiades, Orion, Solar System, Sirius, Galactic Center and travel remain native. */
+(()=>{
+ 'use strict';
+ const universeHost=document.getElementById('cosmos');
+ let activeFrame=null,activeObserver=null;
+ function bindBlackHoleScene(){
+  try{
+   const universe=universeHost.contentDocument;
+   const frame=universe&&universe.getElementById('cosmos-hole-visit-frame');
+   if(!frame||frame===activeFrame)return;
+   if(activeObserver)activeObserver.disconnect();
+   activeFrame=frame;
+   const substitute=()=>{
+    const current=frame.getAttribute('src');
+    if(!current||current==='about:blank')return;
+    const currentUrl=new URL(current,frame.ownerDocument.baseURI);
+    if(!currentUrl.pathname.endsWith('/cosmos-black-hole-tour-extended-v065.html'))return;
+    const approved=new URL('./cosmos-black-hole-radiance-v013.html',frame.ownerDocument.baseURI);
+    approved.search=currentUrl.search;
+    approved.hash=currentUrl.hash;
+    frame.src=approved.href;
+   };
+   activeObserver=new MutationObserver(substitute);
+   activeObserver.observe(frame,{attributes:true,attributeFilter:['src']});
+   substitute();
+  }catch(error){console.warn('COSMOS V13 tour scene unavailable',error);}
+ }
+ universeHost.addEventListener('load',bindBlackHoleScene);
+ bindBlackHoleScene();
 })();
 </script></body></html>
