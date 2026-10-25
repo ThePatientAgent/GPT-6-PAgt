@@ -1385,7 +1385,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
  localGlow.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(glowSize/440).toFixed(3)+')';
  localGlow.style.opacity=(alpha*.45).toFixed(2);
  if(index===0){
-  const sunSize=clamp(mainScale*2.15,190,W<700?710:1100);
+  const sunSize=clamp(mainScale*1.075,95,W<700?355:550);
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
   solarSun.style.opacity=(alpha*.98).toFixed(2);
  }else solarSun.style.opacity='0';
