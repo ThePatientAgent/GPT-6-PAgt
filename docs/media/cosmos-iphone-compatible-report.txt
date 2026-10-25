@@ -1,0 +1,10 @@
+codec_name=h264
+profile=Constrained Baseline
+width=540
+height=960
+pix_fmt=yuv420p
+level=31
+avg_frame_rate=30/1
+nb_frames=1080
+duration=36.000000
+size=8010309
