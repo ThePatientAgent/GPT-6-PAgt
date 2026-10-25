@@ -1,0 +1,7 @@
+run_id=40184445673
+run_attempt=1
+source=docs/media/cosmos-real-tour-live-60fps.mp4
+target=docs/media/cosmos-real-tour-x-optimized-60fps.mp4
+date_utc=2026-10-25T10:21:45Z
+ERROR: ffmpeg/ffprobe unavailable
+RESULT_CODE=10
