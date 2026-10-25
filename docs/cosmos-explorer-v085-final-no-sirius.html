@@ -800,7 +800,7 @@ function tourTick(t,dt){
  if(tourOrbitAt<0)tourOrbitAt=t;
  const elapsed=t-tourOrbitAt;
  // Orion's intricate nebula deserves a longer, slower look than other stops.
- const dwell=4200;
+ const dwell=idx===3?2300:4200;
  if(elapsed<dwell){
   // Roughly 125 degrees of parallax across a whole orbit dwell, no new renderer.
   turnCamera((idx===3?.0024:.0125)*clamp(dt/.0167,0,2.5),
