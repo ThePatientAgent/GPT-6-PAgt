@@ -62,6 +62,7 @@ jobs:
           PY
       - name: Encode video for X
         run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 24 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour.mp4
           ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour.mp4
       - uses: actions/upload-artifact@v4
