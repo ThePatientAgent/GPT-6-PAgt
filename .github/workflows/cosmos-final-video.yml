@@ -34,9 +34,13 @@ jobs:
             page=context.new_page()
             page.on('pageerror',lambda e:print('PAGE ERROR:',str(e),flush=True))
             page.goto(site,wait_until='domcontentloaded',timeout=90000)
+            start_record=time.monotonic()
             inner=page.frame_locator('#cosmos')
             inner.locator('body.touring').wait_for(state='attached',timeout=60000)
             print('RECORDING STARTED',inner.locator('#tourStep').inner_text(),flush=True)
+            tour_elapsed=time.monotonic()-start_record
+            print('STARTUP SECONDS',tour_elapsed,flush=True)
+            with open('/tmp/cosmos-record/startup.txt','w') as f:f.write(str(tour_elapsed))
             names=[]
             end=time.monotonic()+85
             while time.monotonic()<end:
@@ -63,16 +67,18 @@ jobs:
       - name: Encode video for X
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "trim=start=1.8,setpts=PTS-STARTPTS,crop=360:640:0:0,fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour-native-v4.mp4
-          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour-native-v4.mp4
+          START=$(python -c "print(round(float(open('/tmp/cosmos-record/startup.txt').read())+1.0,2))")
+          echo "Trimming startup: ${START}s"
+          ffmpeg -hide_banner -loglevel error -y -ss "$START" -i /tmp/cosmos-record/cosmos-raw.webm -vf "crop=360:640:0:0,fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
       - uses: actions/upload-artifact@v4
         with:
-          name: cosmos-final-tour-native-v4-mp4
-          path: docs/media/cosmos-final-five-stop-tour-native-v4.mp4
+          name: cosmos-final-tour-startup-v5-mp4
+          path: docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
       - name: Publish MP4 to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/media/cosmos-final-five-stop-tour-native-v4.mp4
-          git commit -m "Capture lower-load native-frame COSMOS tour V4"
+          git add docs/media/cosmos-final-five-stop-tour-startup-v5.mp4
+          git commit -m "Remove measured startup time from COSMOS V5"
           git push
