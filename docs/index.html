@@ -331,6 +331,12 @@ try {
  d.head.appendChild(vegaMenuStyle);
 }catch(e){console.warn('Vega menu hide unavailable',e)}
 
+/* v151: reduce Sun apparent size without modifying the animation's transform. */
+try {
+ const sun=d.querySelector('.solar-sun');
+ if(sun) sun.style.setProperty('scale','0.5','important');
+} catch(e){console.warn('Solar scale override unavailable',e)}
+
 /* v150: small, low-position tour caption; never block the target center. */
 try {
  const captions=d.createElement('style');
