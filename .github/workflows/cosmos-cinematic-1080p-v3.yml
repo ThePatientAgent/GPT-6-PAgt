@@ -1,0 +1,109 @@
+name: COSMOS cinematic 1080p clean controls v3
+on:
+  push:
+    paths:
+      - .github/workflows/cosmos-cinematic-1080p-v3.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install capture dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          python -m pip install --quiet playwright==1.58.0 pillow
+          python -m playwright install chromium
+      - name: Capture only actual COSMOS webpage viewport
+        env:
+          DISPLAY: ":99"
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/media
+          report=docs/media/cosmos-cinematic-v3-status.txt
+          echo "RUN_ID=$GITHUB_RUN_ID" > "$report"
+          trap 'code=$?; echo "CAPTURE_EXIT_CODE=$code" >> "$report"; if [ -s /tmp/cosmos-capture.log ]; then echo "CAPTURE_LOG_TAIL:" >> "$report"; tail -n 80 /tmp/cosmos-capture.log >> "$report"; fi; if [ -s /tmp/cosmos-xvfb.log ]; then echo "XVFB_LOG_TAIL:" >> "$report"; tail -n 20 /tmp/cosmos-xvfb.log >> "$report"; fi' EXIT
+          Xvfb :99 -screen 0 1080x1920x24 -nolisten tcp > /tmp/cosmos-xvfb.log 2>&1 &
+          sleep 2
+          mkdir -p docs/media
+          python - <<'PY' > /tmp/cosmos-capture.log 2>&1
+          import os,time,io,hashlib
+          from pathlib import Path
+          from PIL import Image, ImageChops, ImageStat
+          from playwright.sync_api import sync_playwright
+
+          fps=30
+          seconds=36
+          total=fps*seconds
+          frames=Path("/tmp/cosmos-clean-frames")
+          frames.mkdir(exist_ok=True)
+          report=Path("docs/media/cosmos-cinematic-v3-status.txt")
+          report.open("a").write("CAPTURE=STARTED\\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\\nTARGET_FPS=30\\nTARGET_DURATION=36\\nVIEWPORT=1080x1920\\n")
+          captured_count=0
+          exact_duplicate_count=0
+          previous_hash=None
+          capture_wall_start=time.monotonic()
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=False,args=[
+                  "--no-sandbox","--disable-dev-shm-usage",
+                  "--force-device-scale-factor=1",
+                  "--enable-webgl","--use-gl=angle",
+                  "--use-angle=swiftshader","--enable-unsafe-swiftshader"
+              ])
+              page=browser.new_page(viewport={"width":1080,"height":1920},
+                                    device_scale_factor=1,
+                                    reduced_motion="no-preference")
+              # Install the mocked clock before the webpage initializes.
+              page.clock.install()
+              page.goto("https://thepatientagent.github.io/GPT-6-PAgt/",
+                        wait_until="domcontentloaded",timeout=90000)
+              page.frame_locator("#cosmos").locator("body.touring").wait_for(
+                  state="attached",timeout=90000)
+              # Hide only viewer controls, preserving original animated tour.
+              page.frame_locator("#cosmos").locator("body").evaluate("""el => {
+                  const style=document.createElement('style');
+                  style.textContent='#tourToggle,#cinemaToggle,.cosmos-hole-visit-actions{display:none!important}';
+                  el.appendChild(style);
+              }""")
+              # Pause immediately after the live tour starts. Time then advances
+              # exactly 33/33/34ms per frame regardless of screenshot CPU cost.
+              page.clock.pause_at(page.evaluate("Date.now()") + 1000)
+              for i in range(total):
+                  page.clock.run_for(34 if i%3==2 else 33)
+                  data=page.screenshot(type="jpeg",quality=87,timeout=15000,
+                                       animations="allow",caret="hide")
+                  digest=hashlib.sha256(data).digest()
+                  if previous_hash==digest:exact_duplicate_count+=1
+                  previous_hash=digest
+                  captured_count+=1
+                  (frames/(f"{i:05d}.jpg")).write_bytes(data)
+              elapsed=time.monotonic()-capture_wall_start
+              browser.close()
+          with report.open("a") as f:
+              f.write(f"CAPTURE=FINISHED\\nREAL_ELAPSED_SECONDS={elapsed:.3f}\\n")
+              f.write(f"TOTAL_FRAMES={total}\\nACTUAL_SCREENSHOTS={captured_count}\\n")
+              f.write("CLOCK_MODE=deterministic_33_33_34ms\\n")
+              f.write(f"CLOCK_ADVANCE_SECONDS={seconds}\\n")
+              f.write(f"EXACT_DUPLICATES={exact_duplicate_count}\\n")
+          PY
+          ffmpeg -hide_banner -nostdin -loglevel warning -y -framerate 30 -i /tmp/cosmos-clean-frames/%05d.jpg -map 0:v:0 -an -c:v libx264 -preset medium -profile:v baseline -level:v 4.2 -pix_fmt yuv420p -bf 0 -refs 1 -crf 18 -maxrate 8500k -bufsize 17000k -g 60 -movflags +faststart docs/media/cosmos-cinematic-1080p30-v3.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,avg_frame_rate,nb_frames -of default=noprint_wrappers=1 docs/media/cosmos-cinematic-1080p30-v3.mp4 | tee -a docs/media/cosmos-cinematic-v3-status.txt
+          ffmpeg -hide_banner -nostdin -loglevel error -y -ss 19 -i docs/media/cosmos-cinematic-1080p30-v3.mp4 -frames:v 1 docs/media/cosmos-cinematic-v3-sample.jpg
+      - name: Publish deterministic-clock video and frame metrics
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/media/cosmos-cinematic-v3-status.txt
+          for f in docs/media/cosmos-cinematic-1080p30-v3.mp4 docs/media/cosmos-cinematic-v3-sample.jpg; do
+            if [ -s "$f" ]; then git add "$f"; fi
+          done
+          git commit -m "Publish clock capture diagnostics and available media" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
