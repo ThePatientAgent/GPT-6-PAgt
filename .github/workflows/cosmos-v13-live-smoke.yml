@@ -71,14 +71,39 @@ jobs:
                        "manual")
 
               tour = context.new_page()
+              tour.on("pageerror", lambda error: print("TOUR PAGE ERROR:",error,flush=True))
               tour.goto(SITE + "/index.html?release=575cf6c",
                         wait_until="domcontentloaded", timeout=90000)
+              # QA handoff starts at Orion, then uses the normal route to Black Hole.
+              # Only the browser test changes this iframe query; live website stays untouched.
+              tour.locator("#cosmos").evaluate("""el => {
+                  const u = new URL(el.src); u.searchParams.set('handoff','1'); el.src=u.href;
+              }""")
               inner = tour.frame_locator("#cosmos")
               trigger = inner.locator("#tourToggle")
               trigger.wait_for(state="attached", timeout=90000)
               trigger.evaluate("button => button.click()")
+              print("TOUR STARTED", flush=True)
               tour_canvas = inner.frame_locator("#cosmos-hole-visit-frame").locator("#scene[data-ready='true']")
-              validate(tour_canvas, "guided stop 3 of 6")
+              from playwright.sync_api import TimeoutError as PwTimeout
+              found = False
+              for check in range(6):
+                  try:
+                      tour_canvas.wait_for(state="attached", timeout=17000)
+                      validate(tour_canvas, "guided stop 3 of 6")
+                      found = True
+                      break
+                  except PwTimeout:
+                      details = inner.locator("body").evaluate("""body => ({
+                          touring:body.classList.contains('touring'),
+                          name:body.querySelector('#tourName')?.textContent,
+                          step:body.querySelector('#tourStep')?.textContent,
+                          toggle:body.querySelector('#tourToggle')?.getAttribute('aria-pressed'),
+                          holeHidden:body.querySelector('#cosmos-tour-blackhole-v061')?.hidden,
+                          holeSrc:body.querySelector('#cosmos-hole-visit-frame')?.getAttribute('src')
+                      })""")
+                      print("TOUR CHECK",check, details, flush=True)
+              assert found, "guided tour V13 did not reach ready state"
               stage = inner.locator("#tourStep").inner_text(timeout=15000)
               destination = inner.locator("#tourName").inner_text(timeout=15000)
               assert "3" in stage and "Black Hole" in destination, (stage, destination)
