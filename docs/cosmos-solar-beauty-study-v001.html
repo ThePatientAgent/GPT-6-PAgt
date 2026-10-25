@@ -20,7 +20,8 @@ frame.addEventListener('load',()=>{
     .solar-earth{filter:drop-shadow(0 0 7px rgba(60,156,250,.35)) saturate(1.13)!important}
     .solar-earth .cosmos-v106-photo{filter:contrast(1.06) saturate(1.12)!important}
     /* Scale the full 440px Sun sprite, not only its gradient layers. */
-    .solar-sun{scale:.5!important;filter:drop-shadow(0 0 14px rgba(255,174,73,.32))!important}
+    /* Keep original photosphere geometry; shrink the whole projected sprite visually. */
+    .solar-sun{filter:drop-shadow(0 0 14px rgba(255,174,73,.32))!important;scale:none!important}
     .solar-sun .cosmos-v090-surface{transform:none!important}
     .cosmos-v090-surface{filter:contrast(1.08) saturate(1.10)!important}
     .cosmos-v096-saturn{filter:drop-shadow(0 0 7px rgba(247,208,147,.30)) contrast(1.06)!important}
@@ -28,6 +29,20 @@ frame.addEventListener('load',()=>{
     @media(prefers-reduced-motion:reduce){.solar-earth,.solar-sun,.cosmos-v096-saturn{filter:none!important}}
     `;
     d.head.appendChild(s);
+    /* Avoid transient legacy black-hole frames: override the source synchronously
+       before the inner tour loads it, rather than waiting for the outer observer. */
+    const hole=d.getElementById('cosmos-hole-visit-frame');
+    if(hole&&!hole.dataset.radianceGuard){
+      hole.dataset.radianceGuard='1';
+      const approved=new URL('./cosmos-black-hole-radiance-v013.html?tour=3',d.baseURI).href;
+      const guard=new MutationObserver(()=>{
+        const src=hole.getAttribute('src')||'';
+        if(src.includes('cosmos-black-hole-tour-extended-v065.html')){
+          hole.setAttribute('src',approved);
+        }
+      });
+      guard.observe(hole,{attributes:true,attributeFilter:['src']});
+    }
    }catch(e){console.warn('Solar beauty preview unavailable',e)}
   };
   inner.addEventListener('load',enhance);
