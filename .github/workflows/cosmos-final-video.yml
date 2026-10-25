@@ -1,0 +1,75 @@
+name: COSMOS final tour video capture
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/cosmos-final-video.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright
+        run: python -m pip install playwright==1.58.0
+      - name: Record real COSMOS five-stop tour
+        run: |
+          mkdir -p /tmp/cosmos-record docs/media
+          python - <<'PY'
+          import time, os
+          from playwright.sync_api import sync_playwright
+          site='https://thepatientagent.github.io/GPT-6-PAgt/?capture=cosmos-final-20261025'
+          with sync_playwright() as p:
+            browser=p.chromium.launch(channel='chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader'])
+            context=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=1,
+              is_mobile=True,has_touch=True,reduced_motion='no-preference',
+              record_video_dir='/tmp/cosmos-record',record_video_size={'width':540,'height':960})
+            page=context.new_page()
+            page.on('pageerror',lambda e:print('PAGE ERROR:',str(e),flush=True))
+            page.goto(site,wait_until='domcontentloaded',timeout=90000)
+            inner=page.frame_locator('#cosmos')
+            inner.locator('body.touring').wait_for(state='attached',timeout=60000)
+            print('RECORDING STARTED',inner.locator('#tourStep').inner_text(),flush=True)
+            names=[]
+            end=time.monotonic()+85
+            while time.monotonic()<end:
+              try:
+                stage=inner.locator('#tourStep').inner_text(timeout=3000)
+                name=inner.locator('#tourName').inner_text(timeout=3000)
+                key=stage+' '+name
+                if not names or key!=names[-1]:
+                  names.append(key);print('TOUR:',key,flush=True)
+                if len(names)>=5 and not inner.locator('body.touring').count():break
+              except Exception as e:print('MONITOR:',str(e)[:120],flush=True)
+              if len(names)>=5 and time.monotonic()+5>=end:break
+              time.sleep(1.0)
+              if len(names)>=5:
+                time.sleep(6)
+                break
+            print('VISITED',names,flush=True)
+            assert len(names)>=5, 'Did not observe all five tour stops'
+            video=page.video
+            context.close()
+            video.save_as('/tmp/cosmos-record/cosmos-raw.webm')
+            browser.close()
+          PY
+      - name: Encode video for X
+        run: |
+          ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 24 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cosmos-final-tour-mp4
+          path: docs/media/cosmos-final-five-stop-tour.mp4
+      - name: Publish MP4 to GitHub Pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/media/cosmos-final-five-stop-tour.mp4
+          git commit -m "Add captured real COSMOS final five-stop tour MP4"
+          git push
