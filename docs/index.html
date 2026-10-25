@@ -474,6 +474,36 @@ hostFrame.addEventListener('load',()=>{
 });
 })();
 </script>
+<script id="cosmos-v185-tour-start-failsafe">
+/* Final tour start: wait for the embedded universe to finish loading.
+   The inner engine also attempts auto-start; only click if still idle.
+   Never restart after a completed tour or override reduced-motion settings. */
+(()=>{
+ 'use strict';
+ const host=document.getElementById('cosmos');
+ let armed=true;
+ function ensureTour(){
+  if(!armed)return;
+  try{
+   const doc=host.contentDocument;
+   if(!doc||doc.readyState!=='complete')return;
+   const toggle=doc.getElementById('tourToggle');
+   if(!toggle)return;
+   if(doc.body.classList.contains('touring')){armed=false;return;}
+   if(host.contentWindow.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    armed=false;return;
+   }
+   armed=false;
+   toggle.click();
+  }catch(error){console.warn('COSMOS auto-tour fallback unavailable',error);}
+ }
+ host.addEventListener('load',()=>{
+  setTimeout(ensureTour,1300);
+  setTimeout(ensureTour,3000);
+ });
+ if(host.contentDocument&&host.contentDocument.readyState==='complete')setTimeout(ensureTour,1300);
+})();
+</script>
 <script id="cosmos-v151-accepted-radiance">
 /* COSMOS V13 approved: redirect only guided-tour black-hole destination (3/6).
    The native V13 renderer owns both plasma geometry and synchronized radiance;
