@@ -1,6 +1,12 @@
 # COSMOS — technical and artistic checkpoint
 Updated 2026-10-25 JST.
 
+## User-approved appearance
+V13 radiance accepted by the user on 2026-10-25: 「いいね！これで行こう」.
+Approved source: docs/cosmos-black-hole-radiance-v013.html (implementation c73de23afdf9b58a1a03e2d63905c703e935bf2b; Pages and Python tests passed).
+The common docs/index.html has not yet been switched to V13. Read the acceptance section in COSMOS_BLACKHOLE_HANDOFF_2026-10-25.md before continuing.
+
+
 ## Current continuation — V13 radiance, 2026-10-25
 User approved V12's restored shape and requested a much more spectacular appearance.
 V13 keeps the sharp image geometry and adds stronger warm-gold radiance from the same animated source frames.
