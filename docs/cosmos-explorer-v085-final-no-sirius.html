@@ -713,7 +713,7 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-tour-extended-v065.html?tour=3';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
  tourHoleLoadFallback=setTimeout(tourHoleReveal,3500);
 }
@@ -1510,7 +1510,7 @@ function tick(t){
     if(t-lastHybridFrame>=(focusIndex===3?33:16)){updateHybrid(c,t);lastHybridFrame=t;}
    }else{
     if(t-lastWebglFrame>=200){glRender(c,t);lastWebglFrame=t;}
-    if(t-lastHybridFrame>=(focusIndex===4?33:(focusIndex===3?70:220))){updateHybrid(c,t);lastHybridFrame=t;}
+    if(t-lastHybridFrame>=(focusIndex===4?33:(focusIndex===3?33:220))){updateHybrid(c,t);lastHybridFrame=t;}
    }
   }
  }
