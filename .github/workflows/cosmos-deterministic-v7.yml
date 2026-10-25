@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p /tmp/cosmos-v7-frames docs/media
           python - <<'PY'
-          from datetime import datetime
+          from datetime import datetime, timedelta
           import os, time
           from playwright.sync_api import sync_playwright
 
@@ -52,7 +52,7 @@ jobs:
               print('TOUR LOADED:',inner.locator('#tourStep').inner_text(),flush=True)
               # The first captured frame is already IN the guided tour.
               # No landing-page footage is ever recorded or trimmed afterward.
-              page.clock.pause_at(datetime.now())
+              page.clock.pause_at(datetime.now()+timedelta(seconds=2))
               stage_names=[]
               finished_since=None
               elapsed_ms=0
