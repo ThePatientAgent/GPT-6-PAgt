@@ -1,6 +1,32 @@
 # COSMOS black hole — continuation checkpoint
 Updated 2026-10-25 JST.
 
+## SHARED RELEASE COMPLETE — V13 Radiance, 2026-10-25 JST
+The official COSMOS entry `docs/index.html` now uses the user-accepted
+`docs/cosmos-black-hole-radiance-v013.html` for BOTH the manual scene and
+the automatic third tour destination. Production cutover commit:
+`575cf6c6d4fe4656e6b3f2f694a594c7f6d81210`.
+The original `cosmos-explorer-v069-no-title-card-base.html` engine, the
+other five destinations and existing transitions remain untouched.
+
+Public common release: https://thepatientagent.github.io/GPT-6-PAgt/
+Direct scene: https://thepatientagent.github.io/GPT-6-PAgt/cosmos-black-hole-radiance-v013.html
+
+Cloud GitHub Actions mobile-viewport Chromium smoke test PASSED:
+https://github.com/ThePatientAgent/GPT-6-PAgt/actions/runs/40146079333
+Both routes loaded V13, prepared all 48 frames, geometry=identity,
+renderer=canvas2d-radiant-plasma, radiance=source-synchronous,
+exactly one source/playback canvas, and advancing animated phase.
+The guided route confirmed DESTINATION 3 / 6 — Black Hole.
+GitHub Pages build/deployment passed for smoke-test commit
+`800aa820e148859785df7db8ca079a2c76c036aa`.
+The engine autostarts the guided tour; its toggle must NOT be clicked again
+in playback tests or that would stop the tour.
+The CI test lives in `.github/workflows/cosmos-v13-live-smoke.yml`.
+No X posting or pinned-post changes. No iPhone physical device or
+Safari playback was tested. Keep the approved 0.60 framing, shape and
+single-canvas synchronous golden radiance; never restore V11 warp/offset glow.
+
 ## V13 ACCEPTED — authoritative user decision
 On 2026-10-25 JST the user approved V13: 「いいね！これで行こう」.
 The selected black-hole appearance is V13 radiance, not V12 and not the rejected V11 warp.
@@ -9,8 +35,8 @@ Tour experiment: docs/cosmos-cinema-blackhole-v13-radiance-20261025.html.
 Implementation commit: c73de23afdf9b58a1a03e2d63905c703e935bf2b.
 That commit passed Python tests and Pages deployment. The public direct preview loaded with all 48 frames ready and advancing phase (19.31 observed), renderer=canvas2d-radiant-plasma.
 Preserve original sharp geometry, dark center, 0.60 framing and synchronized source-derived gold radiance.
-The common docs/index.html was NOT switched to V13 in this chat; no X post or pin update was performed.
-User requested a prompt for continuation in a new chat. A logical next implementation step is integrating the accepted V13 appearance into the common published tour after checking its current source. Do not confuse the separate V13 preview deployment with completion of that common-release update.
+At the preview acceptance checkpoint, docs/index.html had not yet been switched; see the later SHARED RELEASE COMPLETE checkpoint above. No X post or pin update was performed.
+User requested a prompt for continuation in a new chat. The V13 integration into the common published tour was completed in the subsequent follow-up and verified with cloud mobile-viewport Chromium. Do not confuse the separate V13 preview deployment with completion of that common-release update.
 「な」 means execute the next agreed step without asking again.
 iPhone has not been operated by the assistant; user approval is the appearance decision.
 
