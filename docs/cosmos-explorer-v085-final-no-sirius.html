@@ -803,7 +803,7 @@ function tourTick(t,dt){
  const dwell=idx===3?2300:4200;
  if(elapsed<dwell){
   // Roughly 125 degrees of parallax across a whole orbit dwell, no new renderer.
-  turnCamera((idx===3?.0024:.0125)*clamp(dt/.0167,0,2.5),
+  turnCamera((idx===3?.0024:idx===4?.0045:.0125)*clamp(dt/.0167,0,2.5),
     Math.sin(elapsed/850)*.0013*clamp(dt/.0167,0,2.5));
  }else{
   tourStage++;
@@ -1505,7 +1505,7 @@ function tick(t){
     // On Pleiades approach the 60fps subject sprites take priority over
     // the dimmed distant galaxy. Reduce only WebGL far-field refreshes.
     // Disabled by default: test-only ?sky=eco can compare this tradeoff.
-    const prioritizeStars=balancedSkyOn && focusIndex===4 && proximity>.52;
+    const prioritizeStars=false; // Favor continuous background galaxy rendering on Pleiades
     if(!prioritizeStars || t-lastWebglFrame>=33){glRender(c,t);lastWebglFrame=t;}
     if(t-lastHybridFrame>=(focusIndex===3?16:16)){updateHybrid(c,t);lastHybridFrame=t;}
    }else{
