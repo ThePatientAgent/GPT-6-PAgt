@@ -39,7 +39,7 @@ jobs:
           frames=Path("/tmp/cosmos-clean-frames")
           frames.mkdir(exist_ok=True)
           report=Path("docs/media/cosmos-clean-clock-status.txt")
-          report.write_text("CAPTURE=STARTED\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\nTARGET_FPS=30\nTARGET_DURATION=36\nVIEWPORT=540x960\n")
+          report.write_text("CAPTURE=STARTED\\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\\nTARGET_FPS=30\\nTARGET_DURATION=36\\nVIEWPORT=540x960\\n")
           captured_count=0
           exact_duplicate_count=0
           previous_hash=None
@@ -63,7 +63,7 @@ jobs:
               # Pause immediately after the live tour starts. Time then advances
               # exactly 33/33/34ms per frame regardless of screenshot CPU cost.
               now_ms=page.evaluate("Date.now()")
-              page.clock.pause_at(now_ms/1000)
+              page.clock.pause_at(__import__("datetime").datetime.fromtimestamp(now_ms/1000, __import__("datetime").timezone.utc))
               for i in range(total):
                   page.clock.run_for(34 if i%3==2 else 33)
                   data=page.screenshot(type="jpeg",quality=84,timeout=15000,
@@ -76,11 +76,11 @@ jobs:
               elapsed=time.monotonic()-capture_wall_start
               browser.close()
           with report.open("a") as f:
-              f.write(f"CAPTURE=FINISHED\nREAL_ELAPSED_SECONDS={elapsed:.3f}\n")
-              f.write(f"TOTAL_FRAMES={total}\nACTUAL_SCREENSHOTS={captured_count}\n")
-              f.write("CLOCK_MODE=deterministic_33_33_34ms\n")
-              f.write(f"CLOCK_ADVANCE_SECONDS={seconds}\n")
-              f.write(f"EXACT_DUPLICATES={exact_duplicate_count}\n")
+              f.write(f"CAPTURE=FINISHED\\nREAL_ELAPSED_SECONDS={elapsed:.3f}\\n")
+              f.write(f"TOTAL_FRAMES={total}\\nACTUAL_SCREENSHOTS={captured_count}\\n")
+              f.write("CLOCK_MODE=deterministic_33_33_34ms\\n")
+              f.write(f"CLOCK_ADVANCE_SECONDS={seconds}\\n")
+              f.write(f"EXACT_DUPLICATES={exact_duplicate_count}\\n")
           PY
           ffmpeg -hide_banner -nostdin -loglevel warning -y -framerate 30 -i /tmp/cosmos-clean-frames/%05d.jpg -map 0:v:0 -an -c:v libx264 -preset medium -profile:v high -level:v 4.0 -pix_fmt yuv420p -b:v 2200k -maxrate 2800k -bufsize 5600k -g 60 -movflags +faststart docs/media/cosmos-clean-viewport-clock-30fps.mp4
           ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,avg_frame_rate,nb_frames -of default=noprint_wrappers=1 docs/media/cosmos-clean-viewport-clock-30fps.mp4 | tee -a docs/media/cosmos-clean-clock-status.txt
