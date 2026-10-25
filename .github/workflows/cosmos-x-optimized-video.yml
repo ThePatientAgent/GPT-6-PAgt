@@ -1,0 +1,32 @@
+name: COSMOS X optimized video
+on:
+  push:
+    paths:
+      - .github/workflows/cosmos-x-optimized-video.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Validate and optimize actual 36-second tour capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          src=docs/media/cosmos-real-tour-live-60fps.mp4
+          test -s "$src"
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate -of default=noprint_wrappers=1 "$src"
+          ffmpeg -y -i "$src" -map 0:v:0 -an -vf "fps=60,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -profile:v high -level 4.2 -b:v 3000k -maxrate 3500k -bufsize 7000k -g 120 -keyint_min 120 -sc_threshold 0 -movflags +faststart docs/media/cosmos-real-tour-x-optimized-60fps.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,profile,width,height,r_frame_rate -of default=noprint_wrappers=1 docs/media/cosmos-real-tour-x-optimized-60fps.mp4
+      - name: Publish optimized MP4
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/media/cosmos-real-tour-x-optimized-60fps.mp4
+          git commit -m "Publish X-optimized real COSMOS tour at 60fps"
+          git push
