@@ -124,5 +124,51 @@ class ActiveOwnerWindowExpiryTest(unittest.TestCase):
             os.unlink(path)
 
 
+
+    def test_repeated_expired_window_recovery_never_redispatches(self):
+        """Repeated polling after both windows expire must not create again.
+
+        Uses a gateway that raises on *any* provider operation. This checks
+        a repeated caller, not just a single refusal transition.
+        """
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        path = tmp.name
+        tmp.close()
+        journal = observer = None
+        try:
+            journal = OperationJournal(path)
+            observer = OperationJournal(path)
+            journal.begin(amount=500, currency="usd", operation_id="repeat-expired")
+            token = journal.begin_dispatch("repeat-expired", lease_seconds=60)
+            self.assertIsNotNone(token)
+            journal.db.execute(
+                "UPDATE operations SET dispatch_lease_expires_at=? "
+                "WHERE operation_id=?", (time.time() - 10, "repeat-expired"))
+            journal.db.commit()
+
+            boundary = PaymentIntentBoundary(
+                observer, NoGatewayCalls(), idempotency_window_seconds=0)
+            for attempt in range(3):
+                with self.subTest(attempt=attempt):
+                    outcome = boundary.recover("repeat-expired")
+                    self.assertEqual(outcome.state, EffectState.UNKNOWN)
+                    row = journal.db.execute(
+                        "SELECT state, dispatch_owner_token, "
+                        "dispatch_lease_expires_at FROM operations "
+                        "WHERE operation_id=?", ("repeat-expired",)
+                    ).fetchone()
+                    self.assertEqual(row["state"], EffectState.UNKNOWN.value)
+                    self.assertIsNone(row["dispatch_owner_token"])
+                    self.assertIsNone(row["dispatch_lease_expires_at"])
+                    self.assertIsNone(observer.claim_retry_dispatch(
+                        "repeat-expired", idempotency_window_seconds=0))
+        finally:
+            if journal is not None:
+                journal.db.close()
+            if observer is not None:
+                observer.db.close()
+            os.unlink(path)
+
+
 if __name__ == "__main__":
     unittest.main()
