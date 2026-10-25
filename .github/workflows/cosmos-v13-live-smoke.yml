@@ -81,9 +81,30 @@ jobs:
               }""")
               inner = tour.frame_locator("#cosmos")
               trigger = inner.locator("#tourToggle")
-              trigger.wait_for(state="attached", timeout=90000)
-              trigger.evaluate("button => button.click()")
+              trigger.wait_for(state="visible", timeout=90000)
+              inner.locator("body").evaluate("""body => {
+                  window.__qaEvents=[];
+                  for(const type of ['click','pointerdown','touchstart','keydown']){
+                    document.addEventListener(type,e=>{window.__qaEvents.push({
+                      type, target:e.target?.id||e.target?.tagName,
+                      trusted:e.isTrusted, key:e.key||null
+                    });},true);
+                  }
+                  new MutationObserver(()=>window.__qaEvents.push({
+                    type:'body-class',value:body.className
+                  })).observe(body,{attributes:true,attributeFilter:['class']});
+              }""")
+              trigger.click(timeout=15000)
               print("TOUR STARTED", flush=True)
+              time.sleep(3)
+              early=inner.locator("body").evaluate("""body => ({
+                  touring:body.classList.contains('touring'),
+                  step:body.querySelector('#tourStep')?.textContent,
+                  toggle:body.querySelector('#tourToggle')?.getAttribute('aria-pressed'),
+                  events:window.__qaEvents
+              })""")
+              print("TOUR EARLY",early, flush=True)
+              assert early["touring"], f"Tour canceled too early: {early}"
               tour_canvas = inner.frame_locator("#cosmos-hole-visit-frame").locator("#scene[data-ready='true']")
               from playwright.sync_api import TimeoutError as PwTimeout
               found = False
