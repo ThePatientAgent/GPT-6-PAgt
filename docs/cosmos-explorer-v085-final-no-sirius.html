@@ -566,7 +566,7 @@ function fly(i,orbitOnArrival=true){
  const newYaw=Math.atan2(direction[0],direction[2]);
  const newPitch=Math.asin(clamp(direction[1]/n,-1,1));
  const shortestYaw=Math.atan2(Math.sin(newYaw-state.yaw),Math.cos(newYaw-state.yaw));
- state.fly={from,to,start:performance.now(),duration:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
+ state.fly={from,to,start:performance.now(),duration:i===3?2450:1650,baseYaw:state.yaw,deltaYaw:shortestYaw,basePitch:state.pitch,deltaPitch:newPitch-state.pitch,orbitOnArrival:i>=0&&orbitOnArrival,placeIndex:i};
  $('warp').classList.add('on');refreshMode();
  $('locationLabel').textContent=i<0?(english?'Entire galaxy':'銀河全景'):placeName(i);
  document.querySelectorAll('.destination').forEach(b=>b.classList.toggle('active',Number(b.dataset.place)===i));
@@ -715,7 +715,7 @@ function tourHoleShow(){
  tourHoleLayer.classList.remove('cosmos-hole-open');
  tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
- tourHoleLoadFallback=setTimeout(tourHoleReveal,3500);
+ tourHoleLoadFallback=setTimeout(tourHoleReveal,12000);
 }
 function tourHoleReveal(){
  if(!tourActive||tourStops[tourStage]!==6||tourHoleLayer.hidden||tourHoleDeparting||tourHoleStart!==-2)return;
@@ -1495,7 +1495,7 @@ function tick(t){
   // the bitmap overlays are compositor transforms, not canvas redraws.
   if(!mobile){
    if(t-lastWebglFrame>=(moving?16:160)){glRender(c,t);lastWebglFrame=t;}
-   if(t-lastHybridFrame>=(moving?30:(focusIndex===4?34:focusIndex===3?70:210))){updateHybrid(c,t);lastHybridFrame=t;}
+   if(t-lastHybridFrame>=(moving?16:(focusIndex===4?34:focusIndex===3?33:210))){updateHybrid(c,t);lastHybridFrame=t;}
   }else{
    // v037: no artificial 25-30fps sky cap during camera movement.
    // The WebGL sky and nearby 2.5D subjects share the display cadence while moving.
