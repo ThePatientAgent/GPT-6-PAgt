@@ -1,0 +1,30 @@
+name: Independent positive monotonicity verification
+on:
+  push:
+    paths:
+      - .github/workflows/independent-positive-monotonicity.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run independent positive monotonicity regression
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p research
+          git clone --depth 1 https://github.com/atomicdjt/crewai-stripe-recovery-fixture.git /tmp/fixture
+          git -C /tmp/fixture rev-parse HEAD > research/independent-positive-monotonicity-result.txt
+          PYTHONPATH=/tmp/fixture python research/test_independent_positive_monotonicity.py -v >> research/independent-positive-monotonicity-result.txt 2>&1
+          echo TEST_EXIT_CODE=$? >> research/independent-positive-monotonicity-result.txt
+      - name: Record verification evidence
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/independent-positive-monotonicity-result.txt
+          git diff --cached --quiet || (git commit -m 'Record independent positive monotonicity result' && git push)
