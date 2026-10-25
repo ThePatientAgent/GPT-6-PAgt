@@ -28,9 +28,9 @@ jobs:
           site='https://thepatientagent.github.io/GPT-6-PAgt/?capture=cosmos-final-20261025'
           with sync_playwright() as p:
             browser=p.chromium.launch(channel='chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader'])
-            context=browser.new_context(viewport={'width':540,'height':960},device_scale_factor=1,
+            context=browser.new_context(viewport={'width':360,'height':640},device_scale_factor=1,
               is_mobile=True,has_touch=True,reduced_motion='no-preference',
-              record_video_dir='/tmp/cosmos-record',record_video_size={'width':540,'height':960})
+              record_video_dir='/tmp/cosmos-record',record_video_size={'width':360,'height':640})
             page=context.new_page()
             page.on('pageerror',lambda e:print('PAGE ERROR:',str(e),flush=True))
             page.goto(site,wait_until='domcontentloaded',timeout=90000)
@@ -63,16 +63,16 @@ jobs:
       - name: Encode video for X
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "trim=start=1.8,setpts=PTS-STARTPTS,crop=540:960:0:0,minterpolate=fps=60:mi_mode=mci:mc_mode=obmc:me_mode=bidir:vsbmc=1,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour-smooth-v3.mp4
-          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour-smooth-v3.mp4
+          ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "trim=start=1.8,setpts=PTS-STARTPTS,crop=360:640:0:0,fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour-native-v4.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour-native-v4.mp4
       - uses: actions/upload-artifact@v4
         with:
-          name: cosmos-final-tour-smooth-v3-mp4
-          path: docs/media/cosmos-final-five-stop-tour-smooth-v3.mp4
+          name: cosmos-final-tour-native-v4-mp4
+          path: docs/media/cosmos-final-five-stop-tour-native-v4.mp4
       - name: Publish MP4 to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/media/cosmos-final-five-stop-tour-smooth-v3.mp4
-          git commit -m "Trim initial startup frames from smooth 60fps COSMOS tour V3"
+          git add docs/media/cosmos-final-five-stop-tour-native-v4.mp4
+          git commit -m "Capture lower-load native-frame COSMOS tour V4"
           git push
