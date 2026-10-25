@@ -24,10 +24,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p docs/media
+          report=docs/media/cosmos-clean-clock-status.txt
+          echo "RUN_ID=$GITHUB_RUN_ID" > "$report"
+          trap 'code=$?; echo "CAPTURE_EXIT_CODE=$code" >> "$report"; if [ -s /tmp/cosmos-capture.log ]; then echo "CAPTURE_LOG_TAIL:" >> "$report"; tail -n 80 /tmp/cosmos-capture.log >> "$report"; fi; if [ -s /tmp/cosmos-xvfb.log ]; then echo "XVFB_LOG_TAIL:" >> "$report"; tail -n 20 /tmp/cosmos-xvfb.log >> "$report"; fi' EXIT
           Xvfb :99 -screen 0 540x960x24 -nolisten tcp > /tmp/cosmos-xvfb.log 2>&1 &
           sleep 2
           mkdir -p docs/media
-          python - <<'PY'
+          python - <<'PY' > /tmp/cosmos-capture.log 2>&1
           import os,time,io,hashlib
           from pathlib import Path
           from PIL import Image, ImageChops, ImageStat
@@ -39,7 +43,7 @@ jobs:
           frames=Path("/tmp/cosmos-clean-frames")
           frames.mkdir(exist_ok=True)
           report=Path("docs/media/cosmos-clean-clock-status.txt")
-          report.write_text("CAPTURE=STARTED\\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\\nTARGET_FPS=30\\nTARGET_DURATION=36\\nVIEWPORT=540x960\\n")
+          report.open("a").write("CAPTURE=STARTED\\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\\nTARGET_FPS=30\\nTARGET_DURATION=36\\nVIEWPORT=540x960\\n")
           captured_count=0
           exact_duplicate_count=0
           previous_hash=None
@@ -86,12 +90,15 @@ jobs:
           ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,avg_frame_rate,nb_frames -of default=noprint_wrappers=1 docs/media/cosmos-clean-viewport-clock-30fps.mp4 | tee -a docs/media/cosmos-clean-clock-status.txt
           ffmpeg -hide_banner -nostdin -loglevel error -y -ss 19 -i docs/media/cosmos-clean-viewport-clock-30fps.mp4 -frames:v 1 docs/media/cosmos-clean-clock-sample.jpg
       - name: Publish deterministic-clock video and frame metrics
-        if: success()
+        if: always()
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/media/cosmos-clean-clock-status.txt docs/media/cosmos-clean-viewport-clock-30fps.mp4 docs/media/cosmos-clean-clock-sample.jpg
-          git commit -m "Publish clean viewport capture and frame cadence diagnostics"
+          git add docs/media/cosmos-clean-clock-status.txt
+          for f in docs/media/cosmos-clean-viewport-clock-30fps.mp4 docs/media/cosmos-clean-clock-sample.jpg; do
+            if [ -s "$f" ]; then git add "$f"; fi
+          done
+          git commit -m "Publish clock capture diagnostics and available media" || exit 0
           git pull --rebase origin main
           git push origin HEAD:main
