@@ -1,0 +1,102 @@
+name: COSMOS clean viewport X capture
+on:
+  push:
+    paths:
+      - .github/workflows/cosmos-clean-viewport-capture.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install capture dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          python -m pip install --quiet playwright==1.58.0 pillow
+          python -m playwright install chromium
+      - name: Capture only actual COSMOS webpage viewport
+        env:
+          DISPLAY: ":99"
+        shell: bash
+        run: |
+          set -euo pipefail
+          Xvfb :99 -screen 0 540x960x24 -nolisten tcp > /tmp/cosmos-xvfb.log 2>&1 &
+          sleep 2
+          mkdir -p docs/media
+          python - <<'PY'
+          import os,time,io,hashlib
+          from pathlib import Path
+          from PIL import Image, ImageChops, ImageStat
+          from playwright.sync_api import sync_playwright
+
+          fps=30
+          seconds=36
+          total=fps*seconds
+          frames=Path("/tmp/cosmos-clean-frames")
+          frames.mkdir(exist_ok=True)
+          report=Path("docs/media/cosmos-clean-viewport-status.txt")
+          report.write_text("CAPTURE=STARTED\nMETHOD=Playwright page.screenshot (webpage viewport only)\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\nTARGET_FPS=30\nTARGET_DURATION=36\nVIEWPORT=540x960\n")
+          duplicate_count=0
+          captured_count=0
+          exact_duplicate_count=0
+          previous_bytes=None
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=False,args=[
+                  "--no-sandbox","--disable-dev-shm-usage",
+                  "--force-device-scale-factor=1",
+                  "--enable-webgl","--use-gl=angle",
+                  "--use-angle=swiftshader","--enable-unsafe-swiftshader"
+              ])
+              page=browser.new_page(viewport={"width":540,"height":960},
+                                    device_scale_factor=1,
+                                    reduced_motion="no-preference")
+              page.goto("https://thepatientagent.github.io/GPT-6-PAgt/",
+                        wait_until="domcontentloaded",timeout=90000)
+              page.frame_locator("#cosmos").locator("body.touring").wait_for(
+                  state="attached",timeout=90000)
+              # The actual published tour runs in the iframe. Page screenshot
+              # captures its pixels without Chromium tabs or the URL bar.
+              time.sleep(.25)
+              start=time.monotonic()
+              last_image=None
+              for i in range(total):
+                  deadline=start+i/fps
+                  remaining=deadline-time.monotonic()
+                  if remaining>0:time.sleep(remaining)
+                  now=time.monotonic()
+                  if i and now-deadline>1/fps and last_image is not None:
+                      duplicate_count+=1
+                      data=last_image
+                  else:
+                      data=page.screenshot(type="jpeg",quality=84,timeout=15000,
+                                           animations="allow",caret="hide")
+                      captured_count+=1
+                  if previous_bytes==data:exact_duplicate_count+=1
+                  previous_bytes=data
+                  last_image=data
+                  (frames/(f"{i:05d}.jpg")).write_bytes(data)
+              elapsed=time.monotonic()-start
+              browser.close()
+          with report.open("a") as f:
+              f.write(f"CAPTURE=FINISHED\nREAL_ELAPSED_SECONDS={elapsed:.3f}\n")
+              f.write(f"TOTAL_FRAMES={total}\nACTUAL_SCREENSHOTS={captured_count}\n")
+              f.write(f"SKIPPED_AND_REUSED={duplicate_count}\n")
+              f.write(f"EXACT_DUPLICATES={exact_duplicate_count}\n")
+          PY
+          ffmpeg -hide_banner -nostdin -loglevel warning -y -framerate 30 -i /tmp/cosmos-clean-frames/%05d.jpg -map 0:v:0 -an -c:v libx264 -preset medium -profile:v high -level:v 4.0 -pix_fmt yuv420p -b:v 2200k -maxrate 2800k -bufsize 5600k -g 60 -movflags +faststart docs/media/cosmos-clean-viewport-x-30fps.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,avg_frame_rate,nb_frames -of default=noprint_wrappers=1 docs/media/cosmos-clean-viewport-x-30fps.mp4 | tee -a docs/media/cosmos-clean-viewport-status.txt
+          ffmpeg -hide_banner -nostdin -loglevel error -y -ss 19 -i docs/media/cosmos-clean-viewport-x-30fps.mp4 -frames:v 1 docs/media/cosmos-clean-viewport-sample.jpg
+      - name: Publish clean-capture video and metrics
+        if: success()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/media/cosmos-clean-viewport-status.txt docs/media/cosmos-clean-viewport-x-30fps.mp4 docs/media/cosmos-clean-viewport-sample.jpg
+          git commit -m "Publish clean viewport capture and frame cadence diagnostics"
+          git pull --rebase origin main
+          git push origin HEAD:main
