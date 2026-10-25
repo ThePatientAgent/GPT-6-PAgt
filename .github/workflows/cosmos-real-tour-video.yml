@@ -1,0 +1,54 @@
+name: COSMOS real browser tour video
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/cosmos-real-tour-video.yml
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install video and browser tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg xvfb
+          python -m pip install playwright==1.58.0
+          python -m playwright install chromium
+      - name: Record ACTUAL published COSMOS browser animation
+        env:
+          DISPLAY: ":99"
+        run: |
+          Xvfb :99 -screen 0 720x1280x24 -nolisten tcp > /tmp/xvfb.log 2>&1 &
+          sleep 2
+          mkdir -p docs/media
+          python - <<'PY'
+          import subprocess,time
+          from playwright.sync_api import sync_playwright
+          url="https://thepatientagent.github.io/GPT-6-PAgt/"
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=False,args=["--no-sandbox","--disable-dev-shm-usage","--window-position=0,0","--window-size=720,1280","--hide-scrollbars","--force-device-scale-factor=1"])
+              page=browser.new_page(viewport={"width":720,"height":1280},device_scale_factor=1)
+              page.goto(url,wait_until="domcontentloaded",timeout=90000)
+              page.frame_locator("#cosmos").locator("body.touring").wait_for(state="attached",timeout=90000)
+              # This is a direct screen capture of the live animation, NOT animated stills.
+              time.sleep(1)
+              target="docs/media/cosmos-real-tour-live-60fps.mp4"
+              cmd=["ffmpeg","-y","-loglevel","warning","-f","x11grab","-framerate","60","-video_size","720x1280","-i",":99.0+0,0","-t","36","-an","-c:v","libx264","-preset","ultrafast","-crf","23","-pix_fmt","yuv420p","-movflags","+faststart",target]
+              print("Recording live browser",flush=True)
+              subprocess.run(cmd,check=True)
+              browser.close()
+          PY
+          ffprobe -v error -show_entries format=duration,size:stream=width,height,r_frame_rate,nb_frames -of default=noprint_wrappers=1 docs/media/cosmos-real-tour-live-60fps.mp4
+      - name: Publish MP4 to GitHub Pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/media/cosmos-real-tour-live-60fps.mp4
+          git commit -m "Publish real browser-captured COSMOS tour video"
+          git push
