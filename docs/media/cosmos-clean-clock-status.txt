@@ -1,0 +1,43 @@
+RUN_ID=40188522656
+CAPTURE=STARTED\nMETHOD=Playwright screenshot + deterministic page.clock.run_for\nSOURCE=https://thepatientagent.github.io/GPT-6-PAgt/\nTARGET_FPS=30\nTARGET_DURATION=36\nVIEWPORT=540x960\nCAPTURE_EXIT_CODE=1
+CAPTURE_LOG_TAIL:
+Traceback (most recent call last):
+  File "<stdin>", line 36, in <module>
+  File "/home/runner/.local/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 7027, in pause_at
+    return mapping.from_maybe_impl(self._sync(self._impl_obj.pause_at(time=time)))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_clock.py", line 49, in pause_at
+    await self._browser_context._channel.send(
+  File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Clock.pause_at: Error: Cannot fast-forward to the past
+    at ClockController._innerFastForwardTo (<anonymous>:197:13)
+    at ClockController.pauseAt (<anonymous>:128:16)
+    at async <anonymous>:316:30
+XVFB_LOG_TAIL:
+Errors from xkbcomp are not fatal to the X server
+The XKEYBOARD keymap compiler (xkbcomp) reports:
+> Warning:          Could not resolve keysym XF86CameraAccessEnable
+> Warning:          Could not resolve keysym XF86CameraAccessDisable
+> Warning:          Could not resolve keysym XF86CameraAccessToggle
+> Warning:          Could not resolve keysym XF86NextElement
+> Warning:          Could not resolve keysym XF86PreviousElement
+> Warning:          Could not resolve keysym XF86AutopilotEngageToggle
+> Warning:          Could not resolve keysym XF86MarkWaypoint
+> Warning:          Could not resolve keysym XF86Sos
+> Warning:          Could not resolve keysym XF86NavChart
+> Warning:          Could not resolve keysym XF86FishingChart
+> Warning:          Could not resolve keysym XF86SingleRangeRadar
+> Warning:          Could not resolve keysym XF86DualRangeRadar
+> Warning:          Could not resolve keysym XF86RadarOverlay
+> Warning:          Could not resolve keysym XF86TraditionalSonar
+> Warning:          Could not resolve keysym XF86ClearvuSonar
+> Warning:          Could not resolve keysym XF86SidevuSonar
+> Warning:          Could not resolve keysym XF86NavInfo
+Errors from xkbcomp are not fatal to the X server
