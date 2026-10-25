@@ -9,7 +9,7 @@ permissions:
 jobs:
   record:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +28,7 @@ jobs:
           site='https://thepatientagent.github.io/GPT-6-PAgt/?capture=cosmos-final-20261025'
           with sync_playwright() as p:
             browser=p.chromium.launch(channel='chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--use-gl=angle','--use-angle=swiftshader'])
-            context=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=1,
+            context=browser.new_context(viewport={'width':540,'height':960},device_scale_factor=1,
               is_mobile=True,has_touch=True,reduced_motion='no-preference',
               record_video_dir='/tmp/cosmos-record',record_video_size={'width':540,'height':960})
             page=context.new_page()
@@ -63,16 +63,16 @@ jobs:
       - name: Encode video for X
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "fps=30,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 24 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour.mp4
-          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour.mp4
+          ffmpeg -hide_banner -loglevel error -y -i /tmp/cosmos-record/cosmos-raw.webm -vf "crop=540:960:0:0,minterpolate=fps=60:mi_mode=mci:mc_mode=obmc:me_mode=bidir:vsbmc=1,scale=720:1280:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 19 -movflags +faststart -an docs/media/cosmos-final-five-stop-tour-smooth-v2.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 docs/media/cosmos-final-five-stop-tour-smooth-v2.mp4
       - uses: actions/upload-artifact@v4
         with:
-          name: cosmos-final-tour-mp4
-          path: docs/media/cosmos-final-five-stop-tour.mp4
+          name: cosmos-final-tour-smooth-v2-mp4
+          path: docs/media/cosmos-final-five-stop-tour-smooth-v2.mp4
       - name: Publish MP4 to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/media/cosmos-final-five-stop-tour.mp4
-          git commit -m "Add captured real COSMOS final five-stop tour MP4"
+          git add docs/media/cosmos-final-five-stop-tour-smooth-v2.mp4
+          git commit -m "Add smooth 60fps borderless COSMOS five-stop tour MP4"
           git push
