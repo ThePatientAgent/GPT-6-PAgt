@@ -775,13 +775,11 @@ function tourHoleDepart(){
    tourSolarApproach={index:destination,start:now,duration:1650,from:beginRadius,to:finishRadius};
    // No black curtain or standalone caption: the same tour card changes as the scenes dissolve.
    tourWords();
-   tourHoleLayer.classList.remove('cosmos-hole-open');
-   tourHoleSchedule(()=>{
-    if(journey!==tourHoleTravelToken||!tourActive)return;
-    tourHoleHide();
-    tourHoleDeparting=false;
-    tourOrbitAt=-1;
-   },850);
+   // v203: remove the black-hole iframe before exposing the solar-system scene.
+   // The iframe must never remain composited over destination 4 on iOS.
+   tourHoleHide();
+   tourHoleDeparting=false;
+   tourOrbitAt=-1;
    return;
   }
   tourHoleTravelRAF=requestAnimationFrame(revealWhenReady);
