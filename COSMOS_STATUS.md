@@ -1,3 +1,53 @@
+# COSMOS — current release v222
+Updated 2026-10-27 JST.
+
+## Eight-destination live tour
+Public entry: https://thepatientagent.github.io/GPT-6-PAgt/
+Direct entries: `?start=spica`, `?start=quasar`, `?start=cygnus`.
+
+Order: Pleiades → Orion → V13 Black Hole → Solar system → Spica →
+Galactic core → Quasar → Cygnus X-1 → repeat.
+Gestures rotate the real camera and never cancel automatic progression.
+
+- Spica: two evolving blue-white photospheres orbit their shared barycentre.
+- Quasar: a tilted 3D accretion disk with independently flowing blue-white
+  bipolar jets, warm outer filaments, dark horizon and irregular gas.
+- Cygnus X-1: a blue supergiant and compact red-hot accretion disk orbit
+  together; a curved, animated captured-wind stream stays attached to both.
+  This is an artistic, accelerated wind-fed binary, not a fluid simulation.
+- The three scenes share the existing deep-scene WebGL context, noise
+  texture and native animation loop. No additional animation loop or
+  static image replaces the subjects. Bounded flow fields avoid increasing
+  texture frequency during long-running tours.
+- Preserve the v220 Sun (75% size, white-hot plasma, 4× flow and draggable
+  shader orientation), English upper-left hints and existing planetary paths.
+- Approved V13 Radiance source, geometry, 0.60 framing, golden light and
+  black centre are unchanged. Its background stars remain draggable.
+
+Source implementation checkpoint:
+`f35d5eeb5ab2e7b0b140b658228ffec2911fc80e`.
+Previous published v220 recovery point:
+`2ac452587f987c62b23b01e8fe21886418f82306`.
+
+## Validation and limits
+Local Chromium 131 verified the full eight-stop loop, V13→Solar handoff,
+Sun touch orientation, Kepler path alignment and all three visible planets.
+Mobile 390×844 at 2× device scale and desktop 1440×900 verified all new
+chapters, real touch/mouse camera changes, advancing stellar centres,
+fixed barycentres and zero WebGL errors. Fixed-camera framebuffer tests
+verify photosphere, disk, jet and wind animation independently of camera
+movement, and deterministic pixels at identical shader time.
+The deployed-browser workflow checks public source hashes, repeats these
+checks, and captures native Cygnus animation frames into a 24 fps MP4 QA
+artifact. A rendered recording is not a physical-device FPS measurement.
+Physical iPhone hardware and Safari have not been benchmarked.
+No X post was requested for v222.
+
+Historical checkpoints follow; their version-specific statements do not
+override the current release above.
+
+---
+
 # COSMOS — technical and artistic checkpoint
 Updated 2026-10-25 JST.
 

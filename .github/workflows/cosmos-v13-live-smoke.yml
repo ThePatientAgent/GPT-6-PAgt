@@ -68,6 +68,9 @@ jobs:
           node tools/cosmos-exotics-v221-smoke.cjs --desktop \
             --url "https://thepatientagent.github.io/GPT-6-PAgt/?exotics-desktop=${GITHUB_SHA}" \
             --output cosmos-exotics-desktop-live-qa
+          node tools/cosmos-exotics-v221-smoke.cjs --chapter cygnus --record \
+            --url "https://thepatientagent.github.io/GPT-6-PAgt/?cygnus-record=${GITHUB_SHA}" \
+            --output cosmos-cygnus-video-qa
       - name: Preserve browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,4 +81,5 @@ jobs:
             cosmos-bh-live-qa
             cosmos-exotics-live-qa
             cosmos-exotics-desktop-live-qa
+            cosmos-cygnus-video-qa
           if-no-files-found: ignore
