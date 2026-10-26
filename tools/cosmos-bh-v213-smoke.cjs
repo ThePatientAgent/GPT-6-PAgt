@@ -97,7 +97,7 @@ const browserName=process.env.COSMOS_BROWSER||'chromium';fs.mkdirSync(out,{recur
      assert(Math.abs(afterMouse.pan.x-afterTouch.pan.x-45)<1&&Math.abs(afterMouse.pan.y-afterTouch.pan.y+20)<1,'mouse drag must move the same stars: '+JSON.stringify({before:afterTouch.pan,after:afterMouse.pan,stage:(await state()).name}));
      assert.notEqual(afterTouch.hash,afterMouse.hash);assert(afterMouse.touring,'input must not interrupt the tour');assert.equal(before.mask,afterMouse.mask,'shadow mask must stay fixed');
      before.rect.forEach((v,j)=>assert(Math.abs(v-afterMouse.rect[j])<1,'Black Hole framing must stay fixed'));
-     assert(afterMouse.hintTop<50,'input hint must stay at the top edge');assert(afterMouse.hintText.includes('星々'));
+     assert(afterMouse.hintTop<50,'input hint must stay at the top edge');assert(afterMouse.hintText.includes('stars'),'Black Hole touch guidance must be in English');
      await page.screenshot({path:path.join(out,'black-hole-dragged.png')});
      inputCheck={touchMethod:browserName==='chromium'?'browser-dispatched touch':'native TouchEvent handler',before,afterTouch,afterMouse};
      console.log('PASS touch + mouse move star pixels; Black Hole stays fixed and tour continues');
