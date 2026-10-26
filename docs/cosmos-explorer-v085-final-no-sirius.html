@@ -332,6 +332,23 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 
 .solar-sun.solar-safe-v192::before,.solar-sun.solar-safe-v192::after{content:none!important;display:none!important}
 .solar-sun.solar-safe-v192{isolation:isolate!important;box-shadow:none!important}
+
+/* v195: fine gold corona jets and surface contrast; pseudo layers are restored only for this constrained treatment. */
+.solar-sun.solar-flame-v195::before{
+content:""!important;display:block!important;position:absolute;inset:0;border-radius:50%;pointer-events:none;
+background:repeating-conic-gradient(from 7deg at 50% 50%,rgba(255,209,65,.60) 0deg 1.4deg,rgba(255,137,20,.25) 2deg 3deg,transparent 4deg 8deg),
+radial-gradient(circle at center,transparent 0 22%,rgba(255,196,54,.38) 23%,rgba(255,113,18,.17) 26%,transparent 31%);
+-webkit-mask-image:radial-gradient(circle,transparent 0 22%,#000 24%,rgba(0,0,0,.7) 26%,transparent 30%);
+mask-image:radial-gradient(circle,transparent 0 22%,#000 24%,rgba(0,0,0,.7) 26%,transparent 30%);
+mix-blend-mode:normal;opacity:.86;
+}
+.solar-sun.solar-flame-v195::after{
+content:""!important;display:block!important;position:absolute;inset:0;border-radius:50%;pointer-events:none;
+background:conic-gradient(from 13deg,transparent 0deg,rgba(255,238,136,.9) 9deg,transparent 15deg,transparent 41deg,rgba(255,171,31,.8) 47deg,transparent 54deg,transparent 96deg,rgba(255,241,156,.8) 103deg,transparent 112deg,transparent 160deg,rgba(255,149,25,.9) 167deg,transparent 176deg,transparent 225deg,rgba(255,227,112,.8) 232deg,transparent 240deg,transparent 294deg,rgba(255,174,33,.85) 303deg,transparent 312deg);
+-webkit-mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%);
+mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%);
+opacity:.85;mix-blend-mode:screen;
+}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
@@ -1060,6 +1077,8 @@ solarSun.classList.add('solar-safe-v192');
 // v194: bright compact photosphere and narrow orange corona, without a broad white backdrop.
 solarSun.style.setProperty('background','radial-gradient(circle at 47% 44%,rgba(255,255,255,.96) 0%,rgba(255,255,255,.87) 7%,rgba(255,251,220,.65) 13%,rgba(255,233,150,.23) 19%,transparent 24%),radial-gradient(circle at center,#fff 0%,#fff 10%,#fff9df 15%,#ffe78e 19%,#ffb43c 23%,transparent 25%),radial-gradient(circle at center,rgba(255,203,72,.30) 0%,rgba(255,149,22,.19) 26%,rgba(255,110,0,.07) 34%,transparent 42%)','important');
 solarSun.style.setProperty('filter','none','important');
+// v195: irregular flame tongues confined to the Sun's limb, without a full-screen bloom.
+solarSun.classList.add('solar-flame-v195');
 // v193: make the photosphere itself white-hot without illuminating the entire sky.
 // v194 replaces v193 gradient above; retain constrained ambient glow.
 const frontRings=makeRingHalves('front');
