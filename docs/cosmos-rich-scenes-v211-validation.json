@@ -1,0 +1,209 @@
+{
+  "version": "v211",
+  "restoreCommit": "da09f83e783afc8e63b49c39aef09297d3009bf2",
+  "views": [
+    {
+      "browser": "chromium",
+      "viewport": "390x844 @2x",
+      "stages": [
+        "Pleiades",
+        "Orion",
+        "Black Hole",
+        "Solar system",
+        "Galactic core"
+      ],
+      "tourCompleted": true,
+      "javascriptErrors": [],
+      "pleiades": {
+        "renderer": "webgl-volume-reflection-nebula",
+        "phase": "3.49",
+        "visible": true,
+        "error": 0
+      },
+      "solar": {
+        "rect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.8399658203125,
+          "height": 477.8399658203125
+        },
+        "gl": {
+          "error": 0,
+          "width": 768,
+          "height": 768
+        }
+      },
+      "blackHole": {
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "prepared": "48",
+        "renderer": "webgl-differential-accretion",
+        "phaseBefore": "5.76",
+        "phaseAfter": "16.26"
+      }
+    },
+    {
+      "browser": "chromium",
+      "viewport": "1440x900 @1x",
+      "stages": [
+        "Pleiades",
+        "Orion",
+        "Black Hole",
+        "Solar system",
+        "Galactic core"
+      ],
+      "tourCompleted": true,
+      "javascriptErrors": [],
+      "pleiades": {
+        "renderer": "webgl-volume-reflection-nebula",
+        "error": 0,
+        "evidence": "qa-rich-desktop.log"
+      },
+      "solar": {
+        "rect": {
+          "x": 397.4800109863281,
+          "y": 127.48001098632812,
+          "width": 645.0400390625,
+          "height": 645.0400390625
+        },
+        "gl": {
+          "error": 0,
+          "width": 704,
+          "height": 704
+        }
+      },
+      "blackHole": {
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "prepared": "48",
+        "renderer": "webgl-differential-accretion",
+        "phaseBefore": "3.84",
+        "phaseAfter": "14.21"
+      }
+    },
+    {
+      "browser": "webkit",
+      "viewport": "390x844 @2x",
+      "stages": [
+        "Pleiades",
+        "Orion",
+        "Black Hole",
+        "Solar system",
+        "Galactic core"
+      ],
+      "tourCompleted": true,
+      "javascriptErrors": [],
+      "pleiades": {
+        "renderer": "webgl-volume-reflection-nebula",
+        "phase": "3.50",
+        "visible": true,
+        "error": 0
+      },
+      "solar": {
+        "rect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.84002685546875,
+          "height": 477.8399658203125
+        },
+        "gl": {
+          "error": 0,
+          "width": 768,
+          "height": 768
+        }
+      },
+      "blackHole": {
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "prepared": "48",
+        "renderer": "webgl-differential-accretion",
+        "phaseBefore": "5.89",
+        "phaseAfter": "16.26"
+      }
+    }
+  ],
+  "lifecycle": {
+    "nebula": {
+      "first": {
+        "hash": -1969151348,
+        "whiteFraction": 0.0009091215902667038,
+        "error": 0
+      },
+      "later": {
+        "hash": -1301030734,
+        "whiteFraction": 0.000902793597759047,
+        "error": 0
+      },
+      "nativeStars": 151
+    },
+    "accretion": {
+      "first": {
+        "hash": -606575357,
+        "dark": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "error": 0
+      },
+      "later": {
+        "hash": 20277455,
+        "dark": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "error": 0
+      },
+      "canvasCount": 1
+    },
+    "fixedCameraEvolution": true,
+    "fixedAtlasEvolution": true,
+    "contextLossAndRestoration": "both passed",
+    "reducedMotion": "frozen"
+  },
+  "preserved": {
+    "solarRendererBytes": true,
+    "solarSurfaceSpeed": "4x original / identical to approved v210",
+    "cameraProjectionAndResize": true,
+    "blackHoleSourceAtlasAndFraming": true,
+    "otherTourStopsAndTiming": true
+  },
+  "video": {
+    "file": "media/cosmos-rich-scenes-v211.mp4",
+    "width": 780,
+    "height": 1688,
+    "fps": 30,
+    "durationSeconds": 4,
+    "frames": {
+      "pleiades": {
+        "count": 60,
+        "unique": 60
+      },
+      "black-hole": {
+        "count": 60,
+        "unique": 60
+      }
+    },
+    "method": "Actual native renderers and tour under controlled browser clocks; encoded frame rate is not measured device FPS"
+  },
+  "notTested": [
+    "Physical iPhone GPU FPS, thermals and battery use",
+    "Physical iOS Safari",
+    "Measured hardware GPU frame times"
+  ]
+}

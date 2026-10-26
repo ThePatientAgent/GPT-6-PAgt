@@ -8,6 +8,7 @@ on:
       - docs/index.html
       - docs/cosmos-explorer-v085-final-no-sirius.html
       - docs/cosmos-sun-v207.js
+      - docs/cosmos-rich-scenes-v211.js
       - docs/cosmos-black-hole-radiance-v013.html
   workflow_dispatch:
 permissions:
@@ -26,6 +27,23 @@ jobs:
       - name: Validate the deployed five-stop tour
         shell: bash
         run: |
+          python - <<'PY'
+          import hashlib, os, pathlib, time, urllib.request
+          base='https://thepatientagent.github.io/GPT-6-PAgt/'
+          paths=['index.html','cosmos-explorer-v085-final-no-sirius.html','cosmos-rich-scenes-v211.js','cosmos-black-hole-radiance-v013.html']
+          for attempt in range(60):
+              try:
+                  for path in paths:
+                      with urllib.request.urlopen(base+path+'?verify='+os.environ['GITHUB_SHA'],timeout=15) as response:
+                          actual=response.read()
+                      expected=pathlib.Path('docs',path).read_bytes()
+                      if hashlib.sha256(actual).digest()!=hashlib.sha256(expected).digest():
+                          raise RuntimeError(path+' is still the previous deployment')
+                  print('Public bytes match this commit');break
+              except Exception as error:
+                  if attempt==59: raise
+                  print('Waiting for Pages:',error,flush=True);time.sleep(5)
+          PY
           export COSMOS_CHROMIUM_EXECUTABLE="$(command -v google-chrome)"
           node tools/cosmos-sun-v207-smoke.cjs \
             --url "https://thepatientagent.github.io/GPT-6-PAgt/?qa=${GITHUB_SHA}" \

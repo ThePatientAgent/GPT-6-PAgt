@@ -60,15 +60,27 @@ fs.mkdirSync(output,{recursive:true});
         .map(e=>({class:e.className,text:e.classList.contains('solar-planet-label')?e.textContent:'',style:e.getAttribute('style')}))};
   });
   const stages=[],snapshots=[],bhChecks=[];
-  let solarCaptured=false,ended=false,elapsed=0,last='';
+  let solarCaptured=false,pleiadesCaptured=false,pleiadesCheck=null,ended=false,elapsed=0,last='';
   for(let i=0;i<170;i++){
     await page.clock.runFor(250);elapsed+=250;
     const s=await info();
     if(s.name!==last){stages.push(s.name);console.log('STAGE',s.name,elapsed);last=s.name;}
+    if(!baseline&&!pleiadesCaptured&&s.name==='Pleiades'&&elapsed>=3500){
+      const nebula=frame.locator('.cosmos-pleiades-v211');
+      const data=await nebula.evaluate(e=>({renderer:e.dataset.renderer,phase:e.dataset.phase,
+        visible:getComputedStyle(e).display!=='none',error:e.getContext('webgl').getError()}));
+      assert.equal(data.renderer,'webgl-volume-reflection-nebula');assert(data.visible);assert(+data.phase>0);assert.equal(data.error,0);
+      await page.screenshot({path:path.join(output,'pleiades.png')});
+      console.log('PLEIADES',data);pleiadesCaptured=true;pleiadesCheck=data;
+    }
     if(s.name==='Black Hole'&&!s.bhHidden){
       const child=page.frames().find(f=>f.url().includes('cosmos-black-hole-radiance-v013'));
       if(child){
         const data=await child.locator('#scene').evaluate(e=>({...e.dataset}));
+        if(!baseline&&data.ready==='true'){
+          assert.equal(data.renderer,'webgl-differential-accretion');assert.equal(data.flow,'shape-locked-orbital-filaments');
+          assert.equal(await child.locator('#scene').evaluate(e=>e.getContext('webgl').getError()),0);
+        }
         bhChecks.push(data);
         if(bhChecks.length===2)await page.screenshot({path:path.join(output,'black-hole.png')});
       }
@@ -102,6 +114,7 @@ fs.mkdirSync(output,{recursive:true});
     if(stages.includes('Galactic core')&&!s.touring){ended=true;break;}
   }
   assert(solarCaptured,'tour never reached the visible Sun');
+  if(!baseline)assert(pleiadesCaptured,'living reflection nebula was not verified');
   assert(ended,'tour did not complete');
   assert.deepEqual(stages,['Pleiades','Orion','Black Hole','Solar system','Galactic core']);
   assert(bhChecks.some(e=>e.ready==='true'&&e.geometry==='identity'&&e.radiance==='source-synchronous'),'approved V13 renderer not verified');
@@ -113,16 +126,25 @@ fs.mkdirSync(output,{recursive:true});
   await page.clock.runFor(500);
   const manualFrame=page.frames().find(f=>f.url().includes('cosmos-black-hole-radiance-v013'));
   assert(manualFrame,'manual black-hole iframe missing');
+  for(let attempt=0;attempt<40;attempt++){
+    if(await manualFrame.locator('#scene').evaluate(e=>e.dataset.ready==='true'))break;
+    await page.clock.runFor(125);
+  }
+  await page.clock.runFor(250);
   const manualBefore=await manualFrame.locator('#scene').evaluate(e=>({...e.dataset}));
   assert.equal(manualBefore.ready,'true');assert.equal(manualBefore.geometry,'identity');
   assert.equal(manualBefore.radiance,'source-synchronous');assert.equal(manualBefore.prepared,'48');
+  if(!baseline){
+    assert.equal(manualBefore.renderer,'webgl-differential-accretion');
+    assert.equal(await manualFrame.locator('#scene').evaluate(e=>e.getContext('webgl').getError()),0);
+  }
   await page.clock.runFor(1300);
   const manualAfter=await manualFrame.locator('#scene').evaluate(e=>({...e.dataset}));
   assert.notEqual(manualBefore.phase,manualAfter.phase,'manual black-hole playback stalled');
   await page.screenshot({path:path.join(output,'black-hole-manual.png')});
   console.log('PASS manual V13',manualBefore.phase,'→',manualAfter.phase);
   const report={browser:browserName,url:liveUrl||'local repository files',viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,
-    snapshots,bhChecks,manualBefore,manualAfter,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
+    snapshots,pleiadesCheck,bhChecks,manualBefore,manualAfter,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
   fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2));
   console.log('PASS',report.viewport,stages.join(' → '));
  }finally{await browser.close();}

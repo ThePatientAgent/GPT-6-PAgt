@@ -280,6 +280,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 .cosmos-sun-v207{position:absolute;left:0;top:0;width:440px;height:440px;
  pointer-events:none;opacity:0;z-index:91;transform-origin:220px 220px;
  will-change:transform,opacity;contain:layout style;isolation:isolate}
+.cosmos-pleiades-gpu .cluster-star,.cosmos-pleiades-gpu .pleiades-wisp{visibility:hidden!important}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
@@ -305,6 +306,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
 <script src="./cosmos-sun-v207.js?revision=fast-plasma-v210"></script>
+<script src="./cosmos-rich-scenes-v211.js?revision=living-nebula-v211"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
@@ -1018,6 +1020,12 @@ const pleiadesPoints=[
 [.43,.70,.39,0,.46],[-.16,-.66,.51,4,.58]
 ];
 const clusterCenter=places[4].pos;
+const pleiadesRenderer=window.CosmosPleiadesRenderer?new window.CosmosPleiadesRenderer(hybridLayer):{available:false,draw(){}};
+const pleiadesFieldStars=Array.from({length:140},(_,j)=>{
+ const theta=rand(j+2101)*Math.PI*2,r=.32+Math.sqrt(rand(j+2102))*1.85;
+ return {world:[clusterCenter[0]+Math.cos(theta)*r,clusterCenter[1]+Math.sin(theta)*r*.78,
+   clusterCenter[2]+(rand(j+2103)-.5)*2.6],magnitude:.16+rand(j+2104)*.6,phase:rand(j+2105)*6.28};
+});
 const clusterStars=pleiadesPoints.map((spec,j)=>{
  const el=document.createElement('img');el.className='cluster-star';el.src=pleiadesStarSprites[spec[3]];el.alt='';el.decoding='async';el.draggable=false;hybridLayer.appendChild(el);
  return {el,world:[clusterCenter[0]+spec[0],clusterCenter[1]+spec[1],clusterCenter[2]+spec[2]],magnitude:spec[4]};
@@ -1100,6 +1108,21 @@ function renderPleiades(c,alpha,t){
  const groupX=starTimeLapseOn?.025*Math.sin(livingPhase):0;
  const groupY=starTimeLapseOn?.015*(Math.cos(livingPhase*.87)-1):0;
  const groupZ=starTimeLapseOn?.010*Math.sin(livingPhase*.73):0;
+ if(pleiadesRenderer.available){
+  const stars=[];
+  if(visible)for(const [i,item]of [...clusterStars,...pleiadesFieldStars].entries()){
+   const turned=pleiadesRigidTurn(item.world,spinCos,spinSin);
+   const p=proj([turned[0]+groupX,turned[1]+groupY,turned[2]+groupZ],c);
+   if(!p||p.z<=.15||p.z>10)continue;
+   const major=i<clusterStars.length;
+   const size=clamp(238*item.magnitude/Math.max(p.z,.65),10,W<700?184:272);
+   stars.push({x:p.x,y:p.y,radius:major?size*.88:clamp(4.6/Math.max(p.z,.7),.8,2.8),
+    strength:(major?1.65:1)*item.magnitude*clamp((10-p.z)/3,0,1),phase:item.phase||i*2.7,rays:major?1:0});
+  }
+  pleiadesRenderer.project({camera:c,eye:c.eye.map((v,i)=>v-clusterCenter[i]),axis:pleiadesSpinAxis,
+   angle,drift:[groupX,groupY,groupZ],stars,width:W,height:H,alpha,motion:starTimeLapseOn});
+  return;
+ }
  for(const item of pleiadesWisps){
   // Coherent, slow gas flow: shared field motion plus small individual parallax.
   const flow=t*.00034;
@@ -1469,7 +1492,7 @@ function tick(t){
    }
   }
  }
- if(tourHoleLayer.hidden)solarRenderer.draw(t);
+  if(tourHoleLayer.hidden){solarRenderer.draw(t);pleiadesRenderer.draw(t);}
  requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
