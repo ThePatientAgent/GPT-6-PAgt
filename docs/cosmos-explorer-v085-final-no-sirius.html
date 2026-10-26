@@ -307,8 +307,8 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
 <script src="./cosmos-sun-v207.js?revision=fast-plasma-v210"></script>
-<script src="./cosmos-rich-scenes-v211.js?revision=cinema-v216"></script>
-<script src="./cosmos-worlds-v212.js?revision=cinema-v216"></script>
+<script src="./cosmos-rich-scenes-v211.js?revision=cinema-v217"></script>
+<script src="./cosmos-worlds-v212.js?revision=cinema-v217"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
@@ -687,7 +687,7 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=cinema-v216';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=cinema-v217';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
  tourHoleLoadFallback=setTimeout(()=>{
   if(!tourActive||tourStops[tourStage]!==6||tourHoleStart!==-2)return;
@@ -738,7 +738,7 @@ function tourEnd(){
 function tourNext(){
  tourOrbitAt=-1;
  if(tourHoleDeparting)return;
- if(tourStage>=tourStops.length){tourEnd();return;}
+ if(tourStage>=tourStops.length){tourStage=0;}
  // One-time vignette: advance the native camera during a short covered interval.
  if(!tourHoleLayer.hidden && tourStops[tourStage]!==6){tourHoleDepart();return;}
  tourHoleHide();
@@ -757,15 +757,7 @@ function tourBegin(){
  tourNext();
 }
 tourToggle.addEventListener('click',()=>tourActive?tourEnd():tourBegin());
-// Capture before camera/control handlers: a drag, tap, pinch or navigation wins instantly.
-const tourInterrupt=e=>{
- if(!tourActive)return;
- if(e.target?.closest?.('#tourToggle'))return;
- tourEnd();
-};
-document.addEventListener('pointerdown',tourInterrupt,true);
-document.addEventListener('touchstart',tourInterrupt,{capture:true,passive:true});
-document.addEventListener('keydown',e=>{if(tourActive&&e.key!=='Tab')tourEnd()},true);
+// The tour keeps its schedule during touch/drag; only the explicit toggle stops it.
 function tourTick(t,dt){
  if(!tourActive||document.visibilityState!=='visible'||tourHoleDeparting)return;
  const idx=tourStops[tourStage];
@@ -795,6 +787,7 @@ function tourTick(t,dt){
 // Real look-around: preserve the camera's world position while changing heading.
 let lookUsed=false,lookHeld=null,lookActiveUntil=0;
 function turnCamera(dYaw,dPitch){
+ if(tourActive&&state.fly)return; // Preserve automatic travel while a gesture is in progress.
  if(Math.abs(dYaw)+Math.abs(dPitch)<.000001)return;
  state.yaw+=dYaw;
  state.pitch=clamp(state.pitch+dPitch,-1.43,1.43);
@@ -940,6 +933,7 @@ document.addEventListener('gesturestart',preventNativePageMove,{passive:false});
 document.addEventListener('gesturechange',preventNativePageMove,{passive:false});
 
 function shift(right,up,front){
+ if(tourActive)return;
  const c=cam();for(let i=0;i<3;i++)state.pos[i]+=right*c.right[i]+up*c.up[i]+front*c.forward[i];
  if(state.orbit)exitOrbit(true);
  state.fly=null;$('warp').classList.remove('on');

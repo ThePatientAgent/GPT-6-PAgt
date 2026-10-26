@@ -65,6 +65,7 @@ fs.mkdirSync(output,{recursive:true});
   for(let i=0;i<170;i++){
     await page.clock.runFor(250);elapsed+=250;
     const s=await info();
+    if(!baseline&&elapsed===500){if(mobile)await page.touchscreen.tap(60,300);await page.mouse.move(70,320);await page.mouse.down();await page.mouse.move(140,340,{steps:3});await page.mouse.up();assert((await info()).touring,'touch/drag must not stop the automatic tour');}
     if(s.name!==last){stages.push(s.name);console.log('STAGE',s.name,elapsed);last=s.name;}
     if(!baseline&&s.name==='Solar system'&&s.sunOpacity>.5){
       const names=await frame.evaluate(()=>{
@@ -149,14 +150,14 @@ fs.mkdirSync(output,{recursive:true});
     if(solarCaptured&&s.name==='Galactic core'&&s.touring){
       await page.screenshot({path:path.join(output,'galactic-center.png')});
     }
-    if(stages.includes('Galactic core')&&!s.touring){ended=true;break;}
+    if(stages.includes('Galactic core')&&(baseline?!s.touring:s.name==='Pleiades'&&s.touring)){ended=true;break;}
   }
   assert(solarCaptured,'tour never reached the visible Sun');
   if(!baseline)assert.equal(Object.keys(deepChecks).length,2,'both new deep scenes must render');
   if(!baseline)assert.deepEqual([...seenPlanets].sort(),['EARTH','NEPTUNE','SATURN'],'all three planets must enter the viewport');
   if(!baseline)assert(pleiadesCaptured,'living reflection nebula was not verified');
-  assert(ended,'tour did not complete');
-  assert.deepEqual(stages,['Pleiades','Orion','Black Hole','Solar system','Galactic core']);
+  assert(ended,baseline?'tour did not complete':'tour did not restart its next loop');
+  assert.deepEqual(stages,baseline?['Pleiades','Orion','Black Hole','Solar system','Galactic core']:['Pleiades','Orion','Black Hole','Solar system','Galactic core','Pleiades']);
   assert(bhChecks.some(e=>e.ready==='true'&&e.geometry==='identity'&&e.radiance==='source-synchronous'),'approved V13 renderer not verified');
   assert(new Set(bhChecks.map(e=>e.phase)).size>1,'black-hole animation failed to advance');
   assert.deepEqual(errors,[],'JavaScript errors');

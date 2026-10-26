@@ -32,6 +32,7 @@ const root=path.resolve(__dirname,'../docs'),out=path.resolve(process.argv[2]||p
   for(let f=0;f<2100;f++){
    const target=Math.round(f*1000/60),dt=target-elapsed;if(dt)await page.clock.runFor(dt);elapsed=target;
    const s=await frame.evaluate(()=>({name:document.getElementById('tourName').textContent,touring:document.body.classList.contains('touring')}));
+   if(s.name==='Pleiades'&&stages.length===5)break;
    if(s.name!==previous){console.log('STAGE',s.name,elapsed);stages.push({name:s.name,frame:f,timeMs:elapsed});previous=s.name;}
    const jpg=await page.screenshot({type:'jpeg',quality:95,animations:'allow'});hashes.add(crypto.createHash('sha256').update(jpg).digest('hex'));
    if(!encoder.stdin.write(jpg))await once(encoder.stdin,'drain');frames++;
