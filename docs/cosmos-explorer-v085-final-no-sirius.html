@@ -388,6 +388,14 @@ opacity:.85;mix-blend-mode:screen;
  background:radial-gradient(circle at center,transparent 0 23%,rgba(255,238,164,.58) 25%,rgba(255,180,65,.22) 27%,transparent 31%)!important;
  -webkit-mask-image:none!important;mask-image:none!important;opacity:.72!important;
 }
+/* v199: remove disconnected halo blobs; preserve a single centered soft rim. */
+.solar-sun.solar-flame-v195::before{
+ content:""!important;display:block!important;inset:0!important;
+ background:radial-gradient(circle at 50% 50%,transparent 0 23%,rgba(255,236,154,.65) 25%,rgba(255,180,60,.22) 28%,transparent 33%)!important;
+ -webkit-mask-image:none!important;mask-image:none!important;
+ mix-blend-mode:normal!important;opacity:.7!important;
+}
+.solar-sun.solar-flame-v195::after{content:none!important;display:none!important;}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
