@@ -1048,7 +1048,7 @@ const orbitalPhase=document.createElement('div');orbitalPhase.id='orbitalPhase';
 const solarSun=document.createElement('div');solarSun.className='solar-sun';
 // v190: inline important wins over all wrapper CSS; keep mobile white corona visible.
 solarSun.style.setProperty('background','radial-gradient(circle at 49% 49%,#ffffff 0%,#ffffff 12%,#fffef6 16%,#fff9dc 19%,#ffeeb0 21%,#ffc65e 23%,transparent 25%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.92) 23%,rgba(255,253,239,.78) 30%,rgba(255,247,208,.54) 41%,rgba(255,234,178,.27) 56%,rgba(255,218,150,.10) 70%,transparent 88%)','important');
-solarSun.style.setProperty('filter','drop-shadow(0 0 30px rgba(255,255,245,.9)) drop-shadow(0 0 65px rgba(255,244,205,.65))','important');
+solarSun.style.setProperty('filter','none','important'); // v191: prevent iOS full-screen white compositing; halo remains in radial gradients
 hybridLayer.appendChild(solarSun);
 const frontRings=makeRingHalves('front');
 // v069: separate projected Saturn ring and planet captions, following the orbiting bodies.
