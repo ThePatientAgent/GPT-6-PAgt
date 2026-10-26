@@ -1061,7 +1061,7 @@ solarSun.classList.add('solar-safe-v192');
 solarSun.style.setProperty('background','radial-gradient(circle at 47% 44%,rgba(255,255,255,.96) 0%,rgba(255,255,255,.87) 7%,rgba(255,251,220,.65) 13%,rgba(255,233,150,.23) 19%,transparent 24%),radial-gradient(circle at center,#fff 0%,#fff 10%,#fff9df 15%,#ffe78e 19%,#ffb43c 23%,transparent 25%),radial-gradient(circle at center,rgba(255,203,72,.30) 0%,rgba(255,149,22,.19) 26%,rgba(255,110,0,.07) 34%,transparent 42%)','important');
 solarSun.style.setProperty('filter','none','important');
 // v193: make the photosphere itself white-hot without illuminating the entire sky.
-solarSun.style.setProperty('background','radial-gradient(circle at center,#ffffff 0%,#ffffff 12%,#fffdf1 16%,#fff2bd 20%,#ffc769 23%,transparent 25%),radial-gradient(circle at center,rgba(255,247,218,.18) 0%,rgba(255,223,160,.10) 26%,transparent 37%)','important');
+// v194 replaces v193 gradient above; retain constrained ambient glow.
 const frontRings=makeRingHalves('front');
 // v069: separate projected Saturn ring and planet captions, following the orbiting bodies.
 const saturnRing=document.createElement('div');saturnRing.className='solar-saturn-ring';hybridLayer.appendChild(saturnRing);
