@@ -401,6 +401,28 @@ opacity:.85;mix-blend-mode:screen;
 /* v201: brighten the existing solar disk itself; no new corona layers. */
 .solar-sun.solar-flame-v195{filter:none!important;box-shadow:none!important;}
 .solar-sun.solar-flame-v195::before,.solar-sun.solar-flame-v195::after{display:none!important;content:none!important;}
+
+/* v206: molten, animated solar surface; all effects confined to the existing 110px disk. */
+.molten-sun-v206{position:absolute;left:0;top:0;width:440px;height:440px;pointer-events:none;z-index:91;transform-origin:220px 220px;opacity:0;
+ background:
+ radial-gradient(circle at 50% 50%,transparent 0 20%,rgba(255,244,151,.9) 23%,rgba(255,127,17,.95) 24.4%,transparent 25.3%),
+ radial-gradient(circle at 42% 43%,rgba(255,248,173,.92) 0 2%,transparent 8%),
+ radial-gradient(circle at 58% 61%,rgba(255,239,112,.84) 0 3%,transparent 9%),
+ radial-gradient(circle at 52% 49%,rgba(255,215,74,.58),transparent 24%);
+}
+.molten-sun-v206:before{content:"";position:absolute;inset:25%;border-radius:50%;overflow:hidden;
+ background:
+ repeating-conic-gradient(from 20deg at 44% 57%,rgba(89,20,5,.85) 0deg 9deg,rgba(186,46,5,.9) 15deg 23deg,rgba(255,109,8,.96) 29deg 39deg,rgba(255,200,40,.98) 44deg 53deg,rgba(118,24,3,.9) 61deg 72deg),
+ radial-gradient(circle at 38% 30%,#ffe45b,#e85b08 43%,#8f2208 75%);
+ background-blend-mode:soft-light,normal;
+ box-shadow:inset 0 0 12px 5px rgba(255,220,89,.85),0 0 9px 2px rgba(255,174,43,.72);
+ animation:solarMolten206 23s linear infinite;
+}
+.molten-sun-v206:after{content:"";position:absolute;inset:25%;border-radius:50%;pointer-events:none;
+ background:radial-gradient(ellipse at 35% 32%,rgba(255,250,180,.75),transparent 35%),radial-gradient(circle at center,transparent 57%,rgba(255,235,118,.6) 90%,rgba(255,249,180,.96));
+ mix-blend-mode:screen;
+}
+@keyframes solarMolten206{0%{transform:rotate(0deg);filter:contrast(1.35) saturate(1.45)}50%{transform:rotate(9deg);filter:contrast(1.6) saturate(1.7)}100%{transform:rotate(0deg);filter:contrast(1.35) saturate(1.45)}}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
@@ -1127,6 +1149,11 @@ hybridLayer.appendChild(solarSun);
  const solarWhiteVeil=document.createElement('div');
  solarWhiteVeil.style.cssText='position:absolute;left:0;top:0;width:440px;height:440px;pointer-events:none;z-index:90;transform-origin:220px 220px;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.92) 0%,rgba(255,255,255,.82) 12%,rgba(255,252,235,.62) 18%,rgba(255,244,192,.28) 22%,transparent 24.5%)';
  hybridLayer.appendChild(solarWhiteVeil);
+ // v206: animated molten photosphere, replacing the washed-out white veil.
+ const moltenSun=document.createElement('div');
+ moltenSun.className='molten-sun-v206';
+ hybridLayer.appendChild(moltenSun);
+
 
 // v192: disable oversized pseudo-element corona that could white out mobile viewport.
 solarSun.classList.add('solar-safe-v192');
@@ -1498,9 +1525,12 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
   const sunSize=clamp(mainScale*1.6125,142.5,W<700?532.5:825);
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
    solarWhiteVeil.style.transform=solarSun.style.transform;
+   moltenSun.style.transform=solarSun.style.transform;
+   moltenSun.style.opacity=(alpha*.98).toFixed(2);
+   solarWhiteVeil.style.opacity='0';
    solarWhiteVeil.style.opacity=(alpha*.94).toFixed(2);
   solarSun.style.opacity=(alpha*.98).toFixed(2);
- }else{solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';}
+ }else{solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';moltenSun.style.opacity='0';}
  // Angle with respect to a fixed world-space light direction changes as the visitor flies around the system.
  const dx=c.eye[0]-base[0],dz=c.eye[2]-base[2];
  const illumination=Math.atan2(dz,dx)*180/Math.PI;
@@ -1510,7 +1540,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
 function hideLocalEnvironment(){
  for(const el of satellites)el.style.opacity='0';
  for(const arr of [backRings,frontRings])for(const path of arr)path.style.opacity='0';
- localGlow.style.opacity='0';orbitalPhase.style.opacity='0';solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';detailedEarth.style.opacity='0';earthMoon.style.opacity='0';saturnRing.style.opacity='0';for(const label of solarLabels)label.style.opacity='0';
+ localGlow.style.opacity='0';orbitalPhase.style.opacity='0';solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';moltenSun.style.opacity='0';detailedEarth.style.opacity='0';earthMoon.style.opacity='0';saturnRing.style.opacity='0';for(const label of solarLabels)label.style.opacity='0';
 }
 // Navigation markers are updated from projected 3D locations, with low cost.
 let lastMarkerVisibility=null;
