@@ -226,75 +226,25 @@ body.cinema #tourCard{background:linear-gradient(110deg,rgba(3,13,27,.84),rgba(7
 .orion-cloud-volume.dust{background:radial-gradient(ellipse 47% 34% at 48% 52%,rgba(0,1,10,.79),rgba(4,4,23,.47) 35%,transparent 78%);mix-blend-mode:normal;z-index:5}
 .orion-cloud-volume.filament{background:radial-gradient(ellipse 42% 46% at 45% 48%,rgba(255,204,226,.38),rgba(192,82,169,.23) 35%,transparent 77%);filter:blur(1px)}
 
-/* v068 solar-system study: a layered, shader-free Sun with a restrained corona. */
-/* v187: high-impact solar radiance rendered inside the actual tour engine. */
-.solar-sun{background:radial-gradient(circle at 48% 46%,#fff 0%,#fffbd7 5%,#ffe978 10%,#ffb62e 15%,#f4730c 19%,#b94309 22%,transparent 24.5%),radial-gradient(circle at 50% 50%,rgba(255,240,138,.85) 0%,rgba(255,188,51,.52) 25%,rgba(255,119,12,.30) 39%,rgba(255,100,0,.13) 58%,transparent 80%)!important;}
-.solar-sun::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle,transparent 17%,rgba(255,255,201,.65) 23%,rgba(255,191,52,.45) 29%,rgba(255,122,17,.24) 45%,transparent 77%);mix-blend-mode:screen;}
-.solar-sun::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 10deg,transparent 0deg,rgba(255,233,126,.33) 15deg,transparent 29deg,rgba(255,198,63,.26) 54deg,transparent 74deg,rgba(255,238,161,.31) 103deg,transparent 122deg,rgba(255,178,44,.30) 165deg,transparent 188deg,rgba(255,234,130,.30) 230deg,transparent 255deg,rgba(255,192,55,.27) 300deg,transparent 333deg);-webkit-mask-image:radial-gradient(circle,transparent 0%,transparent 23%,#000 27%,transparent 74%);mask-image:radial-gradient(circle,transparent 0%,transparent 23%,#000 27%,transparent 74%);}
-
-.solar-sun{position:absolute;left:0;top:0;width:440px;height:440px;pointer-events:none;opacity:0;z-index:2;transform-origin:center;will-change:transform,opacity;
- background:
- radial-gradient(circle at 48% 46%,#fffefa 0%,#fff9ce 7%,#ffe77d 12%,#ffb631 17%,#e76814 21%,rgba(225,75,9,.82) 23%,transparent 25%),
- radial-gradient(circle at 50% 50%,rgba(255,220,97,.26) 0%,rgba(255,145,27,.17) 25%,rgba(255,94,13,.085) 42%,transparent 65%),
- radial-gradient(circle at 50% 50%,rgba(255,232,152,.10),transparent 75%);
- filter:drop-shadow(0 0 13px rgba(255,168,55,.32));}
-@media(max-width:700px){.solar-sun{filter:none}}
-
-/* v069: low-cost layered solar treatment. No additional WebGL draw calls. */
-.solar-sun{animation:solarBreathe 8s ease-in-out infinite;filter:drop-shadow(0 0 19px rgba(255,164,43,.38))}
-@keyframes solarBreathe{0%,100%{filter:drop-shadow(0 0 14px rgba(255,165,45,.33)) brightness(1)}50%{filter:drop-shadow(0 0 26px rgba(255,174,60,.52)) brightness(1.10)}}
 .solar-saturn-ring{position:absolute;left:0;top:0;width:130px;height:130px;border:8px solid rgba(232,203,143,.75);border-left-color:rgba(173,140,103,.45);border-bottom-color:rgba(255,225,164,.92);border-radius:50%;pointer-events:none;opacity:0;z-index:5;transform-origin:center;will-change:transform,opacity;box-shadow:0 0 0 3px rgba(211,174,114,.16),inset 0 0 0 4px rgba(247,218,161,.18)}
 .solar-planet-label{position:absolute;left:0;top:0;z-index:6;pointer-events:none;opacity:0;color:#e2edff;font:600 10px/1.3 system-ui,sans-serif;letter-spacing:.16em;text-shadow:0 1px 7px #000,0 0 14px #000;white-space:nowrap;will-change:transform,opacity}
-@media(max-width:700px){.solar-sun{animation:none;filter:none}.solar-planet-label{font-size:9px}.solar-saturn-ring{border-width:6px}}
+@media(max-width:700px){.solar-planet-label{font-size:9px}.solar-saturn-ring{border-width:6px}}
 
-/* v070: richer solar photosphere with structured turbulence and darker limb.
-   CSS gradients stay on compositor-backed layers; no per-frame canvas textures. */
-.solar-sun{
-background:
-radial-gradient(ellipse at 43% 38%,rgba(255,252,204,.95) 0%,rgba(255,238,154,.55) 8%,transparent 23%),
-repeating-conic-gradient(from 23deg at 49% 50%,rgba(255,211,72,.12) 0deg 8deg,rgba(160,47,8,.13) 10deg 17deg,rgba(255,236,118,.12) 19deg 26deg),
-radial-gradient(circle at 51% 50%,#fff5a9 0%,#ffce49 8%,#ff8d22 15%,#c84b0e 20%,rgba(112,27,9,.84) 23%,transparent 26%),
-radial-gradient(circle at 50% 50%,rgba(255,198,82,.37) 0%,rgba(255,124,29,.20) 30%,rgba(238,69,9,.07) 51%,transparent 74%);
-background-blend-mode:screen,soft-light,normal,screen;
-}
 .solar-saturn-ring{border-style:double;border-width:13px;box-shadow:0 0 0 4px rgba(221,191,128,.26),inset 0 0 0 5px rgba(255,237,178,.17)}
 @media(max-width:700px){.solar-saturn-ring{border-width:9px}}
 
 /* v071: remove visual noise and give cinema a genuinely unobstructed viewport. */
 body.cinema #tourToggle{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 body:not(.cinema) #tourToggle{top:auto;bottom:calc(18px + env(safe-area-inset-bottom));left:14px;opacity:.62;transform:scale(.82);transform-origin:bottom left}
-.solar-sun{
-animation:none!important;filter:none!important;
-background:
-radial-gradient(circle at 45% 41%,rgba(255,252,223,.42) 0%,transparent 11%),
-radial-gradient(circle at 49% 50%,#fff8d5 0%,#ffe5a1 6%,#f6b85a 13%,#cf752d 19%,#8c391a 23%,transparent 24.5%),
-radial-gradient(circle at 50% 50%,rgba(255,193,100,.17) 0%,rgba(240,126,47,.10) 31%,rgba(188,78,31,.04) 49%,transparent 65%)!important;
-background-blend-mode:normal!important;
-}
+
 .solar-saturn-ring{border-width:5px!important;border-style:solid!important;box-shadow:0 0 0 2px rgba(202,178,137,.16),inset 0 0 0 2px rgba(230,211,169,.13)!important}
 
 /* v072: understated surface detail and orbital readability, preserving v071 performance. */
-.solar-sun{
- background:
- radial-gradient(circle at 45% 41%,rgba(255,251,216,.34) 0%,transparent 10%),
- radial-gradient(ellipse 8% 3% at 45% 48%,rgba(136,62,19,.17),transparent 96%),
- radial-gradient(ellipse 5% 2% at 57% 52%,rgba(127,57,21,.13),transparent 96%),
- radial-gradient(ellipse 4% 2% at 47% 58%,rgba(132,57,18,.12),transparent 96%),
- radial-gradient(circle at 49% 50%,#fff7d4 0%,#fce0a0 6%,#e9a653 13%,#bd652b 19%,#77321a 23%,transparent 24.5%),
- radial-gradient(circle at 50% 50%,rgba(255,190,96,.15) 0%,rgba(231,123,49,.09) 31%,rgba(188,78,31,.03) 49%,transparent 65%)!important;
-}
+
 .solar-planet-label{font-weight:500;letter-spacing:.13em;color:#c9d6e8;text-shadow:0 1px 5px #000,0 0 9px #000}
 
 /* v073: restrained surface granulation and proper ring/label depth sorting. */
-.solar-sun{
-background:
-radial-gradient(ellipse 2% 1.2% at 46% 49%,rgba(114,55,22,.22),transparent 98%),
-radial-gradient(ellipse 3.5% 1.1% at 53% 46%,rgba(143,65,24,.15),transparent 98%),
-radial-gradient(ellipse 2% 1% at 50% 57%,rgba(112,54,22,.13),transparent 98%),
-radial-gradient(circle at 45% 41%,rgba(255,251,216,.28) 0%,transparent 10%),
-radial-gradient(circle at 49% 50%,#fff7d4 0%,#f9dea0 6%,#e4a453 13%,#b85f2c 19%,#71301a 23%,transparent 24.5%),
-radial-gradient(circle at 50% 50%,rgba(255,190,96,.14) 0%,rgba(231,123,49,.08) 31%,rgba(188,78,31,.025) 49%,transparent 65%)!important;
-}
+
 
 /* v074: an actual textured-looking Earth layer, still pure CSS and inexpensive to project. */
 .solar-earth{position:absolute;left:0;top:0;width:112px;height:112px;border-radius:50%;pointer-events:none;opacity:0;z-index:4;transform-origin:center;will-change:transform,opacity;overflow:hidden;
@@ -325,104 +275,11 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 
 /* v078: generous soft gas with gentle independent world-space drift; no expensive CSS blur */
 .pleiades-wisp{mask-image:radial-gradient(ellipse,black 8%,rgba(0,0,0,.80) 25%,rgba(0,0,0,.40) 48%,transparent 76%);-webkit-mask-image:radial-gradient(ellipse,black 8%,rgba(0,0,0,.80) 25%,rgba(0,0,0,.40) 48%,transparent 76%)}
-/* v188: white-hot solar glow: luminous ivory core, broad pale halo, restrained amber rim. */
-.solar-sun{background:radial-gradient(circle at 48% 46%,#fff 0%,#fff 7%,#fffef4 12%,#fffbd6 16%,#fff0a0 19%,#ffc45b 21%,#f58b21 23%,transparent 24.7%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.97) 0%,rgba(255,253,234,.86) 21%,rgba(255,245,193,.66) 30%,rgba(255,218,139,.38) 42%,rgba(255,181,86,.16) 58%,transparent 83%)!important;}
-.solar-sun::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.22) 0%,rgba(255,255,255,.28) 20%,rgba(255,255,244,.72) 25%,rgba(255,252,215,.55) 33%,rgba(255,240,192,.30) 46%,transparent 78%);mix-blend-mode:screen;}
-.solar-sun::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 10deg,transparent 0deg,rgba(255,255,255,.48) 15deg,transparent 29deg,rgba(255,255,234,.40) 54deg,transparent 74deg,rgba(255,255,255,.46) 103deg,transparent 122deg,rgba(255,249,218,.43) 165deg,transparent 188deg,rgba(255,255,255,.46) 230deg,transparent 255deg,rgba(255,255,235,.42) 300deg,transparent 333deg);-webkit-mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);}
-
-.solar-sun.solar-safe-v192::before,.solar-sun.solar-safe-v192::after{content:none!important;display:none!important}
-.solar-sun.solar-safe-v192{isolation:isolate!important;box-shadow:none!important}
-
-/* v195: fine gold corona jets and surface contrast; pseudo layers are restored only for this constrained treatment. */
-.solar-sun.solar-flame-v195::before{
-content:""!important;display:block!important;position:absolute;inset:0;border-radius:50%;pointer-events:none;
-background:repeating-conic-gradient(from 7deg at 50% 50%,rgba(255,209,65,.60) 0deg 1.4deg,rgba(255,137,20,.25) 2deg 3deg,transparent 4deg 8deg),
-radial-gradient(circle at center,transparent 0 22%,rgba(255,196,54,.38) 23%,rgba(255,113,18,.17) 26%,transparent 31%);
--webkit-mask-image:radial-gradient(circle,transparent 0 22%,#000 24%,rgba(0,0,0,.7) 26%,transparent 30%);
-mask-image:radial-gradient(circle,transparent 0 22%,#000 24%,rgba(0,0,0,.7) 26%,transparent 30%);
-mix-blend-mode:normal;opacity:.86;
-}
-.solar-sun.solar-flame-v195::after{
-content:""!important;display:block!important;position:absolute;inset:0;border-radius:50%;pointer-events:none;
-background:conic-gradient(from 13deg,transparent 0deg,rgba(255,238,136,.9) 9deg,transparent 15deg,transparent 41deg,rgba(255,171,31,.8) 47deg,transparent 54deg,transparent 96deg,rgba(255,241,156,.8) 103deg,transparent 112deg,transparent 160deg,rgba(255,149,25,.9) 167deg,transparent 176deg,transparent 225deg,rgba(255,227,112,.8) 232deg,transparent 240deg,transparent 294deg,rgba(255,174,33,.85) 303deg,transparent 312deg);
--webkit-mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%);
-mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%);
-opacity:.85;mix-blend-mode:screen;
-}
-/* v196: luminous rim and visibly protruding solar flares, clipped to a small local sprite only. */
-.solar-sun.solar-flame-v195::before{
- background:repeating-conic-gradient(from 8deg,rgba(255,240,152,.95) 0deg 1deg,rgba(255,161,26,.74) 1.8deg 3.5deg,transparent 5deg 9deg),radial-gradient(circle,transparent 0 21%,rgba(255,248,190,.95) 23%,rgba(255,180,33,.58) 26%,transparent 34%)!important;
- -webkit-mask-image:radial-gradient(circle,transparent 0 21%,#000 23%,#000 27%,transparent 34%)!important;
- mask-image:radial-gradient(circle,transparent 0 21%,#000 23%,#000 27%,transparent 34%)!important;
- opacity:1!important;
-}
-.solar-sun.solar-flame-v195::after{
- background:repeating-conic-gradient(from 19deg,transparent 0deg 15deg,rgba(255,239,129,.98) 17deg,rgba(255,131,14,.7) 19deg,transparent 23deg 39deg)!important;
- -webkit-mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,rgba(0,0,0,.8) 29%,transparent 36%)!important;
- mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,rgba(0,0,0,.8) 29%,transparent 36%)!important;
- opacity:.96!important;
-}
-/* v197: organic, asymmetrical solar prominences rather than regular radial spokes. */
-.solar-sun.solar-flame-v195::before{
- background:
- radial-gradient(ellipse 7% 13% at 50% 19%,rgba(255,240,145,.88),transparent 95%),
- radial-gradient(ellipse 10% 7% at 79% 34%,rgba(255,173,35,.88),transparent 95%),
- radial-gradient(ellipse 8% 12% at 75% 75%,rgba(255,226,99,.75),transparent 95%),
- radial-gradient(ellipse 12% 8% at 25% 69%,rgba(255,142,25,.82),transparent 95%),
- radial-gradient(ellipse 7% 10% at 22% 34%,rgba(255,210,74,.75),transparent 95%),
- radial-gradient(circle at center,transparent 0 22%,rgba(255,241,157,.84) 24%,rgba(255,164,42,.48) 26%,transparent 31%)!important;
- -webkit-mask-image:none!important;mask-image:none!important;opacity:.88!important;
-}
-.solar-sun.solar-flame-v195::after{
- background:conic-gradient(from 8deg,transparent 0deg 23deg,rgba(255,209,85,.54) 29deg,transparent 39deg 78deg,rgba(255,234,134,.64) 85deg,transparent 94deg 151deg,rgba(255,155,39,.55) 160deg,transparent 172deg 219deg,rgba(255,225,113,.65) 226deg,transparent 236deg 290deg,rgba(255,165,45,.54) 297deg,transparent 310deg)!important;
- -webkit-mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%)!important;
- mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%)!important;
- opacity:.62!important;
-}
-/* v198: no radial spikes; soft, uneven limb glow stays close to photosphere. */
-.solar-sun.solar-flame-v195::before{
- background:radial-gradient(ellipse 29% 28% at 49% 49%,transparent 72%,rgba(255,232,143,.62) 82%,rgba(255,156,39,.24) 91%,transparent 100%)!important;
- -webkit-mask-image:none!important;mask-image:none!important;opacity:.72!important;
-}
-.solar-sun.solar-flame-v195::after{
- background:radial-gradient(circle at center,transparent 0 23%,rgba(255,238,164,.58) 25%,rgba(255,180,65,.22) 27%,transparent 31%)!important;
- -webkit-mask-image:none!important;mask-image:none!important;opacity:.72!important;
-}
-/* v199: remove disconnected halo blobs; preserve a single centered soft rim. */
-.solar-sun.solar-flame-v195::before{
- content:""!important;display:block!important;inset:0!important;
- background:radial-gradient(circle at 50% 50%,transparent 0 23%,rgba(255,236,154,.65) 25%,rgba(255,180,60,.22) 28%,transparent 33%)!important;
- -webkit-mask-image:none!important;mask-image:none!important;
- mix-blend-mode:normal!important;opacity:.7!important;
-}
-.solar-sun.solar-flame-v195::after{content:none!important;display:none!important;}
-/* v200: eliminate the separate concentric halo rings entirely. */
-.solar-sun.solar-flame-v195::before,.solar-sun.solar-flame-v195::after{content:none!important;display:none!important;background:none!important;box-shadow:none!important;}
-/* v201: brighten the existing solar disk itself; no new corona layers. */
-.solar-sun.solar-flame-v195{filter:none!important;box-shadow:none!important;}
-.solar-sun.solar-flame-v195::before,.solar-sun.solar-flame-v195::after{display:none!important;content:none!important;}
-
-/* v206: molten, animated solar surface; all effects confined to the existing 110px disk. */
-.molten-sun-v206{position:absolute;left:0;top:0;width:440px;height:440px;pointer-events:none;z-index:91;transform-origin:220px 220px;opacity:0;
- background:
- radial-gradient(circle at 50% 50%,transparent 0 20%,rgba(255,244,151,.9) 23%,rgba(255,127,17,.95) 24.4%,transparent 25.3%),
- radial-gradient(circle at 42% 43%,rgba(255,248,173,.92) 0 2%,transparent 8%),
- radial-gradient(circle at 58% 61%,rgba(255,239,112,.84) 0 3%,transparent 9%),
- radial-gradient(circle at 52% 49%,rgba(255,215,74,.58),transparent 24%);
-}
-.molten-sun-v206:before{content:"";position:absolute;inset:25%;border-radius:50%;overflow:hidden;
- background:
- repeating-conic-gradient(from 20deg at 44% 57%,rgba(89,20,5,.85) 0deg 9deg,rgba(186,46,5,.9) 15deg 23deg,rgba(255,109,8,.96) 29deg 39deg,rgba(255,200,40,.98) 44deg 53deg,rgba(118,24,3,.9) 61deg 72deg),
- radial-gradient(circle at 38% 30%,#ffe45b,#e85b08 43%,#8f2208 75%);
- background-blend-mode:soft-light,normal;
- box-shadow:inset 0 0 12px 5px rgba(255,220,89,.85),0 0 9px 2px rgba(255,174,43,.72);
- animation:solarMolten206 23s linear infinite;
-}
-.molten-sun-v206:after{content:"";position:absolute;inset:25%;border-radius:50%;pointer-events:none;
- background:radial-gradient(ellipse at 35% 32%,rgba(255,250,180,.75),transparent 35%),radial-gradient(circle at center,transparent 57%,rgba(255,235,118,.6) 90%,rgba(255,249,180,.96));
- mix-blend-mode:screen;
-}
-@keyframes solarMolten206{0%{transform:rotate(0deg);filter:contrast(1.35) saturate(1.45)}50%{transform:rotate(9deg);filter:contrast(1.6) saturate(1.7)}100%{transform:rotate(0deg);filter:contrast(1.35) saturate(1.45)}}
+/* v207: the dedicated canvas owns surface, limb and prominences.
+   The host retains v206's 440px local coordinates and 220px photosphere. */
+.cosmos-sun-v207{position:absolute;left:0;top:0;width:440px;height:440px;
+ pointer-events:none;opacity:0;z-index:91;transform-origin:220px 220px;
+ will-change:transform,opacity;contain:layout style;isolation:isolate}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
@@ -447,6 +304,7 @@ opacity:.85;mix-blend-mode:screen;
 <div id="tour-toast" role="status" aria-live="polite"></div>
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
+<script src="./cosmos-sun-v207.js"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
@@ -834,8 +692,6 @@ function tourHoleHide(){
  if(tourHoleFrame.hasAttribute('src'))tourHoleFrame.removeAttribute('src');
 }
 
-
-
 function tourWords(){
  tourToggle.textContent=tourActive?(english?'✕ STOP TOUR':'✕ ツアー終了'):(english?'▶ CINEMATIC TOUR':'▶ 宇宙を巡るツアー');
  tourToggle.setAttribute('aria-pressed',String(tourActive));
@@ -1135,44 +991,10 @@ const satellitePlan=['earth','gas','ice','stone','purple','red','star'];
 const satellites=[];
 for(let j=0;j<4;j++){const el=document.createElement('img');el.className='local-satellite';el.alt='';el.draggable=false;el.decoding='async';el.src=companionImages[j];hybridLayer.appendChild(el);satellites.push(el);}
 const orbitalPhase=document.createElement('div');orbitalPhase.id='orbitalPhase';hybridLayer.appendChild(orbitalPhase);
-// v068: a luminous Sun at the center of the illustrative planetary system.
-const solarSun=document.createElement('div');solarSun.className='solar-sun';
-// v190: inline important wins over all wrapper CSS; keep mobile white corona visible.
-solarSun.style.setProperty('background','radial-gradient(circle at 49% 49%,#ffffff 0%,#ffffff 12%,#fffef6 16%,#fff9dc 19%,#ffeeb0 21%,#ffc65e 23%,transparent 25%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.92) 23%,rgba(255,253,239,.78) 30%,rgba(255,247,208,.54) 41%,rgba(255,234,178,.27) 56%,rgba(255,218,150,.10) 70%,transparent 88%)','important');
-solarSun.style.setProperty('filter','none','important'); // v191: prevent iOS full-screen white compositing; halo remains in radial gradients
-solarSun.style.setProperty('background','radial-gradient(circle at 50% 50%,#fff 0%,#fff 8%,#fff9dc 13%,#ffe4a0 18%,#ffb952 22%,transparent 25%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.42) 0%,rgba(255,250,218,.24) 27%,rgba(255,215,125,.10) 44%,transparent 62%)','important');
-solarSun.style.setProperty('background-blend-mode','normal','important');
-solarSun.style.setProperty('mix-blend-mode','normal','important');
+// v207: single renderer; inherit the native world-space projection and opacity.
+const solarSun=document.createElement('div');solarSun.className='cosmos-sun-v207';
 hybridLayer.appendChild(solarSun);
- // v205: an independent white-hot photosphere veil ABOVE the textured disk.
- // Diameter matches the existing 25%-radius solar sprite; no rays or detached glow.
- const solarWhiteVeil=document.createElement('div');
- solarWhiteVeil.style.cssText='position:absolute;left:0;top:0;width:440px;height:440px;pointer-events:none;z-index:90;transform-origin:220px 220px;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.92) 0%,rgba(255,255,255,.82) 12%,rgba(255,252,235,.62) 18%,rgba(255,244,192,.28) 22%,transparent 24.5%)';
- hybridLayer.appendChild(solarWhiteVeil);
- // v206: animated molten photosphere, replacing the washed-out white veil.
- const moltenSun=document.createElement('div');
- moltenSun.className='molten-sun-v206';
- hybridLayer.appendChild(moltenSun);
-
-
-// v192: disable oversized pseudo-element corona that could white out mobile viewport.
-solarSun.classList.add('solar-safe-v192');
-// v194: bright compact photosphere and narrow orange corona, without a broad white backdrop.
-// v196 supersedes v194 gradient.
-solarSun.style.setProperty('filter','none','important');
-// v195: irregular flame tongues confined to the Sun's limb, without a full-screen bloom.
-solarSun.classList.add('solar-flame-v195');
-// v196: boost inner white-hot core while keeping the limb and local corona warm.
-solarSun.style.setProperty('background','radial-gradient(circle at 47% 44%,rgba(255,255,255,.99) 0%,rgba(255,255,255,.94) 8%,rgba(255,251,219,.75) 14%,transparent 22%),radial-gradient(circle at center,#ffffff 0%,#fffdf0 12%,#fff1b5 18%,#ffc64f 23%,transparent 25%),radial-gradient(circle at center,rgba(255,218,107,.32) 0%,rgba(255,156,35,.18) 26%,transparent 36%)','important');
-// v201: concentrate pure-white radiance within the photosphere and suppress surface texture visually.
-solarSun.style.setProperty('background','radial-gradient(circle at 49% 48%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.94) 9%,rgba(255,255,244,.78) 15%,rgba(255,244,194,.44) 19%,transparent 23%),radial-gradient(circle at center,#ffffff 0%,#fffef7 11%,#fff8d8 17%,#ffdf83 21%,#ffbb4c 24%,transparent 25%),radial-gradient(circle at center,rgba(255,232,165,.17) 0%,rgba(255,178,67,.09) 27%,transparent 34%)','important');
-// v202: strong white-hot center confined to the solar disk, with no detached halo.
-solarSun.style.setProperty('background','radial-gradient(circle at 49% 49%,#ffffff 0%,#ffffff 14%,#fffef9 18%,#fff7d9 21%,#ffe49d 23%,#ffbf5a 24.5%,transparent 25.2%)','important');
-solarSun.style.setProperty('background-blend-mode','normal','important');
-// v204: visibly white-hot solar photosphere, still confined to the disk.
-solarSun.style.setProperty('background','radial-gradient(circle at 50% 49%,#fff 0%,#fff 18%,#fffdf3 21%,#ffebad 23%,#ffbd50 24.5%,transparent 25.2%)','important');
-// v193: make the photosphere itself white-hot without illuminating the entire sky.
-// v194 replaces v193 gradient above; retain constrained ambient glow.
+const solarRenderer=new CosmosSolarRenderer(solarSun);
 const frontRings=makeRingHalves('front');
 // v069: separate projected Saturn ring and planet captions, following the orbiting bodies.
 const saturnRing=document.createElement('div');saturnRing.className='solar-saturn-ring';hybridLayer.appendChild(saturnRing);
@@ -1180,9 +1002,6 @@ const solarNames=['EARTH','SATURN','MARS','NEPTUNE'];
 const solarLabels=solarNames.map(name=>{const el=document.createElement('div');el.className='solar-planet-label';el.textContent=name;hybridLayer.appendChild(el);return el;});
 const detailedEarth=document.createElement('div');detailedEarth.className='solar-earth';hybridLayer.appendChild(detailedEarth);
 const earthMoon=document.createElement('div');earthMoon.className='solar-moon';hybridLayer.appendChild(earthMoon);
-
-
-
 
 const hybridArts=cachedArtData.map((src,i)=>{
  const img=document.createElement('img');img.className='hybrid-art';
@@ -1312,8 +1131,6 @@ function renderPleiades(c,alpha,t){
   item.el.style.zIndex=p.z<2.8?'6':'3';
  }
 }
-
-
 
 /* Orion's real XYZ gas positions also have projected luminous volumes.
    This removes reliance on WebGL availability/point size for the main subject. */
@@ -1524,13 +1341,9 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
  if(index===0){
   const sunSize=clamp(mainScale*1.6125,142.5,W<700?532.5:825);
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
-   solarWhiteVeil.style.transform=solarSun.style.transform;
-   moltenSun.style.transform=solarSun.style.transform;
-   moltenSun.style.opacity=(alpha*.98).toFixed(2);
-   solarWhiteVeil.style.opacity='0';
-   solarWhiteVeil.style.opacity=(alpha*.94).toFixed(2);
+  solarRenderer.project(sunSize,alpha>.015);
   solarSun.style.opacity=(alpha*.98).toFixed(2);
- }else{solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';moltenSun.style.opacity='0';}
+ }else{solarSun.style.opacity='0';solarRenderer.project(0,false);}
  // Angle with respect to a fixed world-space light direction changes as the visitor flies around the system.
  const dx=c.eye[0]-base[0],dz=c.eye[2]-base[2];
  const illumination=Math.atan2(dz,dx)*180/Math.PI;
@@ -1540,7 +1353,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
 function hideLocalEnvironment(){
  for(const el of satellites)el.style.opacity='0';
  for(const arr of [backRings,frontRings])for(const path of arr)path.style.opacity='0';
- localGlow.style.opacity='0';orbitalPhase.style.opacity='0';solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';moltenSun.style.opacity='0';detailedEarth.style.opacity='0';earthMoon.style.opacity='0';saturnRing.style.opacity='0';for(const label of solarLabels)label.style.opacity='0';
+ localGlow.style.opacity='0';orbitalPhase.style.opacity='0';solarSun.style.opacity='0';solarRenderer.project(0,false);detailedEarth.style.opacity='0';earthMoon.style.opacity='0';saturnRing.style.opacity='0';for(const label of solarLabels)label.style.opacity='0';
 }
 // Navigation markers are updated from projected 3D locations, with low cost.
 let lastMarkerVisibility=null;
@@ -1656,6 +1469,7 @@ function tick(t){
    }
   }
  }
+ if(tourHoleLayer.hidden)solarRenderer.draw(t);
  requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);

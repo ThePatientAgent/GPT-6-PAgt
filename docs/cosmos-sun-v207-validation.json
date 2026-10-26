@@ -1,0 +1,284 @@
+{
+  "mobile": {
+    "viewport": "390x844 @2x",
+    "baseline": false,
+    "stages": [
+      "Pleiades",
+      "Orion",
+      "Black Hole",
+      "Solar system",
+      "Galactic core"
+    ],
+    "ended": true,
+    "elapsed": 24300,
+    "snapshots": [
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.8399658203125,
+          "height": 477.8399658203125
+        },
+        "sunTransform": "translate3d(-25px, 202px, 0px) scale(1.086)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true
+      },
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.8399658203125,
+          "height": 477.8399658203125
+        },
+        "sunTransform": "translate3d(-25px, 202px, 0px) scale(1.086)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true,
+        "gl": {
+          "error": 0,
+          "width": 768,
+          "height": 768
+        }
+      }
+    ],
+    "bhChecks": [
+      {
+        "prepared": "8"
+      },
+      {
+        "prepared": "48",
+        "renderer": "canvas2d-radiant-plasma",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "prepareMs": "10.0",
+        "ready": "true",
+        "phase": "31.74"
+      }
+    ],
+    "errors": [],
+    "consoleErrors": [],
+    "clock": "deterministic; captures do not measure device FPS"
+  },
+  "desktop": {
+    "viewport": "1440x900 @1x",
+    "baseline": false,
+    "stages": [
+      "Pleiades",
+      "Orion",
+      "Black Hole",
+      "Solar system",
+      "Galactic core"
+    ],
+    "ended": true,
+    "elapsed": 24300,
+    "snapshots": [
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": 397.4800109863281,
+          "y": 127.48001098632812,
+          "width": 645.0400390625,
+          "height": 645.0400390625
+        },
+        "sunTransform": "translate3d(500px, 230px, 0px) scale(1.466)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true
+      },
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": 397.4800109863281,
+          "y": 127.48001098632812,
+          "width": 645.0400390625,
+          "height": 645.0400390625
+        },
+        "sunTransform": "translate3d(500px, 230px, 0px) scale(1.466)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true,
+        "gl": {
+          "error": 0,
+          "width": 704,
+          "height": 704
+        }
+      }
+    ],
+    "bhChecks": [
+      {
+        "prepared": "8"
+      },
+      {
+        "prepared": "48",
+        "renderer": "canvas2d-radiant-plasma",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "prepareMs": "10.0",
+        "ready": "true",
+        "phase": "31.87"
+      }
+    ],
+    "errors": [],
+    "consoleErrors": [],
+    "clock": "deterministic; captures do not measure device FPS"
+  },
+  "lifecycle": {
+    "gl": {
+      "error": 0,
+      "frames": 3,
+      "size": 896,
+      "mode": "webgl-domain-warped-plasma"
+    },
+    "restored": {
+      "error": 0,
+      "frames": 2,
+      "mode": "webgl-domain-warped-plasma"
+    },
+    "reducedMotion": "frozen after first frame",
+    "fallback": "context loss renders Canvas2D; restore returns to WebGL"
+  },
+  "preservation": {
+    "fly": true,
+    "tourHoleDepart": true,
+    "tourHoleShow": true,
+    "tourHoleReveal": true,
+    "tourHoleHide": true,
+    "tourBegin": true,
+    "tourTick": true,
+    "renderPleiades": true,
+    "renderOrionVolumes": true,
+    "renderOrionCore": true,
+    "renderGalacticContext": true,
+    "solar_projection_formula": true,
+    "solar-earth CSS": true,
+    "solar-saturn-ring CSS": true,
+    "solar-moon CSS": true,
+    "solar-planet-label CSS": true,
+    "orbit-half CSS": true
+  },
+  "recording": {
+    "dimensions": "780x1688",
+    "frame_rate": 30,
+    "duration_seconds": 4,
+    "frames": 120,
+    "unique_frames": 120,
+    "method": "Native tour; deterministic clock; no substitute animation; not a device FPS measurement"
+  },
+  "rollback": {
+    "branch": "backup/cosmos-sun-v206-20261026",
+    "commit": "20740fa6389ec78f3065c5121e13d811a46c15d0"
+  },
+  "webkit_mobile": {
+    "browser": "webkit",
+    "viewport": "390x844 @2x",
+    "baseline": false,
+    "stages": [
+      "Pleiades",
+      "Orion",
+      "Black Hole",
+      "Solar system",
+      "Galactic core"
+    ],
+    "ended": true,
+    "elapsed": 24300,
+    "snapshots": [
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.84002685546875,
+          "height": 477.8399658203125
+        },
+        "sunTransform": "translate3d(-25px, 202px, 0px) scale(1.086)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true
+      },
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.84002685546875,
+          "height": 477.8399658203125
+        },
+        "sunTransform": "translate3d(-25px, 202px, 0px) scale(1.086)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true,
+        "gl": {
+          "error": 0,
+          "width": 768,
+          "height": 768
+        }
+      }
+    ],
+    "bhChecks": [
+      {
+        "prepared": "4"
+      },
+      {
+        "prepared": "48",
+        "renderer": "canvas2d-radiant-plasma",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "prepareMs": "10.0",
+        "ready": "true",
+        "phase": "31.87"
+      }
+    ],
+    "errors": [],
+    "consoleErrors": [],
+    "clock": "deterministic; captures do not measure device FPS"
+  },
+  "real_time_software_profile": {
+    "duration_ms": 3865.7000000000007,
+    "raf_frames": 56,
+    "solar_draws": 56,
+    "mean_fps": 14.486380215743589,
+    "median_ms": 66.70000000000073,
+    "p95_ms": 116.70000000000073,
+    "over_33ms": 52,
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "hardware": "container software renderer; not iPhone hardware"
+  },
+  "baseline_software_profile": {
+    "duration_ms": 3818.6000000001877,
+    "raf_frames": 83,
+    "solar_draws": 0,
+    "mean_fps": 21.7357146598219,
+    "median_ms": 33.400000000001455,
+    "p95_ms": 83.29999999999927,
+    "over_33ms": 40,
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "hardware": "container software renderer; not iPhone hardware"
+  }
+}
