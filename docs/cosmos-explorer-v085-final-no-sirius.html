@@ -227,11 +227,6 @@ body.cinema #tourCard{background:linear-gradient(110deg,rgba(3,13,27,.84),rgba(7
 .orion-cloud-volume.filament{background:radial-gradient(ellipse 42% 46% at 45% 48%,rgba(255,204,226,.38),rgba(192,82,169,.23) 35%,transparent 77%);filter:blur(1px)}
 
 /* v068 solar-system study: a layered, shader-free Sun with a restrained corona. */
-/* v188: white-hot solar glow: luminous ivory core, broad pale halo, restrained amber rim. */
-.solar-sun{background:radial-gradient(circle at 48% 46%,#fff 0%,#fff 7%,#fffef4 12%,#fffbd6 16%,#fff0a0 19%,#ffc45b 21%,#f58b21 23%,transparent 24.7%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.97) 0%,rgba(255,253,234,.86) 21%,rgba(255,245,193,.66) 30%,rgba(255,218,139,.38) 42%,rgba(255,181,86,.16) 58%,transparent 83%)!important;}
-.solar-sun::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.22) 0%,rgba(255,255,255,.28) 20%,rgba(255,255,244,.72) 25%,rgba(255,252,215,.55) 33%,rgba(255,240,192,.30) 46%,transparent 78%);mix-blend-mode:screen;}
-.solar-sun::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 10deg,transparent 0deg,rgba(255,255,255,.48) 15deg,transparent 29deg,rgba(255,255,234,.40) 54deg,transparent 74deg,rgba(255,255,255,.46) 103deg,transparent 122deg,rgba(255,249,218,.43) 165deg,transparent 188deg,rgba(255,255,255,.46) 230deg,transparent 255deg,rgba(255,255,235,.42) 300deg,transparent 333deg);-webkit-mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);}
-
 /* v187: high-impact solar radiance rendered inside the actual tour engine. */
 .solar-sun{background:radial-gradient(circle at 48% 46%,#fff 0%,#fffbd7 5%,#ffe978 10%,#ffb62e 15%,#f4730c 19%,#b94309 22%,transparent 24.5%),radial-gradient(circle at 50% 50%,rgba(255,240,138,.85) 0%,rgba(255,188,51,.52) 25%,rgba(255,119,12,.30) 39%,rgba(255,100,0,.13) 58%,transparent 80%)!important;}
 .solar-sun::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle,transparent 17%,rgba(255,255,201,.65) 23%,rgba(255,191,52,.45) 29%,rgba(255,122,17,.24) 45%,transparent 77%);mix-blend-mode:screen;}
@@ -330,6 +325,11 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 
 /* v078: generous soft gas with gentle independent world-space drift; no expensive CSS blur */
 .pleiades-wisp{mask-image:radial-gradient(ellipse,black 8%,rgba(0,0,0,.80) 25%,rgba(0,0,0,.40) 48%,transparent 76%);-webkit-mask-image:radial-gradient(ellipse,black 8%,rgba(0,0,0,.80) 25%,rgba(0,0,0,.40) 48%,transparent 76%)}
+/* v188: white-hot solar glow: luminous ivory core, broad pale halo, restrained amber rim. */
+.solar-sun{background:radial-gradient(circle at 48% 46%,#fff 0%,#fff 7%,#fffef4 12%,#fffbd6 16%,#fff0a0 19%,#ffc45b 21%,#f58b21 23%,transparent 24.7%),radial-gradient(circle at 50% 50%,rgba(255,255,255,.97) 0%,rgba(255,253,234,.86) 21%,rgba(255,245,193,.66) 30%,rgba(255,218,139,.38) 42%,rgba(255,181,86,.16) 58%,transparent 83%)!important;}
+.solar-sun::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.22) 0%,rgba(255,255,255,.28) 20%,rgba(255,255,244,.72) 25%,rgba(255,252,215,.55) 33%,rgba(255,240,192,.30) 46%,transparent 78%);mix-blend-mode:screen;}
+.solar-sun::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 10deg,transparent 0deg,rgba(255,255,255,.48) 15deg,transparent 29deg,rgba(255,255,234,.40) 54deg,transparent 74deg,rgba(255,255,255,.46) 103deg,transparent 122deg,rgba(255,249,218,.43) 165deg,transparent 188deg,rgba(255,255,255,.46) 230deg,transparent 255deg,rgba(255,255,235,.42) 300deg,transparent 333deg);-webkit-mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);}
+
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
