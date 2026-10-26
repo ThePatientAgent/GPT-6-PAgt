@@ -36,7 +36,7 @@ const browserName=process.env.COSMOS_BROWSER||'chromium';fs.mkdirSync(out,{recur
    const layer=document.getElementById('cosmos-tour-blackhole-v061'),deep=document.querySelector('.cosmos-deep-v212'),sun=document.querySelector('.cosmos-sun-v207');
    return {name:document.getElementById('tourName').textContent,hidden:layer.hidden,open:layer.classList.contains('cosmos-hole-open'),worldPhase:deep.dataset.phase,
     deepDisplay:getComputedStyle(deep).display,sunOpacity:+sun.style.opacity,time:performance.now(),
-    child:(()=>{try{const e=layer.querySelector('iframe').contentDocument.querySelector('#scene');return e?{...e.dataset,allocations:e.qaAllocations||[],width:e.width,height:e.height}:null;}catch{return null;}})()};
+    child:(()=>{try{const e=layer.querySelector('iframe').contentDocument.querySelector('#scene');return e?{...e.dataset,allocations:e.qaAllocations||[],width:e.width,height:e.height,starsReady:e.ownerDocument.getElementById('cosmos-stellar-backdrop-v218')?.dataset.ready,starTransform:e.ownerDocument.defaultView.getComputedStyle(e.ownerDocument.getElementById('cosmos-stellar-backdrop-v218')).transform}:null;}catch{return null;}})()};
   });
   let waiting=null;
   if(delayed){
@@ -47,13 +47,13 @@ const browserName=process.env.COSMOS_BROWSER||'chromium';fs.mkdirSync(out,{recur
    assert(+later.worldPhase>+waiting.worldPhase,'Orion must continue animating while black-hole data is delayed');
    console.log('PASS delayed preparation keeps Orion alive',waiting.worldPhase,'→',later.worldPhase);release();
   }
-  const started=Date.now(),phases=new Set();let enteredAt=0,allocations=null,solar=null,opened=false,bhSnapshot=false;
+  const started=Date.now(),phases=new Set(),starPositions=new Set();let enteredAt=0,allocations=null,solar=null,opened=false,bhSnapshot=false;
   for(let i=0;i<400&&Date.now()-started<90000;i++){
    if(delayed)await page.clock.runFor(250);else await page.waitForTimeout(200);
    const s=await state();
    if(s.open&&!s.hidden){
     const data=s.child;assert(data,'visible black hole must retain its ready canvas');
-    assert.equal(data.ready,'true');assert.equal(data.preparation,'prebaked-lossless');assert.equal(data.frameTextures,'2');
+    assert.equal(data.ready,'true');assert.equal(data.preparation,'prebaked-lossless');assert.equal(data.frameTextures,'2');assert.equal(data.starsReady,'true');starPositions.add(data.starTransform);
     assert(data.allocations.every(a=>a.width<=620&&a.height<=420),'a full atlas must never be uploaded as a WebGL texture');
     assert.equal(data.allocations.filter(a=>a.width===620&&a.height===420).length,2);
     if(!opened){enteredAt=s.time;console.log('OPEN',s.time,data.width,data.height);}
@@ -66,11 +66,11 @@ const browserName=process.env.COSMOS_BROWSER||'chromium';fs.mkdirSync(out,{recur
     await page.screenshot({path:path.join(out,'solar.png')});break;
    }
   }
-  assert(opened,'black hole never became ready');assert(solar,'handoff did not reach a visible Solar System');assert.deepEqual(errors,[]);
+  assert(starPositions.size>1,'background stars must move while the black hole is visible');assert(opened,'black hole never became ready');assert(solar,'handoff did not reach a visible Solar System');assert.deepEqual(errors,[]);
   const gaps=await frame.evaluate(()=>qaGaps),handoffGaps=gaps.filter(g=>g.at>=enteredAt-1000&&g.at<=solar.time+100);
   const maxGap=handoffGaps.length?handoffGaps.reduce((m,g)=>Math.max(m,g.gap),0):null;
   if(!delayed&&maxGap!==null)assert(maxGap<2500,'main-thread heartbeat stalled for over 2.5 seconds during handoff');
-  const report={browser:browserName,mode:delayed?'held-atlas controlled-clock':'normal real-time playback',waiting,blackHolePhases:phases.size,allocations,
+  const report={browser:browserName,mode:delayed?'held-atlas controlled-clock':'normal real-time playback',waiting,blackHolePhases:phases.size,backgroundStarPositions:starPositions.size,allocations,
     maxHeartbeatGapMs:maxGap,solar,errors,physicalIPhone:false};
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(report,null,2));console.log('PASS',report.mode,'BH → Solar; maximum heartbeat gap',maxGap);
  }finally{if(release)release();await browser.close();}
