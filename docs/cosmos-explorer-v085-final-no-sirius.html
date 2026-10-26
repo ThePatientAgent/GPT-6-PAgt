@@ -396,6 +396,8 @@ opacity:.85;mix-blend-mode:screen;
  mix-blend-mode:normal!important;opacity:.7!important;
 }
 .solar-sun.solar-flame-v195::after{content:none!important;display:none!important;}
+/* v200: eliminate the separate concentric halo rings entirely. */
+.solar-sun.solar-flame-v195::before,.solar-sun.solar-flame-v195::after{content:none!important;display:none!important;background:none!important;box-shadow:none!important;}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
