@@ -1,0 +1,41 @@
+{
+  "sourceVersion": "v219",
+  "sourceCommit": "c47e472700fdea5091d45c91db6ab22f5b84c71a",
+  "cssAnimationSampling": true,
+  "width": 720,
+  "height": 1280,
+  "fps": 60,
+  "frames": 1374,
+  "uniqueFrameHashes": 1374,
+  "duration": 22.9,
+  "beginning": 1351,
+  "stages": [
+    {
+      "name": "Pleiades",
+      "frame": 0,
+      "timeMs": 0
+    },
+    {
+      "name": "Orion",
+      "frame": 273,
+      "timeMs": 4550
+    },
+    {
+      "name": "Black Hole",
+      "frame": 511,
+      "timeMs": 8517
+    },
+    {
+      "name": "Solar system",
+      "frame": 769,
+      "timeMs": 12817
+    },
+    {
+      "name": "Galactic core",
+      "frame": 1021,
+      "timeMs": 17017
+    }
+  ],
+  "errors": [],
+  "clock": "Each frame advances the native browser clock by 1/60 second; this is a rendering capture, not a physical iPhone FPS measurement."
+}

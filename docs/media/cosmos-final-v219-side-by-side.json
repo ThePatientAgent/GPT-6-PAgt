@@ -1,0 +1,90 @@
+{
+  "sourceVersion": "v219",
+  "sourceCommit": "c47e472700fdea5091d45c91db6ab22f5b84c71a",
+  "nativeCapture": {
+    "sourceVersion": "v219",
+    "sourceCommit": "c47e472700fdea5091d45c91db6ab22f5b84c71a",
+    "cssAnimationSampling": true,
+    "width": 720,
+    "height": 1280,
+    "fps": 60,
+    "frames": 1374,
+    "uniqueFrameHashes": 1374,
+    "duration": 22.9,
+    "beginning": 1351,
+    "stages": [
+      {
+        "name": "Pleiades",
+        "frame": 0,
+        "timeMs": 0
+      },
+      {
+        "name": "Orion",
+        "frame": 273,
+        "timeMs": 4550
+      },
+      {
+        "name": "Black Hole",
+        "frame": 511,
+        "timeMs": 8517
+      },
+      {
+        "name": "Solar system",
+        "frame": 769,
+        "timeMs": 12817
+      },
+      {
+        "name": "Galactic core",
+        "frame": 1021,
+        "timeMs": 17017
+      }
+    ],
+    "errors": [],
+    "clock": "Each frame advances the native browser clock by 1/60 second; this is a rendering capture, not a physical iPhone FPS measurement."
+  },
+  "composition": {
+    "width": 1008,
+    "height": 1280,
+    "cosmos": {
+      "x": 0,
+      "y": 0,
+      "width": 720,
+      "height": 1280
+    },
+    "mascot": {
+      "x": 720,
+      "y": 544,
+      "width": 288,
+      "height": 192,
+      "source": "cosmos-mascot-20261027.jpg",
+      "sourceSha256": "7c91256eb6c1c92066dd768002d5c9feb8d313cd7f91797e47d91464fddadb33"
+    }
+  },
+  "export": {
+    "codec": "H.264",
+    "crf": 20,
+    "maximumBitrate": 4000000,
+    "font": "Noto Sans JP"
+  },
+  "postText": "We are evil. 😈\n我々は悪いです。\n\nhttps://thepatientagent.github.io/GPT-6-PAgt/",
+  "ffprobe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1008,
+        "height": 1280,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "60/1",
+        "nb_frames": "1374"
+      }
+    ],
+    "format": {
+      "duration": "22.900000",
+      "size": "10147490"
+    }
+  },
+  "sha256": "c9c91a2c16cecaba83aa12f77462cefd7b520cf6306c4247705f77a1a8c8e9f5",
+  "fullDecodeErrors": []
+}
