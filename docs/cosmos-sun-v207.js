@@ -1,4 +1,4 @@
-/* COSMOS v208 — white-hot plasma; one world-anchored, emissive solar renderer.
+/* COSMOS v209 — white-hot plasma, double-speed surface; one world-anchored, emissive solar renderer.
  * No assets, libraries, CSS blending, extra animation loop or full-screen bloom.
  * Sphere diameter = 220 in the existing 440px projection, identical to v206.
  */
@@ -52,7 +52,7 @@
       if(r>1.70){gl_FragColor=vec4(0.);return;}
       float aa=u_pixel*1.1;
       float disk=1.-smoothstep(1.-aa,1.+aa,r);
-      float t=u_time;
+      float t=u_time*2.; // Surface flow only; corona and prominence timing remain native.
       vec3 rgb=vec3(0.);
       float alpha=0.;
       if(r<1.+aa){
@@ -165,7 +165,7 @@
       if(!this.visible||document.visibilityState!=='visible')return;
       if(this.reduced.matches&&this.frames>0)return;
       const t=this.reduced.matches?0:now*.001;
-      if(this.fallbackCanvas){if(now-this.last>=66){this.paintFallback(t);this.last=now;this.frames++;}return;}
+      if(this.fallbackCanvas){if(now-this.last>=66){this.paintFallback(t*2);this.last=now;this.frames++;}return;}
       if(this.lost)return;
       const gl=this.gl;
       // Resize in coarse steps only, retaining near-retina detail on iPhone.

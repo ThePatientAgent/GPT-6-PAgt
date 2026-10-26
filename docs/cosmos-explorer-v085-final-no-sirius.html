@@ -304,7 +304,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <div id="tour-toast" role="status" aria-live="polite"></div>
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
-<script src="./cosmos-sun-v207.js?revision=white-plasma-v208"></script>
+<script src="./cosmos-sun-v207.js?revision=fast-plasma-v209"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
