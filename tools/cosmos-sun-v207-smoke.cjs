@@ -85,6 +85,8 @@ fs.mkdirSync(output,{recursive:true});
       console.log('PLEIADES',data);pleiadesCaptured=true;pleiadesCheck=data;
     }
     if(!baseline&&((s.name==='Orion'&&elapsed>=8250)||(s.name==='Galactic core'&&elapsed>=21000))&&!deepChecks[s.name]){
+      const expectedMode=s.name==='Orion'?'webgl-ionized-orion':'webgl-luminous-galactic-core';
+      if(!await frame.locator('.cosmos-deep-v212').evaluate((e,mode)=>e.dataset.renderer===mode&&getComputedStyle(e).display!=='none',expectedMode))continue;
       const data=await frame.locator('.cosmos-deep-v212').evaluate(e=>({renderer:e.dataset.renderer,phase:e.dataset.phase,
         visible:getComputedStyle(e).display!=='none',error:e.getContext('webgl').getError()}));
       assert.equal(data.renderer,s.name==='Orion'?'webgl-ionized-orion':'webgl-luminous-galactic-core');
@@ -97,6 +99,7 @@ fs.mkdirSync(output,{recursive:true});
         const data=await child.locator('#scene').evaluate(e=>({...e.dataset}));
         if(!baseline&&data.ready==='true'){
           assert.equal(data.renderer,'webgl-differential-accretion');assert.equal(data.flow,'shape-locked-orbital-filaments');
+          assert.equal(data.preparation,'prebaked-lossless');assert.equal(data.frameTextures,'2');
           assert.equal(await child.locator('#scene').evaluate(e=>e.getContext('webgl').getError()),0);
         }
         bhChecks.push(data);

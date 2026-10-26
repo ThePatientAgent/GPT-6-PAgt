@@ -1,0 +1,677 @@
+{
+  "mobile_full": {
+    "browser": "chromium",
+    "url": "local repository files",
+    "viewport": "390x844 @2x",
+    "baseline": false,
+    "stages": [
+      "Pleiades",
+      "Orion",
+      "Black Hole",
+      "Solar system",
+      "Galactic core"
+    ],
+    "ended": true,
+    "elapsed": 24550,
+    "snapshots": [
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.8399658203125,
+          "height": 477.8399658203125
+        },
+        "sunTransform": "translate3d(-25px, 202px, 0px) scale(1.086)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true,
+        "planets": [
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.05, 0.841);"
+          },
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.165, 0.933);"
+          },
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.489, 1.193);"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(261px, 521px, 0px) scale(0.394); z-index: 90;"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0.808; transform: translate3d(89.4px, 578.1px, 0px) scale(0.48); z-index: 90; visibility: hidden;"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0.808; transform: translate3d(198.8px, 658px, 0px) scale(0.47); z-index: 90;"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.05, 0.841);"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.165, 0.933);"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.489, 1.193);"
+          },
+          {
+            "class": "solar-saturn-ring",
+            "text": "",
+            "style": "opacity: 0.19; transform: translate3d(80.4px, 569.1px, 0px) rotate(-23deg) scale(0.746, 0.316); z-index: 90; visibility: hidden;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "EARTH",
+            "style": "opacity: 0.5; transform: translate3d(342.3px, 593.8px, 0px); z-index: 90;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "SATURN",
+            "style": "opacity: 0.5; transform: translate3d(175.1px, 654.5px, 0px); z-index: 90;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "MARS",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "NEPTUNE",
+            "style": "opacity: 0.5; transform: translate3d(284px, 734px, 0px); z-index: 90;"
+          },
+          {
+            "class": "solar-earth",
+            "text": "",
+            "style": "opacity: 0.808; transform: translate3d(261px, 521px, 0px) scale(0.394); z-index: 90;"
+          }
+        ]
+      },
+      {
+        "name": "Solar system",
+        "step": "DESTINATION 4 / 5",
+        "touring": true,
+        "sunOpacity": 0.98,
+        "sunRect": {
+          "x": -43.91999816894531,
+          "y": 183.0800018310547,
+          "width": 477.8399658203125,
+          "height": 477.8399658203125
+        },
+        "sunTransform": "translate3d(-25px, 202px, 0px) scale(1.086)",
+        "sunRenderer": "webgl-domain-warped-plasma",
+        "bhHidden": true,
+        "bhSource": null,
+        "curtainHidden": true,
+        "planets": [
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.05, 0.841);"
+          },
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.165, 0.933);"
+          },
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "orbit-half back",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.489, 1.193);"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(261px, 521px, 0px) scale(0.394); z-index: 90;"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0.808; transform: translate3d(89.4px, 578.1px, 0px) scale(0.48); z-index: 90; visibility: hidden;"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "local-satellite",
+            "text": "",
+            "style": "opacity: 0.808; transform: translate3d(198.8px, 658px, 0px) scale(0.47); z-index: 90;"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.05, 0.841);"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.165, 0.933);"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "orbit-half front",
+            "text": "",
+            "style": "opacity: 0; transform: translate3d(-25px, 202px, 0px) scale(1.489, 1.193);"
+          },
+          {
+            "class": "solar-saturn-ring",
+            "text": "",
+            "style": "opacity: 0.19; transform: translate3d(80.4px, 569.1px, 0px) rotate(-23deg) scale(0.746, 0.316); z-index: 90; visibility: hidden;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "EARTH",
+            "style": "opacity: 0.5; transform: translate3d(342.3px, 593.8px, 0px); z-index: 90;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "SATURN",
+            "style": "opacity: 0.5; transform: translate3d(175.1px, 654.5px, 0px); z-index: 90;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "MARS",
+            "style": "opacity: 0;"
+          },
+          {
+            "class": "solar-planet-label",
+            "text": "NEPTUNE",
+            "style": "opacity: 0.5; transform: translate3d(284px, 734px, 0px); z-index: 90;"
+          },
+          {
+            "class": "solar-earth",
+            "text": "",
+            "style": "opacity: 0.808; transform: translate3d(261px, 521px, 0px) scale(0.394); z-index: 90;"
+          }
+        ],
+        "gl": {
+          "error": 0,
+          "width": 768,
+          "height": 768
+        }
+      }
+    ],
+    "pleiadesCheck": {
+      "renderer": "webgl-volume-reflection-nebula",
+      "phase": "3.49",
+      "visible": true,
+      "error": 0
+    },
+    "deepChecks": {
+      "Orion": {
+        "renderer": "webgl-ionized-orion",
+        "phase": "8.24",
+        "visible": true,
+        "error": 0
+      },
+      "Galactic core": {
+        "renderer": "webgl-luminous-galactic-core",
+        "phase": "21.04",
+        "visible": true,
+        "error": 0
+      }
+    },
+    "orbitCheck": {
+      "model": "shared-kepler-perspective",
+      "visible": true,
+      "maskX": "0",
+      "maskY": "0",
+      "maskWidth": 390,
+      "maskHeight": 844,
+      "viewport": [
+        390,
+        844
+      ],
+      "shadowRadius": 125.48625,
+      "sunRadius": 119.45999145507812,
+      "distances": [
+        {
+          "name": "EARTH",
+          "x": 317,
+          "y": 576.9999694824219,
+          "error": 0.6635370482699992
+        },
+        {
+          "name": "SATURN",
+          "x": 145.39999389648438,
+          "y": 634.0999755859375,
+          "error": 0.058277358728674476
+        },
+        {
+          "name": "NEPTUNE",
+          "x": 254.80001831054688,
+          "y": 714,
+          "error": 0.6148176447017215
+        }
+      ]
+    },
+    "seenPlanets": [
+      "EARTH",
+      "SATURN",
+      "NEPTUNE"
+    ],
+    "bhChecks": [
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "0.00"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "1.79"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "3.84"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "5.76"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "7.81"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "9.86"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "11.78"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "13.82"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "15.87"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "17.79"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "19.84"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "21.76"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "23.81"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "25.86"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "27.78"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "29.82"
+      },
+      {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "31.87"
+      }
+    ],
+    "manualBefore": {
+      "prepared": "48",
+      "geometry": "identity",
+      "radiance": "source-synchronous",
+      "renderer": "webgl-differential-accretion",
+      "preparation": "prebaked-lossless",
+      "flow": "shape-locked-orbital-filaments",
+      "frameTextures": "2",
+      "texturePixels": "520800",
+      "ready": "true",
+      "phase": "5.89"
+    },
+    "manualAfter": {
+      "prepared": "48",
+      "geometry": "identity",
+      "radiance": "source-synchronous",
+      "renderer": "webgl-differential-accretion",
+      "preparation": "prebaked-lossless",
+      "flow": "shape-locked-orbital-filaments",
+      "frameTextures": "2",
+      "texturePixels": "520800",
+      "ready": "true",
+      "phase": "16.26"
+    },
+    "errors": [],
+    "consoleErrors": [],
+    "clock": "deterministic; captures do not measure device FPS"
+  },
+  "delayed_atlas": {
+    "browser": "chromium",
+    "mode": "held-atlas controlled-clock",
+    "waiting": {
+      "name": "Orion",
+      "hidden": false,
+      "open": false,
+      "worldPhase": "10.00",
+      "deepDisplay": "block",
+      "sunOpacity": 0,
+      "time": 10002
+    },
+    "blackHolePhases": 17,
+    "allocations": [
+      {
+        "width": 256,
+        "height": 256
+      },
+      {
+        "width": 620,
+        "height": 420
+      },
+      {
+        "width": 620,
+        "height": 420
+      }
+    ],
+    "maxHeartbeatGapMs": 80,
+    "solar": {
+      "name": "Solar system",
+      "hidden": true,
+      "open": false,
+      "worldPhase": "11.78",
+      "deepDisplay": "none",
+      "sunOpacity": 0.98,
+      "time": 15252
+    },
+    "errors": [],
+    "physicalIPhone": false
+  },
+  "realtime_chromium": {
+    "browser": "chromium",
+    "mode": "normal real-time playback",
+    "waiting": null,
+    "blackHolePhases": 10,
+    "allocations": [
+      {
+        "width": 256,
+        "height": 256
+      },
+      {
+        "width": 620,
+        "height": 420
+      },
+      {
+        "width": 620,
+        "height": 420
+      }
+    ],
+    "maxHeartbeatGapMs": 824.1999999992549,
+    "solar": {
+      "name": "Solar system",
+      "hidden": true,
+      "open": false,
+      "worldPhase": "15.65",
+      "deepDisplay": "none",
+      "sunOpacity": 0.98,
+      "time": 19338.400000000373,
+      "child": null
+    },
+    "errors": [],
+    "physicalIPhone": false
+  },
+  "realtime_webkit": {
+    "browser": "webkit",
+    "mode": "normal real-time playback",
+    "waiting": null,
+    "blackHolePhases": 6,
+    "allocations": [
+      {
+        "width": 256,
+        "height": 256
+      },
+      {
+        "width": 620,
+        "height": 420
+      },
+      {
+        "width": 620,
+        "height": 420
+      }
+    ],
+    "maxHeartbeatGapMs": null,
+    "solar": {
+      "name": "Solar system",
+      "hidden": true,
+      "open": false,
+      "worldPhase": "13.50",
+      "deepDisplay": "none",
+      "sunOpacity": 0.98,
+      "time": 19381,
+      "child": {
+        "prepared": "48",
+        "geometry": "identity",
+        "radiance": "source-synchronous",
+        "renderer": "webgl-differential-accretion",
+        "preparation": "prebaked-lossless",
+        "flow": "shape-locked-orbital-filaments",
+        "frameTextures": "2",
+        "texturePixels": "520800",
+        "ready": "true",
+        "phase": "44.30",
+        "allocations": [
+          {
+            "width": 256,
+            "height": 256
+          },
+          {
+            "width": 620,
+            "height": 420
+          },
+          {
+            "width": 620,
+            "height": 420
+          }
+        ],
+        "width": 691,
+        "height": 468
+      }
+    },
+    "errors": [],
+    "physicalIPhone": false,
+    "heartbeatNote": "WebKit timer instrumentation did not produce samples in the handoff window; animation phase and completed transition were verified."
+  },
+  "atlas": {
+    "width": 3720,
+    "height": 3360,
+    "bytes": 4975580,
+    "sha256": "3dc447e5dfa59e6a6bcf682df9c6a5eec82481113cba4982091d8c5b26131f5d",
+    "losslessPreparedV13Pixels": true,
+    "gpuFrameTextureBytes": 2083200,
+    "oldGpuAtlasBytes": 49996800
+  }
+}

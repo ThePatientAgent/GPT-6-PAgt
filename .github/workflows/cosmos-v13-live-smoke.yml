@@ -11,6 +11,8 @@ on:
       - docs/cosmos-rich-scenes-v211.js
       - docs/cosmos-worlds-v212.js
       - tools/cosmos-orbits-v212-test.cjs
+      - tools/cosmos-bh-v213-smoke.cjs
+      - docs/media/cosmos-v13-radiance-atlas-v213.webp
       - docs/cosmos-black-hole-radiance-v013.html
   workflow_dispatch:
 permissions:
@@ -18,7 +20,7 @@ permissions:
 jobs:
   deployed-tour:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,7 +34,7 @@ jobs:
           python - <<'PY'
           import hashlib, os, pathlib, time, urllib.request
           base='https://thepatientagent.github.io/GPT-6-PAgt/'
-          paths=['index.html','cosmos-explorer-v085-final-no-sirius.html','cosmos-rich-scenes-v211.js','cosmos-worlds-v212.js','cosmos-black-hole-radiance-v013.html']
+          paths=['index.html','cosmos-explorer-v085-final-no-sirius.html','cosmos-rich-scenes-v211.js','cosmos-worlds-v212.js','cosmos-black-hole-radiance-v013.html','media/cosmos-v13-radiance-atlas-v213.webp']
           for attempt in range(60):
               try:
                   for path in paths:
@@ -51,10 +53,15 @@ jobs:
           node tools/cosmos-sun-v207-smoke.cjs \
             --url "https://thepatientagent.github.io/GPT-6-PAgt/?qa=${GITHUB_SHA}" \
             --output cosmos-sun-live-qa
+          node tools/cosmos-bh-v213-smoke.cjs \
+            --url "https://thepatientagent.github.io/GPT-6-PAgt/?realtime=${GITHUB_SHA}" \
+            --output cosmos-bh-live-qa
       - name: Preserve browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cosmos-sun-live-qa
-          path: cosmos-sun-live-qa
+          path: |
+            cosmos-sun-live-qa
+            cosmos-bh-live-qa
           if-no-files-found: ignore

@@ -307,7 +307,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
 <script src="./cosmos-sun-v207.js?revision=fast-plasma-v210"></script>
-<script src="./cosmos-rich-scenes-v211.js?revision=living-nebula-v211"></script>
+<script src="./cosmos-rich-scenes-v211.js?revision=safe-bh-v213"></script>
 <script src="./cosmos-worlds-v212.js?revision=worlds-v212"></script>
 <script>
 (()=>{'use strict';
@@ -659,6 +659,9 @@ function tourHoleDepart(){
    tourSolarApproach={index:destination,start:now,duration:1650,from:beginRadius,to:finishRadius};
    // No black curtain or standalone caption: the same tour card changes as the scenes dissolve.
    tourWords();
+   // Commit a real Solar frame before removing the covering black-hole iframe.
+   const firstSolarCamera=cam();glRender(firstSolarCamera,now);updateHybrid(firstSolarCamera,now);
+   solarRenderer.draw(now);lastWebglFrame=now;lastHybridFrame=now;
    // v203: remove the black-hole iframe before exposing the solar-system scene.
    // The iframe must never remain composited over destination 4 on iOS.
    tourHoleHide();
@@ -676,18 +679,27 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=safe-bh-v213';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
- tourHoleLoadFallback=setTimeout(tourHoleReveal,12000);
+ tourHoleLoadFallback=setTimeout(()=>{
+  if(!tourActive||tourStops[tourStage]!==6||tourHoleStart!==-2)return;
+  try{if(tourHoleFrame.contentDocument?.getElementById('scene')?.dataset.ready==='true'){tourHoleReveal();return;}}catch(e){}
+  tourHoleHide();tourStage++;tourNext();
+ },12000);
 }
 function tourHoleReveal(){
  if(!tourActive||tourStops[tourStage]!==6||tourHoleLayer.hidden||tourHoleDeparting||tourHoleStart!==-2)return;
+ try{if(tourHoleFrame.contentDocument?.getElementById('scene')?.dataset.ready!=='true')return;}catch(e){return;}
  clearTimeout(tourHoleLoadFallback);tourHoleLoadFallback=0;
  tourHoleStart=performance.now();
+ tourWords();
  void tourHoleLayer.offsetWidth; // establish transparent frame before transition
  tourHoleLayer.classList.add('cosmos-hole-open');
 }
 tourHoleFrame.addEventListener('load',tourHoleReveal);
+addEventListener('message',event=>{
+ if(event.origin===location.origin&&event.source===tourHoleFrame.contentWindow&&event.data?.type==='cosmos:bh:ready')tourHoleReveal();
+});
 function tourHoleHide(){
  clearTimeout(tourHoleLoadFallback);tourHoleLoadFallback=0;
  tourHoleEnteringAt=-1;tourHoleStart=-1;
@@ -722,8 +734,8 @@ function tourNext(){
  // One-time vignette: advance the native camera during a short covered interval.
  if(!tourHoleLayer.hidden && tourStops[tourStage]!==6){tourHoleDepart();return;}
  tourHoleHide();
- tourWords();
  if(tourStops[tourStage]===6){tourHoleShow();return;}
+ tourWords();
  fly(tourStops[tourStage],true);
 }
 function tourBegin(){
@@ -1501,7 +1513,8 @@ function tick(t){
   if(lookUsed&&performance.now()>lookActiveUntil){const label=state.orbit?(english?'DRAG TO ORBIT '+placeName(state.orbit.index):'★ '+placeName(state.orbit.index)+' を中心に回転'):(english?'DRAG TO LOOK AROUND':'ドラッグして自由に見回す');if($('lookCue').textContent!==label){$('lookCue').classList.remove('turning');$('lookCue').textContent=label;}}
   lastUiFrame=t;
  }
- if(document.visibilityState==='visible'){
+  const holeOpaque=!tourHoleLayer.hidden&&tourHoleLayer.classList.contains('cosmos-hole-open')&&tourHoleStart>=0&&t-tourHoleStart>=900;
+  if(document.visibilityState==='visible'&&!holeOpaque){
   // A moving camera keeps the lightweight 3D view highly responsive;
   // the bitmap overlays are compositor transforms, not canvas redraws.
   if(!mobile){
@@ -1525,10 +1538,12 @@ function tick(t){
    }
   }
  }
-   if(tourHoleLayer.hidden){solarRenderer.draw(t);pleiadesRenderer.draw(t);deepRenderer.draw(t);}
+   if(!holeOpaque){solarRenderer.draw(t);pleiadesRenderer.draw(t);deepRenderer.draw(t);}
  requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
+// Fetch compressed source frames while earlier destinations play, without delaying startup.
+setTimeout(()=>{fetch('./media/cosmos-v13-radiance-atlas-v213.webp',{cache:'force-cache',priority:'low'}).then(r=>r.arrayBuffer()).then(()=>{}).catch(()=>{});},1200);
 // v055: Orion showcase automatically makes a slow camera orbit, so
 // parallax is visible without touching the screen. User interaction cancels it.
 const demo=new URLSearchParams(location.search).get('demo');

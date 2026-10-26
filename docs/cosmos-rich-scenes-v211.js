@@ -175,14 +175,10 @@
   }
 
   const accretionFragment = `precision highp float;varying vec2 v_uv;
-    uniform sampler2D u_atlas;uniform float u_cycle,u_time;${noise}
-    vec3 source(float frame,vec2 uv){
-      vec2 tile=vec2(mod(frame,6.),floor(frame/6.));
-      return texture2D(u_atlas,(tile*vec2(620.,420.)+clamp(uv*vec2(620.,420.),vec2(.5),vec2(619.5,419.5)))/vec2(3720.,3360.)).rgb;
-    }
+    uniform sampler2D u_atlas,u_nextAtlas;uniform float u_cycle,u_time;${noise}
     void main(){
-      vec2 uv=vec2(v_uv.x,1.-v_uv.y);float frame=floor(u_cycle);
-      vec3 base=mix(source(frame,uv),source(mod(frame+1.,48.),uv),fract(u_cycle));
+      vec2 uv=clamp(vec2(v_uv.x,1.-v_uv.y),vec2(.5/620.,.5/420.),vec2(619.5/620.,419.5/420.));
+      vec3 base=mix(texture2D(u_atlas,uv).rgb,texture2D(u_nextAtlas,uv).rgb,fract(u_cycle));
       float peak=max(base.r,max(base.g,base.b));
       if(peak<.002){gl_FragColor=vec4(0.,0.,0.,1.);return;}
       vec2 p=(uv*vec2(620.,420.)-vec2(310.,214.))/vec2(109.,111.);
@@ -210,7 +206,7 @@
   class AccretionRenderer {
     constructor(fallback,atlas,onCanvas){
       this.fallback=fallback;this.atlas=atlas;this.onCanvas=onCanvas;this.available=false;
-      this.canvas=document.createElement('canvas');this.canvas.width=1240;this.canvas.height=840;
+      this.canvas=document.createElement('canvas');this.canvas.width=620;this.canvas.height=420;
       this.gl=context(this.canvas,false);
       if(this.gl)try{this.initialize();this.activate();}catch(e){console.warn('COSMOS accretion keeps V13 fallback',e);}
       this.canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.available=false;
@@ -227,18 +223,46 @@
       this.canvas.dataset.flow='shape-locked-orbital-filaments';
     }
     initialize(){
-      const gl=this.gl;if(gl.getParameter(gl.MAX_TEXTURE_SIZE)<3720)throw Error('V13 atlas exceeds GPU texture limit');
+      const gl=this.gl;if(gl.getParameter(gl.MAX_TEXTURE_SIZE)<620)throw Error('V13 frame exceeds GPU texture limit');
       this.program=program(gl,vertex,accretionFragment,['a_position']);gl.useProgram(this.program);triangle(gl);
       this.time=gl.getUniformLocation(this.program,'u_time');this.cycle=gl.getUniformLocation(this.program,'u_cycle');
       this.noise=seedNoise(gl,1);gl.uniform1i(gl.getUniformLocation(this.program,'u_noise'),1);
-      this.texture=gl.createTexture();gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,this.texture);
-      gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,this.atlas);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      this.stage=document.createElement('canvas');this.stage.width=620;this.stage.height=420;
+      this.stageContext=this.stage.getContext('2d',{alpha:false,willReadFrequently:true});
+      this.textures=[0,1].map(()=>{
+        const texture=gl.createTexture();gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,620,420,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+        return {texture,frame:-1};
+      });
       gl.uniform1i(gl.getUniformLocation(this.program,'u_atlas'),0);
-      gl.viewport(0,0,this.canvas.width,this.canvas.height);gl.disable(gl.BLEND);gl.disable(gl.DEPTH_TEST);this.available=true;
+      gl.uniform1i(gl.getUniformLocation(this.program,'u_nextAtlas'),2);
+      this.resize();gl.disable(gl.BLEND);gl.disable(gl.DEPTH_TEST);this.available=true;
     }
-    draw(cycle,time){const gl=this.gl;gl.uniform1f(this.cycle,cycle);gl.uniform1f(this.time,time);gl.drawArrays(gl.TRIANGLES,0,3);}
+    resize(){
+      const target=this.canvas.isConnected?this.canvas:this.fallback,box=target.getBoundingClientRect();
+      const w=Math.min(1240,Math.max(620,Math.ceil(box.width*Math.min(devicePixelRatio||1,2)))),h=Math.round(w*420/620);
+      if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;}
+      this.gl.viewport(0,0,w,h);
+    }
+    upload(slot,frame){
+      const g=this.stageContext,gl=this.gl;
+      g.drawImage(this.atlas,frame%6*620,Math.floor(frame/6)*420,620,420,0,0,620,420);
+      const pixels=g.getImageData(0,0,620,420);
+      gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,slot.texture);
+      gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,620,420,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array(pixels.data.buffer));slot.frame=frame;
+    }
+    draw(cycle,time){
+      const gl=this.gl,frame=Math.floor(cycle)%48,next=(frame+1)%48;
+      let a=this.textures.find(s=>s.frame===frame),b=this.textures.find(s=>s.frame===next);
+      if(!a){a=this.textures.find(s=>s!==b);this.upload(a,frame);}
+      if(!b){b=this.textures.find(s=>s!==a);this.upload(b,next);}
+      gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,a.texture);
+      gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,b.texture);
+      this.resize();gl.uniform1f(this.cycle,cycle);gl.uniform1f(this.time,time);gl.drawArrays(gl.TRIANGLES,0,3);
+      this.canvas.dataset.frameTextures='2';this.canvas.dataset.texturePixels=String(620*420*2);
+    }
   }
   window.CosmosPleiadesRenderer=PleiadesRenderer;
   window.CosmosAccretionRenderer=AccretionRenderer;
