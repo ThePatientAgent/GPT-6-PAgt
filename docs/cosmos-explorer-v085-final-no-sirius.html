@@ -607,8 +607,8 @@ tourHoleLayer.innerHTML=`
 const holeCSS=document.createElement('style');
 holeCSS.textContent=`
 /* v067: don't fade over Orion until the embedded v065 scene is actually ready. */
-#cosmos-tour-blackhole-v061{position:fixed;inset:0;z-index:1000000;background:#000;display:flex;align-items:stretch;justify-content:center;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 1100ms cubic-bezier(.22,.65,.30,1),visibility 0s linear 1100ms}
-#cosmos-tour-blackhole-v061.cosmos-hole-open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity 1100ms cubic-bezier(.22,.65,.30,1),visibility 0s}
+#cosmos-tour-blackhole-v061{position:fixed;inset:0;z-index:1000000;background:#000;display:flex;align-items:stretch;justify-content:center;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 650ms cubic-bezier(.22,.65,.30,1),visibility 0s linear 650ms}
+#cosmos-tour-blackhole-v061.cosmos-hole-open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity 650ms cubic-bezier(.22,.65,.30,1),visibility 0s}
 #cosmos-tour-blackhole-v061[hidden]{display:none!important}
 /* v064: Keep the iframe at full viewport size; the embedded tour-only renderer fits the scene at 60%
    by scaling only its embedded presentation, not the native COSMOS star field or UI.
@@ -700,7 +700,7 @@ function tourHoleDepart(){
     tourHoleHide();
     tourHoleDeparting=false;
     tourOrbitAt=-1;
-   },1800);
+   },850);
    return;
   }
   tourHoleTravelRAF=requestAnimationFrame(revealWhenReady);
