@@ -179,13 +179,28 @@ fs.mkdirSync(output,{recursive:true});
     assert.equal(manualBefore.renderer,'webgl-differential-accretion');
     assert.equal(await manualFrame.locator('#scene').evaluate(e=>e.getContext('webgl').getError()),0);
   }
+  let manualDrag=null;
+  if(!baseline){
+    const pan=()=>manualFrame.locator('#cosmos-stellar-backdrop-v218').evaluate(e=>({x:+e.dataset.panX,y:+e.dataset.panY}));
+    const before=await pan();
+    await page.mouse.move(90,350);await page.mouse.down();await page.mouse.move(155,370,{steps:3});await page.mouse.up();await page.clock.runFor(80);
+    const afterMouse=await pan();assert(Math.abs(afterMouse.x-before.x-65)<1&&Math.abs(afterMouse.y-before.y-20)<1,'manual entry must accept mouse dragging');
+    await manualFrame.evaluate(()=>{
+      const target=document.elementFromPoint(155,370);
+      for(const [type,x,y]of [['touchstart',155,370],['touchmove',110,340],['touchend',110,340]]){
+        const e=new Event(type,{bubbles:true,cancelable:true});Object.defineProperty(e,'changedTouches',{value:[{identifier:219,target,clientX:x,clientY:y}]});target.dispatchEvent(e);
+      }
+    });await page.clock.runFor(80);
+    const afterTouch=await pan();assert(Math.abs(afterTouch.x-afterMouse.x+45)<1&&Math.abs(afterTouch.y-afterMouse.y+30)<1,'manual entry must accept touch dragging');
+    manualDrag={before,afterMouse,afterTouch};
+  }
   await page.clock.runFor(1300);
   const manualAfter=await manualFrame.locator('#scene').evaluate(e=>({...e.dataset}));
   assert.notEqual(manualBefore.phase,manualAfter.phase,'manual black-hole playback stalled');
   await page.screenshot({path:path.join(output,'black-hole-manual.png')});
   console.log('PASS manual V13',manualBefore.phase,'→',manualAfter.phase);
   const report={browser:browserName,url:liveUrl||'local repository files',viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,
-    snapshots,pleiadesCheck,deepChecks,orbitCheck,seenPlanets:[...seenPlanets],bhChecks,manualBefore,manualAfter,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
+    snapshots,pleiadesCheck,deepChecks,orbitCheck,seenPlanets:[...seenPlanets],bhChecks,manualBefore,manualAfter,manualDrag,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
   fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2));
   console.log('PASS',report.viewport,stages.join(' → '));
  }finally{await browser.close();}

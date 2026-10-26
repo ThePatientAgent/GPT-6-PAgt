@@ -283,7 +283,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 .cosmos-pleiades-gpu .cluster-star,.cosmos-pleiades-gpu .pleiades-wisp{visibility:hidden!important}
 .cosmos-deep-gpu .orion-cloud-volume,.cosmos-deep-gpu .orion-core-star{visibility:hidden!important}
 </style><style>
-#touchRotateHint{position:fixed;z-index:1000002;top:calc(76px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);width:max-content;padding:10px 16px;border:1px solid #8acbff99;border-radius:24px;background:#061321e8;color:#effaff;font:600 13px/1.4 system-ui,sans-serif;letter-spacing:.035em;box-shadow:0 3px 20px #000a;pointer-events:none;text-align:center}
+#touchRotateHint{position:fixed;z-index:1000002;top:calc(18px + env(safe-area-inset-top));left:12px;max-width:calc(100vw - 172px);width:max-content;padding:6px 9px;border:1px solid #8acbff66;border-radius:12px;background:#061321c9;color:#effaff;font:500 11px/1.4 system-ui,sans-serif;letter-spacing:.025em;box-shadow:0 2px 12px #0008;pointer-events:none;text-align:left}
 #touchRotateHint[hidden]{display:none!important}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
@@ -311,8 +311,8 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
 <script src="./cosmos-sun-v207.js?revision=fast-plasma-v210"></script>
-<script src="./cosmos-rich-scenes-v211.js?revision=stellar-v218"></script>
-<script src="./cosmos-worlds-v212.js?revision=stellar-v218"></script>
+<script src="./cosmos-rich-scenes-v211.js?revision=touch-stars-v219"></script>
+<script src="./cosmos-worlds-v212.js?revision=touch-stars-v219"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
@@ -578,7 +578,7 @@ const holeCSS=document.createElement('style');
 holeCSS.textContent=`
 /* v067: don't fade over Orion until the embedded v065 scene is actually ready. */
 #cosmos-tour-blackhole-v061{position:fixed;inset:0;z-index:1000000;background:#000;display:flex;align-items:stretch;justify-content:center;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 650ms cubic-bezier(.22,.65,.30,1),visibility 0s linear 650ms}
-#cosmos-tour-blackhole-v061.cosmos-hole-open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity 650ms cubic-bezier(.22,.65,.30,1),visibility 0s}
+#cosmos-tour-blackhole-v061.cosmos-hole-open{opacity:1;visibility:visible;pointer-events:none;transition:opacity 650ms cubic-bezier(.22,.65,.30,1),visibility 0s}
 #cosmos-tour-blackhole-v061[hidden]{display:none!important}
 /* v064: Keep the iframe at full viewport size; the embedded tour-only renderer fits the scene at 60%
    by scaling only its embedded presentation, not the native COSMOS star field or UI.
@@ -617,7 +617,7 @@ background:linear-gradient(90deg,transparent,#9ab8dbad,transparent)}
 @media(prefers-reduced-motion:reduce){#cosmos-tour-blackhole-v061{animation:none!important;transition:none!important}#cosmos-tour-curtain-v066{transition:none!important}#cosmos-hole-visit-frame{transition:none!important}}
 `;
 holeCSS.textContent+="\n/* Consistent cinematic caption, visible above the embedded black-hole renderer. */\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading{z-index:10!important;top:calc(68px + env(safe-area-inset-top))!important;left:18px!important;opacity:1!important;visibility:visible!important;animation:none!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading strong{font-size:19px!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-actions{display:none!important;}\n";
-holeCSS.textContent+="\n/* Same caption component as every other destination, above black-hole iframe. */\nbody.touring #tourCard{z-index:1000002!important;}\n#cosmos-tour-blackhole-v061{transition:opacity 1150ms ease-in-out,visibility 0s linear 1150ms!important;}\n#cosmos-tour-blackhole-v061.cosmos-hole-open{transition:opacity 850ms ease-in-out,visibility 0s!important;}\n";
+holeCSS.textContent+="\n/* Same caption component as every other destination, above black-hole iframe. */\nbody.touring #tourCard,body.touring #tourToggle{z-index:1000002!important;}\n#cosmos-tour-blackhole-v061{transition:opacity 1150ms ease-in-out,visibility 0s linear 1150ms!important;}\n#cosmos-tour-blackhole-v061.cosmos-hole-open{transition:opacity 850ms ease-in-out,visibility 0s!important;}\n";
 holeCSS.textContent+=`
 /* v216: move the complete V13 frame into view without deforming its geometry. */
 #cosmos-tour-blackhole-v061.cosmos-hole-open #cosmos-hole-visit-frame{animation:cosmos-hole-entry-v216 1800ms cubic-bezier(.18,.65,.25,1) both}
@@ -691,7 +691,7 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=stellar-v218';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=touch-stars-v219';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
  tourHoleLoadFallback=setTimeout(()=>{
   if(!tourActive||tourStops[tourStage]!==6||tourHoleStart!==-2)return;
@@ -721,7 +721,8 @@ function tourHoleHide(){
 }
 
 function tourWords(){
- $('touchRotateHint').hidden=!!(tourActive&&tourStops[tourStage]===6);
+ $('touchRotateHint').hidden=false;
+ $('touchRotateHint').textContent=tourActive&&tourStops[tourStage]===6?'↔ タッチで背景の星々を動かす':'↔ タッチ・ドラッグで回転';
  tourToggle.textContent=tourActive?(english?'✕ STOP TOUR':'✕ ツアー終了'):(english?'▶ CINEMATIC TOUR':'▶ 宇宙を巡るツアー');
  tourToggle.setAttribute('aria-pressed',String(tourActive));
  tourToggle.setAttribute('aria-label',tourActive?(english?'Stop guided tour':'自動ツアーを終了'):(english?'Start guided tour':'自動ツアーを開始'));
@@ -791,7 +792,13 @@ function tourTick(t,dt){
 
 // Real look-around: preserve the camera's world position while changing heading.
 let lookUsed=false,lookHeld=null,lookActiveUntil=0;
-function turnCamera(dYaw,dPitch){
+function blackHoleVisible(){return !tourHoleLayer.hidden&&tourHoleLayer.classList.contains('cosmos-hole-open');}
+function turnCamera(dYaw,dPitch,gesturePixels){
+ if(blackHoleVisible()){
+  // Forward the original screen delta; do not turn the hidden world or cancel its next flight.
+  try{tourHoleFrame.contentWindow.CosmosBlackHoleStars?.drag(...(gesturePixels||[dYaw*W/2.9,-dPitch*H/2.6]));}catch{}
+  return;
+ }
  if(tourActive&&state.fly)return; // Preserve automatic travel while a gesture is in progress.
  if(Math.abs(dYaw)+Math.abs(dPitch)<.000001)return;
  state.yaw+=dYaw;
@@ -816,6 +823,7 @@ function travelScale(){
  return clamp(d*.35,.45,4.5);
 }
 function dolly(pixels){
+ if(blackHoleVisible())return;
  const delta=clamp(pixels,-80,80);
  if(!delta)return;
  if(state.orbit){
@@ -845,7 +853,7 @@ canvas.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||!controlPo
 const gain=state.orbit?.index===0?1.25:1;
 const sx=clamp(2.9/Math.max(W,320),.0038,.0087)*gain;
 const sy=clamp(2.6/Math.max(H,320),.0038,.008)*gain;
-turnCamera(dx*sx,-dy*sy);
+turnCamera(dx*sx,-dy*sy,[dx,dy]);
 }else if(controlPointers.size===2){const a=[...controlPointers.values()],pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastPinch)dolly((pinch-lastPinch)*1.5);lastPinch=pinch;state.motion=1}});
 canvas.addEventListener('pointerup',e=>{if(e.pointerType==='touch')return;const orig=pressXY;const quick=performance.now()-pressTime<350;controlPointers.delete(e.pointerId);if(!controlPointers.size&&quick&&orig&&Math.hypot(e.clientX-orig.x,e.clientY-orig.y)<9){const c=cam();let best=-1,dist=60;for(let i=0;i<places.length;i++){const p=proj(places[i].pos,c);if(p){const d=Math.hypot(p.x-e.clientX,p.y-e.clientY);if(d<dist){best=i;dist=d}}}if(best>=0)select(best)}pressXY=null});canvas.addEventListener('pointercancel',e=>controlPointers.delete(e.pointerId));
 canvas.addEventListener('lostpointercapture',e=>controlPointers.delete(e.pointerId));
@@ -902,7 +910,7 @@ document.addEventListener('touchmove',e=>{
       const gain=state.orbit?.index===0?1.25:1;
       const sx=clamp(7.1/Math.max(W,320),.007,.014)*gain;
       const sy=clamp(6.4/Math.max(H,320),.006,.012)*gain;
-      turnCamera(dx*sx,-dy*sy);
+      turnCamera(dx*sx,-dy*sy,[dx,dy]);
     }
   }
   if(nativeTouches.size>=2){
