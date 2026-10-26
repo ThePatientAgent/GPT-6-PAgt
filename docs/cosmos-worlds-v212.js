@@ -180,7 +180,7 @@
     }
     initialize(){
       const gl=this.gl;this.programs={};this.uniforms={};
-      const exotic=window.CosmosExoticScenes?.shaders(projection,noise)||{};
+      const exotic={...window.CosmosExoticScenes?.shaders(projection,noise),...window.CosmosCygnus?.shaders(projection,noise)};
       for(const [name,fs]of [['orion',orionFragment],['core',coreFragment],...Object.entries(exotic)]){
        try{
         const p=this.programs[name]=program(gl,vertex,fs,['a_position']),u=this.uniforms[name]={};
@@ -197,7 +197,7 @@
     project(data){this.data=this.programs?.[data.mode]?data:null;this.canvas.style.display=this.available&&this.data&&data.alpha>.015?'block':'none';}
     draw(now){
       const d=this.data;if(!this.available||!d||d.alpha<=.015||document.hidden)return;
-      const exotic=d.mode==='spica'||d.mode==='quasar';
+      const exotic=['spica','quasar','cygnus'].includes(d.mode);
       const gl=this.gl,t=this.motion.matches?0:now*.001,scale=Math.min(d.width<700?(exotic?Math.min(devicePixelRatio||1,1.6):1.15):1,(exotic?1600:1440)/d.width,(exotic?1400:1100)/d.height);
       const w=Math.round(d.width*scale),h=Math.round(d.height*scale);
       if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;gl.viewport(0,0,w,h);}
@@ -205,8 +205,8 @@
       gl.bindBuffer(gl.ARRAY_BUFFER,this.triangle);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.disableVertexAttribArray(1);gl.disableVertexAttribArray(2);
       gl.uniform2f(u.u_view,d.width,d.height);gl.uniform3fv(u.u_eye,d.eye);gl.uniform3fv(u.u_right,d.camera.right);gl.uniform3fv(u.u_up,d.camera.up);gl.uniform3fv(u.u_forward,d.camera.forward);
       gl.uniform1f(u.u_time,t);gl.uniform1f(u.u_alpha,d.alpha);
-      if(d.mode==='spica'){
-        const orbit=window.CosmosExoticScenes.binaryOrbit(t);
+      if(d.mode==='spica'||d.mode==='cygnus'){
+        const orbit=d.mode==='cygnus'?window.CosmosCygnus.orbit(t):window.CosmosExoticScenes.binaryOrbit(t);
         gl.uniform3fv(u.u_star_a,orbit.a);gl.uniform3fv(u.u_star_b,orbit.b);gl.uniform3fv(u.u_star_axis,orbit.axis);
       }
       gl.drawArrays(gl.TRIANGLES,0,3);
@@ -216,7 +216,7 @@
       if(k){gl.useProgram(this.starProgram);gl.bindBuffer(gl.ARRAY_BUFFER,this.starBuffer);gl.bufferData(gl.ARRAY_BUFFER,this.vertices.subarray(0,k),gl.DYNAMIC_DRAW);
         for(const [i,size,offset]of [[0,2,0],[1,2,8],[2,4,16]]){gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,size,gl.FLOAT,false,32,offset);}
         gl.uniform1f(this.starTime,t);gl.uniform1f(this.starAlpha,d.alpha);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);gl.drawArrays(gl.TRIANGLES,0,k/8);gl.disable(gl.BLEND);}
-      this.canvas.dataset.renderer={orion:'webgl-ionized-orion',core:'webgl-luminous-galactic-core',spica:'webgl-barycentric-spica',quasar:'webgl-accretion-bipolar-jets'}[d.mode];this.canvas.dataset.phase=t.toFixed(2);
+      this.canvas.dataset.renderer={orion:'webgl-ionized-orion',core:'webgl-luminous-galactic-core',spica:'webgl-barycentric-spica',quasar:'webgl-accretion-bipolar-jets',cygnus:'webgl-wind-fed-cygnus'}[d.mode];this.canvas.dataset.phase=t.toFixed(2);
     }
   }
   window.CosmosOrbitModel=OrbitModel;window.CosmosOrbitRenderer=OrbitRenderer;window.CosmosDeepRenderer=DeepRenderer;

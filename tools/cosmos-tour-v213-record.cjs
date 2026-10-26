@@ -1,7 +1,7 @@
-/* Capture the unmodified five-stop tour at 60 distinct native clock steps/second. */
+/* Capture the native eight-stop tour at 60 distinct native clock steps/second. */
 const fs=require('fs'),path=require('path'),{spawn}=require('child_process'),{once}=require('events'),assert=require('assert/strict');
 const {chromium}=require('playwright');
-const root=path.resolve(__dirname,'../docs'),out=path.resolve(process.argv[2]||path.join(root,'media/cosmos-tour-final-v219-60fps.mp4'));
+const root=path.resolve(__dirname,'../docs'),out=path.resolve(process.argv[2]||path.join(root,'media/cosmos-tour-final-v222-60fps.mp4'));
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.COSMOS_CHROMIUM_EXECUTABLE,headless:true,
   ...(process.env.COSMOS_CHROMIUM_LEGACY==='1'?{ignoreDefaultArgs:['--headless']}:{}),
@@ -29,7 +29,7 @@ const root=path.resolve(__dirname,'../docs'),out=path.resolve(process.argv[2]||p
   encoder=spawn('ffmpeg',['-y','-loglevel','error','-f','image2pipe','-vcodec','mjpeg','-framerate','60','-i','pipe:0',
     '-c:v','libx264','-preset','fast','-crf','20','-maxrate','4000k','-bufsize','8000k','-pix_fmt','yuv420p','-profile:v','high','-level:v','4.2','-movflags','+faststart','-an',out],{stdio:['pipe','ignore','inherit']});
   const done=once(encoder,'close'),stages=[],hashes=new Set(),crypto=require('crypto');let previous='',frames=0,elapsed=0,tail=0;
-  for(let f=0;f<2100;f++){
+  for(let f=0;f<4800;f++){
    const target=Math.round(f*1000/60),dt=target-elapsed;if(dt)await page.clock.runFor(dt);elapsed=target;
    // Browser clock emulation does not advance the compositor's CSS timeline.
    // Sample the original animations at the same 60 Hz steps as the app clock.
@@ -41,16 +41,16 @@ const root=path.resolve(__dirname,'../docs'),out=path.resolve(process.argv[2]||p
     }
    },elapsed);
    const s=await frame.evaluate(()=>({name:document.getElementById('tourName').textContent,touring:document.body.classList.contains('touring')}));
-   if(s.name==='Pleiades'&&stages.length===5)break;
+   if(s.name==='Pleiades'&&stages.length===8)break;
    if(s.name!==previous){console.log('STAGE',s.name,elapsed);stages.push({name:s.name,frame:f,timeMs:elapsed});previous=s.name;}
    const jpg=await page.screenshot({type:'jpeg',quality:95,animations:'allow'});hashes.add(crypto.createHash('sha256').update(jpg).digest('hex'));
    if(process.env.COSMOS_CAPTURE_PREVIEWS&&f%120===0){fs.mkdirSync(process.env.COSMOS_CAPTURE_PREVIEWS,{recursive:true});fs.writeFileSync(path.join(process.env.COSMOS_CAPTURE_PREVIEWS,`frame-${String(f).padStart(4,'0')}.jpg`),jpg);}
    if(!encoder.stdin.write(jpg))await once(encoder.stdin,'drain');frames++;
    if(f%120===0)console.log('FRAMES',frames,elapsed);
-   if(!s.touring&&stages.length===5){tail++;if(tail>=30)break;}
+   if(!s.touring&&stages.length===8){tail++;if(tail>=30)break;}
   }
-  encoder.stdin.end();const [code]=await done;assert.equal(code,0);assert.deepEqual(errors,[]);assert.equal(stages.length,5);assert(hashes.size>frames*.98,'too many duplicate frames');
-  const report={sourceVersion:'v219',sourceCommit:'c47e472700fdea5091d45c91db6ab22f5b84c71a',cssAnimationSampling:true,width:720,height:1280,fps:60,frames,uniqueFrameHashes:hashes.size,duration:frames/60,beginning,stages,errors,
+  encoder.stdin.end();const [code]=await done;assert.equal(code,0);assert.deepEqual(errors,[]);assert.equal(stages.length,8);assert(hashes.size>frames*.98,'too many duplicate frames');
+  const report={sourceVersion:'v222',sourceCommit:process.env.GITHUB_SHA||require('child_process').execFileSync('git',['rev-parse','HEAD'],{cwd:path.resolve(__dirname,'..'),encoding:'utf8'}).trim(),cssAnimationSampling:true,width:720,height:1280,fps:60,frames,uniqueFrameHashes:hashes.size,duration:frames/60,beginning,stages,errors,
     clock:'Each frame advances the native browser clock by 1/60 second; this is a rendering capture, not a physical iPhone FPS measurement.'};
   fs.writeFileSync(out.replace(/\.mp4$/,'.json'),JSON.stringify(report,null,2));console.log('PASS',JSON.stringify(report));
  }finally{if(encoder&&!encoder.killed)encoder.kill();await browser.close();}

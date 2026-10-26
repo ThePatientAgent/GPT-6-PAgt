@@ -105,7 +105,7 @@ async function checkSolarOrientation(page){
   const stages=[],snapshots=[],bhChecks=[],hintChecks=[];let solarDrag=null;
   let solarCaptured=false,pleiadesCaptured=false,pleiadesCheck=null,ended=false,elapsed=0,last='';
   const deepChecks={},seenPlanets=new Set();let orbitCheck=null;
-  for(let i=0;i<170;i++){
+  for(let i=0;i<310;i++){
     await page.clock.runFor(250);elapsed+=250;
     const s=await info();
     if(!baseline&&elapsed===500){if(mobile)await page.touchscreen.tap(60,300);await page.mouse.move(70,320);await page.mouse.down();await page.mouse.move(140,340,{steps:3});await page.mouse.up();assert((await info()).touring,'touch/drag must not stop the automatic tour');}
@@ -217,9 +217,7 @@ async function checkSolarOrientation(page){
       snapshots.push({...solar,gl:glCheck});solarCaptured=true;
       console.log('SOLAR',solar.sunRect,glCheck);
     }
-    if(solarCaptured&&s.name==='Galactic core'&&s.touring){
-      await page.screenshot({path:path.join(output,'galactic-center.png')});
-    }
+    
     if(stages.includes('Galactic core')&&(baseline?!s.touring:s.name==='Pleiades'&&s.touring)){ended=true;break;}
   }
   assert(solarCaptured,'tour never reached the visible Sun');
@@ -227,7 +225,7 @@ async function checkSolarOrientation(page){
   if(!baseline)assert.deepEqual([...seenPlanets].sort(),['EARTH','NEPTUNE','SATURN'],'all three planets must enter the viewport');
   if(!baseline)assert(pleiadesCaptured,'living reflection nebula was not verified');
   assert(ended,baseline?'tour did not complete':'tour did not restart its next loop');
-  assert.deepEqual(stages,baseline?['Pleiades','Orion','Black Hole','Solar system','Galactic core']:['Pleiades','Orion','Black Hole','Solar system','Galactic core','Pleiades']);
+  assert.deepEqual(stages,baseline?['Pleiades','Orion','Black Hole','Solar system','Galactic core']:['Pleiades','Orion','Black Hole','Solar system','Spica','Galactic core','Quasar','Cygnus X-1','Pleiades']);
   assert(bhChecks.some(e=>e.ready==='true'&&e.geometry==='identity'&&e.radiance==='source-synchronous'),'approved V13 renderer not verified');
   assert(new Set(bhChecks.map(e=>e.phase)).size>1,'black-hole animation failed to advance');
   assert.deepEqual(errors,[],'JavaScript errors');

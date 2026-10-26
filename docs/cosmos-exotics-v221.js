@@ -27,14 +27,14 @@
     vec3 p=(u_eye+ray*distance-centre)/radius;
     vec3 n=normalize(p-u_star_axis*dot(p,u_star_axis)*.126);
     float mu=max(0.,dot(n,-ray));
-    vec3 flow=n*3.4+vec3(u_time*.085,phase,-u_time*.065);
+    vec3 flow=n*5.8+vec3(u_time*.085,phase,-u_time*.065);
     float warp=fbm(flow*.95),gas=fbm(flow*1.9+warp*2.2);
     float filaments=pow(1.-abs(gas*2.-1.),4.);
     float cells=noise3(flow*23.+warp*3.);
     float heat=clamp(.25+.51*gas+.24*filaments+.08*cells,0.,1.);
-    vec3 color=mix(vec3(.26,.53,.85),vec3(.94,.98,1.),smoothstep(.32,.80,heat));
-    color+=vec3(.075,.095,.12)*filaments*filaments;
-    color*=.45+.55*pow(mu,.34);
+    vec3 color=mix(vec3(.44,.66,.91),vec3(.97,.985,1.),smoothstep(.22,.88,heat));
+    color+=vec3(.025,.035,.05)*filaments*filaments;
+    color*=.54+.46*pow(mu,.34);
     color+=vec3(.05,.31,.67)*pow(1.-mu,5.)*.28;
     return color*(.98+.02*sin(u_time*3.2+phase));
    }
@@ -73,12 +73,16 @@
      for(int i=0;i<6;i++){
       float along=range.x+(float(i)+.5)*stepSize;
       vec3 p=eye+ray*along;float r=length(p.xz),angle=atan(p.z,p.x);
-      float spin=u_time*1.65/pow(.35+r,1.35);
-      vec3 flow=vec3(cos(angle-spin)*r,p.y*4.,sin(angle-spin)*r);
-      float coarse=fbm(flow*1.65+vec3(0.,u_time*.045,0.));
+      // Two steady flow fields shear past each other without accumulating
+      // ever finer frequencies as the looping tour runs for hours.
+      float slow=angle-u_time*.62+log(.3+r)*1.7,fast=angle-u_time*1.75+log(.3+r)*1.7;
+      float inner=1.-smoothstep(.6,2.4,r);
+      vec3 flow=vec3(cos(slow)*r,p.y*4.,sin(slow)*r);
+      vec3 fastFlow=vec3(cos(fast)*r,p.y*4.,sin(fast)*r);
+      float coarse=mix(fbm(flow*1.65+vec3(0.,u_time*.045,0.)),fbm(fastFlow*1.65+vec3(0.,u_time*.07,0.)),inner);
       float warp=fbm(flow*3.3+coarse*2.1);
       float clumps=fbm(flow*5.2+warp*2.8);
-      float threads=noise3(vec3(r*65.+warp*3.,cos(angle-spin)*4.,sin(angle-spin)*4.));
+      float threads=mix(noise3(vec3(r*36.+warp*3.,cos(slow)*4.,sin(slow)*4.)),noise3(vec3(r*36.+warp*3.,cos(fast)*4.,sin(fast)*4.)),inner);
       float filaments=pow(1.-abs(threads*2.-1.),4.);
       float height=.045+.060*r;
       float edge=r+(coarse-.5)*.72;
@@ -99,7 +103,7 @@
     float at=-dot(eye.xz,ray.xz)/transverse;
     vec3 closest=eye+ray*at;float height=abs(closest.y);
     if(at>.02&&height<5.35){
-     float width=.045+.075*height;
+     float width=.038+.052*height;
      float stride=width/sqrt(transverse)*.65;vec3 beam=vec3(0.);
      for(int j=0;j<3;j++){
       float along=at+(float(j)-1.)*stride;vec3 p=eye+ray*along;
@@ -108,11 +112,12 @@
       vec2 centre=vec2(sin(twist),cos(twist*.93))*width*.055;
       float radius=length(p.xz-centre)/width;
       float core=exp(-radius*radius*7.),sheath=exp(-radius*radius*1.5);
+      float strands=noise3(vec3(p.x/width*3.,p.z/width*3.,y*5.-u_time*6.2));
       float packets=.50+.50*noise3(vec3(y*4.-u_time*5.8,side*7.2,u_time*.11));
       float braid=.92+.08*sin(twist+atan(p.z,p.x)*2.);
       float fade=smoothstep(.29,.52,y)*(1.-smoothstep(4.2,5.3,y));
       float beaming=eye.y*p.y>0.?1.:.52;
-      beam+=(vec3(.78,.94,1.)*core*7.2+vec3(.07,.38,1.)*sheath*1.7)*
+      beam+=(vec3(.78,.94,1.)*core*(2.8+strands*strands*3.5)+vec3(.07,.38,1.)*sheath*(.5+strands*1.2))*
        fade*(.75+packets*.75)*braid*beaming*step(along,horizon)/3.;
      }
      light+=beam;

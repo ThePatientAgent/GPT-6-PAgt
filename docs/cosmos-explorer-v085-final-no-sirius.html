@@ -310,10 +310,11 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <div id="tour-toast" role="status" aria-live="polite"></div>
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
-<script src="./cosmos-sun-v207.js?revision=exotics-v221"></script>
+<script src="./cosmos-sun-v207.js?revision=cygnus-v222"></script>
 <script src="./cosmos-rich-scenes-v211.js?revision=touch-stars-v219"></script>
-<script src="./cosmos-exotics-v221.js?revision=exotics-v221"></script>
-<script src="./cosmos-worlds-v212.js?revision=exotics-v221"></script>
+<script src="./cosmos-exotics-v221.js?revision=cygnus-v222"></script>
+<script src="./cosmos-cygnus-v222.js?revision=cygnus-v222"></script>
+<script src="./cosmos-worlds-v212.js?revision=cygnus-v222"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
@@ -326,7 +327,8 @@ const places=[
 {name:'プレアデス',enName:'Pleiades',en:'PLEIADES / BLUE CLUSTER',descEn:'Eleven luminous stars inhabit separate 3D positions. Orbit to see their perspective change. Artistic Pleiades-inspired layout, not an accurate star map.',pos:[2.3,-1.1,2.2],hue:[.53,.75,1],desc:'11個の星がそれぞれ3D空間に浮かぶ、プレアデスに着想を得た星団。回り込むと星の並びが変化します。実際の星の位置・距離は再現していません。',planets:[.63,1.13,1.66]},
 {name:'銀河の中心',enName:'Galactic core',en:'GALACTIC CORE / ARTISTIC',descEn:'Fly into the glowing heart of our imagined galaxy and change your perspective in real 3D.',pos:[0,0,0],hue:[1,.76,.55],desc:'何万もの星と光が重なり合う、作品の中心部。角度を変えて光の渦を眺めよう。',planets:[]},
 {name:'スピカ',enName:'Spica',en:'SPICA / BLUE BINARY',descEn:'Two hot blue-white stars orbit their shared centre of mass. Spica completes a real orbit in 4.01 days; this artistic view accelerates time.',pos:[3.8,1.8,-2.9],hue:[.35,.65,1],desc:'青白い二つの恒星が共通重心をめぐる近接連星。実際の約4.01日の公転を、見やすい速さで描きます。',planets:[]},
-{name:'クエーサー',enName:'Quasar',en:'QUASAR / ACTIVE GALACTIC NUCLEUS',descEn:'A luminous accretion disk surrounds a supermassive black hole. Plasma travels outward through two opposing jets. Artistic scale and accelerated motion.',pos:[-4.0,1.6,-3.2],hue:[.68,.81,1],desc:'超大質量ブラックホールの降着円盤が白熱し、上下のジェットへプラズマが流れ出す活動銀河核。大きさと時間は芸術的な表現です。',planets:[]}
+{name:'クエーサー',enName:'Quasar',en:'QUASAR / ACTIVE GALACTIC NUCLEUS',descEn:'A luminous accretion disk surrounds a supermassive black hole. Plasma travels outward through two opposing jets. Artistic scale and accelerated motion.',pos:[-4.0,1.6,-3.2],hue:[.68,.81,1],desc:'超大質量ブラックホールの降着円盤が白熱し、上下のジェットへプラズマが流れ出す活動銀河核。大きさと時間は芸術的な表現です。',planets:[]},
+{name:'はくちょう座X-1',enName:'Cygnus X-1',en:'CYGNUS X-1 / WIND-FED BINARY',descEn:'A blue supergiant and a black hole orbit a shared centre. Captured stellar wind spirals into a red-hot accretion disk. Artistic scale and accelerated time.',pos:[3.5,-1.5,-4.5],hue:[.4,.7,1],desc:'青白い超巨星とブラックホールが共通重心を公転。恒星風が引き込まれ、赤熱する降着円盤へ流れ込みます。大きさと時間は芸術的な表現です。',planets:[]}
 ];
 // World-space camera is the primary truth. No implicit galactic pivot.
 const initialYaw=.2,initialPitch=.83,initialRange=12;
@@ -500,7 +502,7 @@ function refreshMode(){
  if(!lookUsed||performance.now()>lookActiveUntil){$('lookCue').textContent=state.orbit?(english?'DRAG TO ORBIT '+placeName(state.orbit.index):'★ '+placeName(state.orbit.index)+' を中心に回り込む'):(english?'DRAG TO LOOK AROUND':'ドラッグして自由に見回す');}
 }
 function orionViewingDistance(){return Math.max(6.0,2.45*Math.sqrt(1+Math.pow(1.5/Math.max(.35,W/H),2))*1.08);}
-function exoticViewingDistance(i){return i===6?Math.max(3.8,1.55*1.5/Math.max(.35,W/H)+.6):Math.max(9.5,3.3*1.5/Math.max(.35,W/H)+1.);}
+function exoticViewingDistance(i){const aspect=Math.max(.35,W/H);return i===6?Math.max(3.8,1.55*1.5/aspect+.6):i===8?Math.max(7.0,2.95*1.5/aspect+1.7):Math.max(10.8,3.3*1.5/aspect+1.);}
 function startOrbit(i){
  if(i<0||!places[i])return;
  const p=places[i].pos.slice(),d=p.map((x,j)=>x-state.pos[j]);
@@ -529,7 +531,7 @@ function fly(i,orbitOnArrival=true){
  $('info').classList.add('hide');$('hero').classList.add('subdued');
  const dest=i<0?[0,0,0]:places[i].pos;
  const target=i<0?initialPos.slice():i>=6?dest.map((v,j)=>{
-  const yaw=i===6?-.55:.55,pitch=i===6?-.22:-.34;
+  const yaw=i===6?-.55:i===8?Math.PI-((performance.now()+1650)*.001*Math.PI*2/window.CosmosCygnus.period+.35):.55,pitch=i===6?-.22:i===8?-.52:-.34;
   const forward=[Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),Math.cos(yaw)*Math.cos(pitch)];
   return v-forward[j]*exoticViewingDistance(i);
  }):dest.map((v,j)=>{
@@ -555,8 +557,8 @@ $('orbitTo').addEventListener('click',()=>state.orbit&&state.orbit.index===state
 $('freeFlight').addEventListener('click',()=>exitOrbit());$('infoClose').addEventListener('click',()=>$('info').classList.add('hide'));
 const nav=$('destinations');places.forEach((pl,i)=>{if(i===1)return;const b=document.createElement('button');b.type='button';b.className='destination';b.dataset.place=String(i);b.textContent=(i===5?'✷ ':'✦ ')+pl.name;b.addEventListener('click',()=>fly(i,true));nav.append(b)});nav.querySelector('[data-place="-1"]').addEventListener('click',()=>fly(-1));
 
-// Seven destinations; the V13 visit remains third. Gestures never cancel the tour.
-const BLACK_HOLE=8,tourStops=[4,3,BLACK_HOLE,0,6,5,7];
+// Eight destinations; the V13 visit remains third. Gestures never cancel the tour.
+const BLACK_HOLE=places.length,tourStops=[4,3,BLACK_HOLE,0,6,5,7,8];
 let tourActive=false,tourStage=0,tourOrbitAt=-1;
 const tourToggle=$('tourToggle');
 // v061: third destination is the approved, precomputed black-hole Canvas scene.
@@ -699,7 +701,7 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=exotics-v221';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=cygnus-v222';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
  tourHoleLoadFallback=setTimeout(()=>{
   if(!tourActive||tourStops[tourStage]!==BLACK_HOLE||tourHoleStart!==-2)return;
@@ -738,7 +740,7 @@ function tourWords(){
    const idx=tourStops[tourStage];
    $('tourStep').textContent=(english?'DESTINATION ':'探索地点 ')+(tourStage+1)+' / '+tourStops.length;
    $('tourName').textContent=idx===BLACK_HOLE?'Black Hole':placeName(idx);
-   $('tourHint').textContent=idx===BLACK_HOLE?(english?'Animated accretion disk · gravitational lensing':'光が曲がるブラックホール · 動く降着円盤'):idx===6?'Two blue stars · orbiting a shared centre':idx===7?'Accretion flow · bipolar plasma jets':(english?'Real-time 3D · Automatic tour':'リアルタイム3D · 自動ツアー進行中');
+   $('tourHint').textContent=idx===BLACK_HOLE?(english?'Animated accretion disk · gravitational lensing':'光が曲がるブラックホール · 動く降着円盤'):idx===6?'Two blue stars · orbiting a shared centre':idx===7?'Accretion flow · bipolar plasma jets':idx===8?'Blue supergiant · captured stellar wind':(english?'Real-time 3D · Automatic tour':'リアルタイム3D · 自動ツアー進行中');
  }
 }
 function tourEnd(){
@@ -766,7 +768,7 @@ function tourBegin(){
   toast(english?'Guided motion is disabled by your accessibility setting.':'端末の動き軽減設定によりツアーは無効です');return;
  }
  const query=new URLSearchParams(location.search),requestedChapter=(query.get('start')||'').toLowerCase();
- const requestedStage=tourStops.findIndex(i=>i!==BLACK_HOLE&&places[i].enName.toLowerCase()===requestedChapter);
+ const requestedStage=tourStops.findIndex(i=>i!==BLACK_HOLE&&(places[i].enName.toLowerCase()===requestedChapter||i===8&&requestedChapter==='cygnus'));
  tourActive=true;tourStage=requestedStage>=0?requestedStage:query.get('handoff')==='1'?1:0;tourOrbitAt=-1;
  document.body.classList.remove('cinema');updateCinemaLabel();
  document.body.classList.add('touring');$('help').hidden=true;
@@ -789,7 +791,7 @@ function tourTick(t,dt){
  if(tourOrbitAt<0)tourOrbitAt=t;
  const elapsed=t-tourOrbitAt;
  // Orion's intricate nebula deserves a longer, slower look than other stops.
- const dwell=idx===6?6800:idx===7?6200:idx===3?2300:4200;
+ const dwell=idx===6?6800:idx===7?6800:idx===8?8400:idx===3?2300:4200;
  if(elapsed<dwell){
   // Roughly 125 degrees of parallax across a whole orbit dwell, no new renderer.
   turnCamera((idx>=6?.00075:idx===3?.0024:idx===4?.0022:.0125)*clamp(dt/.0167,0,2.5),
@@ -1315,7 +1317,7 @@ const orionFieldStars=Array.from({length:90},(_,i)=>{
  return {world:[base[0]+Math.cos(a)*r,base[1]+Math.sin(a)*r*.8,base[2]+(rand(i+21203)-.5)*2.2],mag:.18+rand(i+21204)*.6};
 });
 function renderDeepScenes(c,index,alpha){
- if(index!==3&&index!==5&&index!==6&&index!==7){deepRenderer.project({alpha:0});return;}
+ if(index!==3&&index!==5&&index!==6&&index!==7&&index!==8){deepRenderer.project({alpha:0});return;}
  const stars=[];
  if(index===3&&alpha>.015)for(const [i,star]of [...orionCoreStars,...orionFieldStars].entries()){
   const p=proj(star.world,c);if(!p||p.z<.2||p.z>10)continue;
@@ -1323,7 +1325,7 @@ function renderDeepScenes(c,index,alpha){
   stars.push({x:p.x,y:p.y,radius:major?clamp(155*mag/p.z,14,112):clamp(4.5/p.z,.8,2.7),
    strength:mag*(major?1.6:1),phase:i*2.39,rays:major?1:0,warm:major?.08:rand(i+21207)*.65});
  }
- deepRenderer.project({mode:index===6?'spica':index===7?'quasar':index===3?'orion':'core',camera:c,eye:c.eye.map((v,i)=>v-places[index].pos[i]),
+ deepRenderer.project({mode:index===6?'spica':index===7?'quasar':index===8?'cygnus':index===3?'orion':'core',camera:c,eye:c.eye.map((v,i)=>v-places[index].pos[i]),
   alpha,width:W,height:H,stars});
 }
 
