@@ -1,0 +1,38 @@
+{
+  "width": 720,
+  "height": 1280,
+  "fps": 60,
+  "frames": 1404,
+  "uniqueFrameHashes": 1404,
+  "duration": 23.4,
+  "beginning": 1352,
+  "stages": [
+    {
+      "name": "Pleiades",
+      "frame": 0,
+      "timeMs": 0
+    },
+    {
+      "name": "Orion",
+      "frame": 273,
+      "timeMs": 4550
+    },
+    {
+      "name": "Black Hole",
+      "frame": 512,
+      "timeMs": 8533
+    },
+    {
+      "name": "Solar system",
+      "frame": 769,
+      "timeMs": 12817
+    },
+    {
+      "name": "Galactic core",
+      "frame": 1021,
+      "timeMs": 17017
+    }
+  ],
+  "errors": [],
+  "clock": "Each frame advances the native browser clock by 1/60 second; this is a rendering capture, not a physical iPhone FPS measurement."
+}
