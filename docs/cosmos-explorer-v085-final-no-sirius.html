@@ -331,6 +331,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 .solar-sun::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 10deg,transparent 0deg,rgba(255,255,255,.48) 15deg,transparent 29deg,rgba(255,255,234,.40) 54deg,transparent 74deg,rgba(255,255,255,.46) 103deg,transparent 122deg,rgba(255,249,218,.43) 165deg,transparent 188deg,rgba(255,255,255,.46) 230deg,transparent 255deg,rgba(255,255,235,.42) 300deg,transparent 333deg);-webkit-mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);mask-image:radial-gradient(circle,transparent 0%,transparent 22%,#000 26%,transparent 78%);}
 
 .solar-sun.solar-safe-v192::before,.solar-sun.solar-safe-v192::after{content:none!important;display:none!important}
+.solar-sun.solar-safe-v192{isolation:isolate!important;box-shadow:none!important}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
@@ -1056,6 +1057,8 @@ solarSun.style.setProperty('mix-blend-mode','normal','important');
 hybridLayer.appendChild(solarSun);
 // v192: disable oversized pseudo-element corona that could white out mobile viewport.
 solarSun.classList.add('solar-safe-v192');
+// v193: make the photosphere itself white-hot without illuminating the entire sky.
+solarSun.style.setProperty('background','radial-gradient(circle at center,#ffffff 0%,#ffffff 12%,#fffdf1 16%,#fff2bd 20%,#ffc769 23%,transparent 25%),radial-gradient(circle at center,rgba(255,247,218,.18) 0%,rgba(255,223,160,.10) 26%,transparent 37%)','important');
 const frontRings=makeRingHalves('front');
 // v069: separate projected Saturn ring and planet captions, following the orbiting bodies.
 const saturnRing=document.createElement('div');saturnRing.className='solar-saturn-ring';hybridLayer.appendChild(saturnRing);
@@ -1403,7 +1406,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
  }
  const glowSize=mainScale*1.82;
  localGlow.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(glowSize/440).toFixed(3)+')';
- localGlow.style.opacity=(alpha*.45).toFixed(2);
+ localGlow.style.opacity=index===0?(alpha*.07).toFixed(2):(alpha*.45).toFixed(2);
  if(index===0){
   const sunSize=clamp(mainScale*1.6125,142.5,W<700?532.5:825);
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
