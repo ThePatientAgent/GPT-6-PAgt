@@ -1,4 +1,4 @@
-/* COSMOS v209 — white-hot plasma, double-speed surface; one world-anchored, emissive solar renderer.
+/* COSMOS v210 — white-hot plasma, quadruple-speed surface; one world-anchored, emissive solar renderer.
  * No assets, libraries, CSS blending, extra animation loop or full-screen bloom.
  * Sphere diameter = 220 in the existing 440px projection, identical to v206.
  */
@@ -52,7 +52,7 @@
       if(r>1.70){gl_FragColor=vec4(0.);return;}
       float aa=u_pixel*1.1;
       float disk=1.-smoothstep(1.-aa,1.+aa,r);
-      float t=u_time*2.; // Surface flow only; corona and prominence timing remain native.
+      float t=u_time*4.; // Surface flow doubles v209; prominence timing remains native.
       vec3 rgb=vec3(0.);
       float alpha=0.;
       if(r<1.+aa){
@@ -85,8 +85,9 @@
       if(r>.96){
         vec2 dir=p/max(r,.001);
         float h=max(0.,r-1.);
-        float structure=fbm(vec3(dir*8.5,t*.13));
-        float fine=noise3(vec3(dir*37.,t*.26-h*13.));
+        float coronaTime=u_time*2.; // Keep the v209 corona cadence.
+        float structure=fbm(vec3(dir*8.5,coronaTime*.13));
+        float fine=noise3(vec3(dir*37.,coronaTime*.26-h*13.));
         float edge=exp(-h/(.020+.026*structure))*(.40+.36*fine);
         float haze=exp(-h*10.)*.045;
         float arcs=loopArc(p,2.16,.155,.102,1.2)*.66
@@ -165,7 +166,7 @@
       if(!this.visible||document.visibilityState!=='visible')return;
       if(this.reduced.matches&&this.frames>0)return;
       const t=this.reduced.matches?0:now*.001;
-      if(this.fallbackCanvas){if(now-this.last>=66){this.paintFallback(t*2);this.last=now;this.frames++;}return;}
+      if(this.fallbackCanvas){if(now-this.last>=66){this.paintFallback(t*4);this.last=now;this.frames++;}return;}
       if(this.lost)return;
       const gl=this.gl;
       // Resize in coarse steps only, retaining near-retina detail on iPhone.
