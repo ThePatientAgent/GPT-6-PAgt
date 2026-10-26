@@ -793,7 +793,7 @@ function tourTick(t,dt){
    if(tourHoleStart===-2)return; // viewer sees Orion until the black-hole document is ready
    if(tourHoleStart<0)return;
    // Begin the hidden camera trip during the last seconds of the black-hole scene.
-   if(t-tourHoleStart>=3900){tourStage++;tourNext();}
+   if(t-tourHoleStart>=2600){tourStage++;tourNext();}
    return;
  }
  if(state.fly||!state.orbit||state.orbit.index!==idx){tourOrbitAt=-1;return;}
