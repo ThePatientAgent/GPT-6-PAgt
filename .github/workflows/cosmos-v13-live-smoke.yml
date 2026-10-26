@@ -35,7 +35,7 @@ jobs:
           python - <<'PY'
           import hashlib, os, pathlib, time, urllib.request
           base='https://thepatientagent.github.io/GPT-6-PAgt/'
-          paths=['index.html','cosmos-explorer-v085-final-no-sirius.html','cosmos-rich-scenes-v211.js','cosmos-stellar-backdrop-v218.js','cosmos-worlds-v212.js','cosmos-black-hole-radiance-v013.html','media/cosmos-v13-radiance-atlas-v213.webp']
+          paths=['index.html','cosmos-explorer-v085-final-no-sirius.html','cosmos-sun-v207.js','cosmos-rich-scenes-v211.js','cosmos-stellar-backdrop-v218.js','cosmos-worlds-v212.js','cosmos-black-hole-radiance-v013.html','media/cosmos-v13-radiance-atlas-v213.webp']
           for attempt in range(60):
               try:
                   for path in paths:

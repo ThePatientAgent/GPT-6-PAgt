@@ -20,12 +20,55 @@ if(browserName==='chromium'&&process.env.COSMOS_CHROMIUM_LEGACY==='1'){
   launch.ignoreDefaultArgs=['--headless'];launch.args.push('--headless=old','--single-process','--no-zygote');
 }
 fs.mkdirSync(output,{recursive:true});
+async function checkSolarOrientation(page){
+ try{
+  await page.setContent('<body style="margin:0;background:#000"></body>');
+  await page.addScriptTag({path:path.join(root,'cosmos-sun-v207.js')});
+  const checks=[];
+  for(const mode of ['webgl','reduced-motion','fallback']){
+   await page.emulateMedia({reducedMotion:mode==='webgl'?'no-preference':'reduce'});
+   const check=await page.evaluate(mode=>{
+    const host=document.createElement('div');host.style.cssText='width:384px;height:384px';document.body.appendChild(host);
+    const renderer=new CosmosSolarRenderer(host);if(mode==='fallback')renderer.fallback();
+    const cameras=[{right:[1,0,0],up:[0,1,0],forward:[0,0,1]},
+      {right:[0,0,-1],up:[0,1,0],forward:[1,0,0]},
+      {right:[1,0,0],up:[0,.5,-Math.sqrt(.75)],forward:[0,Math.sqrt(.75),.5]}];
+    let sampleTime=1000;
+    const sample=camera=>{
+     // Keep plasma time fixed, allowing the low-power fallback its normal 15 Hz cadence.
+     if(mode==='fallback')sampleTime+=80;
+     renderer.project(384,true,camera);renderer.draw(sampleTime);
+     const canvas=renderer.fallbackCanvas||renderer.canvas;
+     const pixels=new Uint8Array(canvas.width*canvas.height*4);
+     if(renderer.fallbackCanvas)pixels.set(renderer.context.getImageData(0,0,canvas.width,canvas.height).data);
+     else renderer.gl.readPixels(0,0,canvas.width,canvas.height,renderer.gl.RGBA,renderer.gl.UNSIGNED_BYTE,pixels);
+     return {pixels,image:canvas.toDataURL(),width:canvas.width,height:canvas.height};
+    };
+    const first=sample(cameras[0]),repeat=sample(cameras[0]),yaw=sample(cameras[1]),pitch=sample(cameras[2]),back=sample(cameras[0]);
+    const difference=(a,b)=>{let rgb=0,alpha=0;for(let i=0;i<a.length;i+=4){rgb+=Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2]);alpha+=a[i+3]!==b[i+3];}return {meanRGB:rgb/(a.length/4*3),alphaPixelsChanged:alpha};};
+    const result={mode,width:first.width,height:first.height,repeat:difference(first.pixels,repeat.pixels),
+      yaw:difference(first.pixels,yaw.pixels),pitch:difference(first.pixels,pitch.pixels),back:difference(first.pixels,back.pixels),
+      cornerAlpha:first.pixels[3],glError:renderer.gl?.getError(),images:{front:first.image,yaw:yaw.image,pitch:pitch.image}};
+    renderer.gl?.getExtension('WEBGL_lose_context')?.loseContext();host.remove();return result;
+   },mode);
+   assert.equal(check.repeat.meanRGB,0,'frozen surface must be deterministic');
+   assert(check.yaw.meanRGB>3&&check.pitch.meanRGB>3,'camera rotation must reveal different surface pixels');
+   assert.equal(check.back.meanRGB,0,'returning the camera must restore the same hemisphere');
+   assert.equal(check.yaw.alphaPixelsChanged,0,'rotation must preserve the solar silhouette and corona');
+   assert.equal(check.pitch.alphaPixelsChanged,0);assert.equal(check.cornerAlpha,0);assert.equal(check.glError,0);
+   for(const [view,image]of Object.entries(check.images))fs.writeFileSync(path.join(output,`sun-${mode}-${view}.png`),Buffer.from(image.split(',')[1],'base64'));
+   delete check.images;checks.push(check);
+  }
+  return checks;
+ }finally{await page.emulateMedia({reducedMotion:'no-preference'});}
+}
 (async()=>{
  const browser=await playwright[browserName].launch(launch);
  try{
   const page=await browser.newPage({viewport:mobile?{width:390,height:844}:{width:1440,height:900},
     deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile,
     ...(mobile?{userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 Version/18.2 Mobile/15E148 Safari/604.1'}:{})});
+  const orientationPixels=!baseline&&!liveUrl?await checkSolarOrientation(page):null;
   const errors=[],consoleErrors=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text())});
@@ -59,14 +102,21 @@ fs.mkdirSync(output,{recursive:true});
       planets:[...document.querySelectorAll('.solar-earth,.solar-saturn-ring,.local-satellite,.solar-planet-label,.orbit-half')]
         .map(e=>({class:e.className,text:e.classList.contains('solar-planet-label')?e.textContent:'',style:e.getAttribute('style')}))};
   });
-  const stages=[],snapshots=[],bhChecks=[];
+  const stages=[],snapshots=[],bhChecks=[],hintChecks=[];let solarDrag=null;
   let solarCaptured=false,pleiadesCaptured=false,pleiadesCheck=null,ended=false,elapsed=0,last='';
   const deepChecks={},seenPlanets=new Set();let orbitCheck=null;
   for(let i=0;i<170;i++){
     await page.clock.runFor(250);elapsed+=250;
     const s=await info();
     if(!baseline&&elapsed===500){if(mobile)await page.touchscreen.tap(60,300);await page.mouse.move(70,320);await page.mouse.down();await page.mouse.move(140,340,{steps:3});await page.mouse.up();assert((await info()).touring,'touch/drag must not stop the automatic tour');}
-    if(s.name!==last){stages.push(s.name);console.log('STAGE',s.name,elapsed);last=s.name;}
+    if(s.name!==last){
+      stages.push(s.name);console.log('STAGE',s.name,elapsed);last=s.name;
+      if(!baseline){
+        const hint=await frame.evaluate(()=>{const e=document.getElementById('touchRotateHint'),r=e.getBoundingClientRect(),stop=document.getElementById('tourToggle').getBoundingClientRect();return {text:e.textContent,left:r.left,right:r.right,top:r.top,bottom:r.bottom,stopLeft:stop.left,visible:!e.hidden};});
+        assert.equal(hint.text,s.name==='Black Hole'?'↔ Drag to move the stars':'↔ Touch & drag to rotate');
+        assert(hint.visible&&hint.left>=0&&hint.top>=0&&hint.right+5<hint.stopLeft,'English hint must fit beside Stop Tour');hintChecks.push({stage:s.name,...hint});
+      }
+    }
     if(!baseline&&s.name==='Solar system'&&s.sunOpacity>.5){
       const names=await frame.evaluate(()=>{
         const sun=document.querySelector('.cosmos-sun-v207').getBoundingClientRect(),sx=sun.x+sun.width/2,sy=sun.y+sun.height/2;
@@ -110,6 +160,26 @@ fs.mkdirSync(output,{recursive:true});
     if(!solarCaptured&&s.name==='Solar system'&&s.bhHidden&&s.sunOpacity>.8){
       assert(s.curtainHidden,'black-hole travel curtain still covers solar system');
       if(!baseline)assert.equal(s.sunRenderer,'webgl-domain-warped-plasma');
+      if(!baseline){
+        const orientation=()=>frame.locator('.cosmos-sun-v207 canvas').first().evaluate(e=>{const gl=e.getContext('webgl'),program=gl.getParameter(gl.CURRENT_PROGRAM);return [...gl.getUniform(program,gl.getUniformLocation(program,'u_view_to_world'))];});
+        const before=await orientation();
+        const drag=async dx=>{
+          const r=await frame.locator('.cosmos-sun-v207').boundingBox(),x=r.x+r.width/2,y=r.y+r.height/2;
+          if(mobile&&browserName==='chromium'){
+            const cdp=await page.context().newCDPSession(page);
+            await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+            await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+dx,y}]});
+            await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+          }else if(mobile){
+            await frame.evaluate(({x,y,dx})=>{const target=document.elementFromPoint(x,y);for(const [type,px]of [['touchstart',x],['touchmove',x+dx],['touchend',x+dx]]){const e=new Event(type,{bubbles:true,cancelable:true});Object.defineProperty(e,'changedTouches',{value:[{identifier:220,target,clientX:px,clientY:y}]});target.dispatchEvent(e);}}, {x,y,dx});
+          }else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx,y,{steps:3});await page.mouse.up();}
+          await page.clock.runFor(80);elapsed+=80;
+        };
+        await drag(60);const after=await orientation();await drag(-60);const restored=await orientation();
+        const delta=Math.max(...after.map((v,i)=>Math.abs(v-before[i])));
+        assert(delta>.10,'dragging the Sun must rotate its actual shader orientation');assert((await info()).touring,'dragging the Sun must not stop the tour');
+        solarDrag={input:mobile?'touch':'mouse',before,after,restored,delta};console.log('SOLAR DRAG',solarDrag.input,delta);
+      }
       if(record){
         const dir=path.join(output,'frames');fs.mkdirSync(dir,{recursive:true});
         for(let f=0;f<120;f++){
@@ -199,7 +269,7 @@ fs.mkdirSync(output,{recursive:true});
   assert.notEqual(manualBefore.phase,manualAfter.phase,'manual black-hole playback stalled');
   await page.screenshot({path:path.join(output,'black-hole-manual.png')});
   console.log('PASS manual V13',manualBefore.phase,'→',manualAfter.phase);
-  const report={browser:browserName,url:liveUrl||'local repository files',viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,
+  const report={browser:browserName,url:liveUrl||'local repository files',viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,orientationPixels,solarDrag,hintChecks,
     snapshots,pleiadesCheck,deepChecks,orbitCheck,seenPlanets:[...seenPlanets],bhChecks,manualBefore,manualAfter,manualDrag,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
   fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2));
   console.log('PASS',report.viewport,stages.join(' → '));

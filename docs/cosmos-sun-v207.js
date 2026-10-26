@@ -1,4 +1,4 @@
-/* COSMOS v210 — white-hot plasma, quadruple-speed surface; one world-anchored, emissive solar renderer.
+/* COSMOS v220 — touch-oriented, white-hot plasma with the approved quadruple-speed surface.
  * No assets, libraries, CSS blending, extra animation loop or full-screen bloom.
  * Sphere diameter = 220 in the existing 440px projection, identical to v206.
  */
@@ -15,6 +15,7 @@
     uniform sampler2D u_noise;
     uniform float u_time;
     uniform float u_pixel;
+    uniform mat3 u_view_to_world;
 
     // One filtered RG lookup interpolates two adjacent slices of 3D noise.
     // The seeded, periodic texture is generated locally once, never uploaded per frame.
@@ -57,7 +58,9 @@
       float alpha=0.;
       if(r<1.+aa){
         float z=sqrt(max(0.,1.-r*r));
-        vec3 n=vec3(p,z);
+        // A different hemisphere becomes visible as the camera orbits the Sun.
+        // Keep limb shading and the corona in view space; rotate the plasma in 3D.
+        vec3 n=u_view_to_world*vec3(p,z);
         // Slow differential rotation in 3D; the flow itself continues to evolve.
         float spin=t*.018+.12*n.y*n.y;
         n.xz=mat2(cos(spin),-sin(spin),sin(spin),cos(spin))*n.xz;
@@ -113,6 +116,7 @@
       host.appendChild(this.canvas);
       this.reduced=matchMedia('(prefers-reduced-motion: reduce)');
       this.size=0;this.visible=false;this.last=-Infinity;this.frames=0;
+      this.viewToWorld=new Float32Array([1,0,0,0,1,0,0,0,1]);this.orientationDirty=true;
       this.gl=this.canvas.getContext('webgl',{
         alpha:true,premultipliedAlpha:true,antialias:false,depth:false,stencil:false,
         preserveDrawingBuffer:false,powerPreference:'high-performance'
@@ -140,6 +144,7 @@
       gl.deleteShader(vs);gl.deleteShader(fs);gl.useProgram(program);
       this.program=program;
       this.time=gl.getUniformLocation(program,'u_time');this.pixel=gl.getUniformLocation(program,'u_pixel');
+      this.orientation=gl.getUniformLocation(program,'u_view_to_world');
       const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
       gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
       gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
@@ -158,15 +163,25 @@
       gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
       gl.uniform1i(gl.getUniformLocation(program,'u_noise'),0);
       gl.disable(gl.BLEND);gl.disable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
-      this.size=0;this.host.dataset.renderer='webgl-domain-warped-plasma';
+      this.size=0;this.orientationDirty=true;this.host.dataset.renderer='webgl-domain-warped-plasma';
       this.host.dataset.ready='true';
     }
-    project(spriteSize,visible){this.projectedSize=spriteSize;this.visible=visible;}
+    project(spriteSize,visible,camera){
+      this.projectedSize=spriteSize;this.visible=visible;
+      if(!camera)return;
+      // Column-major basis: screen right, screen up, and toward the viewer.
+      for(let i=0;i<3;i++){
+        const r=camera.right[i],u=camera.up[i],back=-camera.forward[i];
+        if(Math.abs(this.viewToWorld[i]-r)>1e-6||Math.abs(this.viewToWorld[i+3]-u)>1e-6||
+           Math.abs(this.viewToWorld[i+6]-back)>1e-6)this.orientationDirty=true;
+        this.viewToWorld[i]=r;this.viewToWorld[i+3]=u;this.viewToWorld[i+6]=back;
+      }
+    }
     draw(now){
       if(!this.visible||document.visibilityState!=='visible')return;
-      if(this.reduced.matches&&this.frames>0)return;
+      if(this.reduced.matches&&this.frames>0&&!this.orientationDirty)return;
       const t=this.reduced.matches?0:now*.001;
-      if(this.fallbackCanvas){if(now-this.last>=66){this.paintFallback(t*4);this.last=now;this.frames++;}return;}
+      if(this.fallbackCanvas){if(now-this.last>=66){this.paintFallback(t*4);this.last=now;this.frames++;this.orientationDirty=false;}return;}
       if(this.lost)return;
       const gl=this.gl;
       // Resize in coarse steps only, retaining near-retina detail on iPhone.
@@ -176,7 +191,8 @@
         this.size=desired;this.canvas.width=desired;this.canvas.height=desired;gl.viewport(0,0,desired,desired);
         gl.uniform1f(this.pixel,4/desired);
       }
-      gl.uniform1f(this.time,t);gl.drawArrays(gl.TRIANGLES,0,3);this.frames++;
+      gl.uniform1f(this.time,t);gl.uniformMatrix3fv(this.orientation,false,this.viewToWorld);
+      gl.drawArrays(gl.TRIANGLES,0,3);this.frames++;this.orientationDirty=false;
     }
     fallback(){
       if(this.fallbackCanvas)return;
@@ -194,9 +210,11 @@
         const nx=(x-79.5)/40,ny=(y-79.5)/40,r=Math.hypot(nx,ny),i=(y*160+x)*4;
         if(r>1.6){p[i+3]=0;continue;}
         if(r<=1){
-          const z=Math.sqrt(1-r*r),u=Math.atan2(nx,z)+t*.035;
-          const w=Math.sin(u*7+Math.sin(ny*9+t*.15)*1.7+t*.17);
-          const f=Math.sin(u*19+ny*15+w*2+t*.24)*Math.sin(ny*23-u*11-w-t*.18);
+          const z=Math.sqrt(1-r*r),m=this.viewToWorld;
+          const wx=m[0]*nx-m[3]*ny+m[6]*z,wy=m[1]*nx-m[4]*ny+m[7]*z,wz=m[2]*nx-m[5]*ny+m[8]*z;
+          const u=Math.atan2(wx,wz)+t*.035;
+          const w=Math.sin(u*7+Math.sin(wy*9+t*.15)*1.7+t*.17);
+          const f=Math.sin(u*19+wy*15+w*2+t*.24)*Math.sin(wy*23-u*11-w-t*.18);
           const heat=Math.max(0,Math.min(1,.40+.30*f+.16*w));
           p[i]=90+165*Math.min(1,heat*1.7);p[i+1]=8+240*heat;p[i+2]=2+220*heat**2;p[i+3]=255;
         }else{const a=Math.exp(-(r-1)*28)*190;p[i]=255;p[i+1]=184;p[i+2]=82;p[i+3]=a;}

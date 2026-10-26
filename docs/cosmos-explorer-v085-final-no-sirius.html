@@ -288,8 +288,8 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
-<div id="touchRotateHint">↔ 画面をタッチ・ドラッグで回転</div>
-<div id="tourCard" role="status" aria-live="off" aria-atomic="true"><span id="tourStep">THE COSMOS TOUR</span><strong id="tourName">Pleiades</strong><span id="tourHint">Touch &amp; drag to rotate · タッチで回転</span></div>
+<div id="touchRotateHint" lang="en">↔ Touch &amp; drag to rotate</div>
+<div id="tourCard" role="status" aria-live="off" aria-atomic="true"><span id="tourStep">THE COSMOS TOUR</span><strong id="tourName">Pleiades</strong><span id="tourHint">Touch &amp; drag to rotate</span></div>
 <canvas id="sky" aria-label="Interactive 3D universe. Drag to look around, pinch to move closer." tabindex="0"></canvas><div id="nebula" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div><div id="warp" aria-hidden="true"></div><div id="aim" aria-hidden="true"></div><div id="hybridLayer" aria-hidden="true"></div><div id="markers"></div><div id="hybridCredit" aria-hidden="true">WORLD-ANCHORED ART · 3D PARALLAX</div>
 <header><div><div class="eyebrow">THE PATIENT AGENT · PROJECT WOW</div><div class="brand"><b>COS</b>MOS<span style="color:#6ab8ff">.</span></div><div class="byline" id="byline">A universe you can actually explore.</div></div><div class="headActions" style="display:flex;gap:7px"><button class="pill" id="langBtn" type="button" aria-label="Switch to Japanese">日本語</button><button class="pill" id="helpBtn" type="button">? How to fly</button></div></header>
 <button id="freeFlight" type="button" hidden>↗ Return to free flight</button><div id="hudTag">LIVE 3D EXPLORER · LAB 060<br>CINEMATIC TOUR · ART-DIRECTED COSMOS<br><span id="navMode">FREE FLIGHT / NO FIXED PIVOT</span></div>
@@ -310,7 +310,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <div id="tour-toast" role="status" aria-live="polite"></div>
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
-<script src="./cosmos-sun-v207.js?revision=fast-plasma-v210"></script>
+<script src="./cosmos-sun-v207.js?revision=solar-drag-v220"></script>
 <script src="./cosmos-rich-scenes-v211.js?revision=touch-stars-v219"></script>
 <script src="./cosmos-worlds-v212.js?revision=touch-stars-v219"></script>
 <script>
@@ -691,7 +691,7 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=touch-stars-v219';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=solar-drag-v220';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
  tourHoleLoadFallback=setTimeout(()=>{
   if(!tourActive||tourStops[tourStage]!==6||tourHoleStart!==-2)return;
@@ -722,7 +722,7 @@ function tourHoleHide(){
 
 function tourWords(){
  $('touchRotateHint').hidden=false;
- $('touchRotateHint').textContent=tourActive&&tourStops[tourStage]===6?'↔ タッチで背景の星々を動かす':'↔ タッチ・ドラッグで回転';
+ $('touchRotateHint').textContent=tourActive&&tourStops[tourStage]===6?'↔ Drag to move the stars':'↔ Touch & drag to rotate';
  tourToggle.textContent=tourActive?(english?'✕ STOP TOUR':'✕ ツアー終了'):(english?'▶ CINEMATIC TOUR':'▶ 宇宙を巡るツアー');
  tourToggle.setAttribute('aria-pressed',String(tourActive));
  tourToggle.setAttribute('aria-label',tourActive?(english?'Stop guided tour':'自動ツアーを終了'):(english?'Start guided tour':'自動ツアーを開始'));
@@ -1424,7 +1424,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
  if(index===0){
   const sunSize=clamp(mainScale*1.6125,142.5,W<700?532.5:825)*.75;
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
-  solarRenderer.project(sunSize,alpha>.015);
+  solarRenderer.project(sunSize,alpha>.015,c);
   solarSun.style.opacity=(alpha*.98).toFixed(2);
  }else{solarSun.style.opacity='0';solarRenderer.project(0,false);}
  // Angle with respect to a fixed world-space light direction changes as the visitor flies around the system.
