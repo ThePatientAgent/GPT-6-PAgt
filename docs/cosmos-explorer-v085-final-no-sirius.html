@@ -1122,6 +1122,12 @@ solarSun.style.setProperty('background','radial-gradient(circle at 50% 50%,#fff 
 solarSun.style.setProperty('background-blend-mode','normal','important');
 solarSun.style.setProperty('mix-blend-mode','normal','important');
 hybridLayer.appendChild(solarSun);
+ // v205: an independent white-hot photosphere veil ABOVE the textured disk.
+ // Diameter matches the existing 25%-radius solar sprite; no rays or detached glow.
+ const solarWhiteVeil=document.createElement('div');
+ solarWhiteVeil.style.cssText='position:absolute;left:0;top:0;width:440px;height:440px;pointer-events:none;z-index:90;transform-origin:220px 220px;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.92) 0%,rgba(255,255,255,.82) 12%,rgba(255,252,235,.62) 18%,rgba(255,244,192,.28) 22%,transparent 24.5%)';
+ hybridLayer.appendChild(solarWhiteVeil);
+
 // v192: disable oversized pseudo-element corona that could white out mobile viewport.
 solarSun.classList.add('solar-safe-v192');
 // v194: bright compact photosphere and narrow orange corona, without a broad white backdrop.
@@ -1491,8 +1497,10 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
  if(index===0){
   const sunSize=clamp(mainScale*1.6125,142.5,W<700?532.5:825);
   solarSun.style.transform='translate3d('+(mainProj.x-220).toFixed(1)+'px,'+(mainProj.y-220).toFixed(1)+'px,0) scale('+(sunSize/440).toFixed(3)+')';
+   solarWhiteVeil.style.transform=solarSun.style.transform;
+   solarWhiteVeil.style.opacity=(alpha*.94).toFixed(2);
   solarSun.style.opacity=(alpha*.98).toFixed(2);
- }else solarSun.style.opacity='0';
+ }else{solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';}
  // Angle with respect to a fixed world-space light direction changes as the visitor flies around the system.
  const dx=c.eye[0]-base[0],dz=c.eye[2]-base[2];
  const illumination=Math.atan2(dz,dx)*180/Math.PI;
@@ -1502,7 +1510,7 @@ function projectLocalEnvironment(c,t,index,mainProj,mainScale,alpha){
 function hideLocalEnvironment(){
  for(const el of satellites)el.style.opacity='0';
  for(const arr of [backRings,frontRings])for(const path of arr)path.style.opacity='0';
- localGlow.style.opacity='0';orbitalPhase.style.opacity='0';solarSun.style.opacity='0';detailedEarth.style.opacity='0';earthMoon.style.opacity='0';saturnRing.style.opacity='0';for(const label of solarLabels)label.style.opacity='0';
+ localGlow.style.opacity='0';orbitalPhase.style.opacity='0';solarSun.style.opacity='0';solarWhiteVeil.style.opacity='0';detailedEarth.style.opacity='0';earthMoon.style.opacity='0';saturnRing.style.opacity='0';for(const label of solarLabels)label.style.opacity='0';
 }
 // Navigation markers are updated from projected 3D locations, with low cost.
 let lastMarkerVisibility=null;
