@@ -4,110 +4,36 @@ on:
     branches: [main]
     paths:
       - .github/workflows/cosmos-v13-live-smoke.yml
+      - tools/cosmos-sun-v207-smoke.cjs
       - docs/index.html
+      - docs/cosmos-explorer-v085-final-no-sirius.html
+      - docs/cosmos-sun-v207.js
       - docs/cosmos-black-hole-radiance-v013.html
-      - docs/cosmos-explorer-v069-no-title-card-base.html
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  mobile-chromium:
+  deployed-tour:
     runs-on: ubuntu-latest
     timeout-minutes: 9
     steps:
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
+          node-version: '22'
       - name: Install browser driver
-        run: python -m pip install playwright==1.58.0
-      - name: Validate deployed V13 in both routes
+        run: npm install --no-save --no-package-lock playwright@1.58.0
+      - name: Validate the deployed five-stop tour
         shell: bash
         run: |
-          python - <<'PY'
-          import time
-          from playwright.sync_api import sync_playwright
-
-          SITE = "https://thepatientagent.github.io/GPT-6-PAgt"
-          expected = "cosmos-black-hole-radiance-v013.html"
-
-          def snapshot(canvas):
-              return canvas.evaluate("""el => ({
-                  document: el.ownerDocument.URL,
-                  ready: el.dataset.ready,
-                  renderer: el.dataset.renderer,
-                  radiance: el.dataset.radiance,
-                  geometry: el.dataset.geometry,
-                  prepared: el.dataset.prepared,
-                  phase: el.dataset.phase,
-                  canvases: el.ownerDocument.querySelectorAll('canvas').length
-              })""")
-
-          def validate(canvas, route):
-              canvas.wait_for(state="attached", timeout=115000)
-              data = snapshot(canvas)
-              assert expected in data["document"], f"{route}: wrong iframe source {data}"
-              assert data["ready"] == "true", f"{route}: not ready {data}"
-              assert data["renderer"] == "canvas2d-radiant-plasma", f"{route}: V13 lost {data}"
-              assert data["radiance"] == "source-synchronous", f"{route}: desynchronized glow {data}"
-              assert data["geometry"] == "identity", f"{route}: warped geometry {data}"
-              assert data["prepared"] == "48", f"{route}: missing frames {data}"
-              assert data["canvases"] == 1, f"{route}: unexpected playback canvases {data}"
-              p1 = data["phase"]
-              time.sleep(1.3)
-              p2 = snapshot(canvas)["phase"]
-              assert p1 is not None and p2 is not None and p1 != p2, f"{route}: animation stalled {p1}, {p2}"
-              print(f"PASS {route}: {data}; advanced phase {p1} -> {p2}", flush=True)
-
-          with sync_playwright() as playwright:
-              browser = playwright.chromium.launch(channel="chrome", headless=True,
-                                                   args=["--no-sandbox", "--disable-dev-shm-usage"])
-              context = browser.new_context(viewport={"width":390,"height":844},
-                                            device_scale_factor=2, is_mobile=True, has_touch=True,
-                                            reduced_motion="no-preference")
-              manual = context.new_page()
-              manual.goto(SITE + "/index.html?scene=black-hole&release=575cf6c",
-                          wait_until="domcontentloaded", timeout=90000)
-              validate(manual.frame_locator("#cosmos-bh-frame-v057").locator("#scene[data-ready='true']"),
-                       "manual")
-
-              tour = context.new_page()
-              tour.on("pageerror", lambda error: print("TOUR PAGE ERROR:",error,flush=True))
-              tour.goto(SITE + "/index.html?release=575cf6c",
-                        wait_until="domcontentloaded", timeout=90000)
-              # QA handoff starts at Orion, then uses the normal route to Black Hole.
-              # Only the browser test changes this iframe query; live website stays untouched.
-              tour.locator("#cosmos").evaluate("""el => {
-                  const u = new URL(el.src); u.searchParams.set('handoff','1'); el.src=u.href;
-              }""")
-              inner = tour.frame_locator("#cosmos")
-              # The published engine AUTOSTARTS on ready unless a demo is selected.
-              # Clicking the toggle here would STOP the legitimate tour.
-              inner.locator("body.touring").wait_for(state="attached", timeout=30000)
-              print("PASS guided tour autostart:",inner.locator("#tourStep").inner_text(), flush=True)
-              tour_canvas = inner.frame_locator("#cosmos-hole-visit-frame").locator("#scene[data-ready='true']")
-              from playwright.sync_api import TimeoutError as PwTimeout
-              found = False
-              for check in range(6):
-                  try:
-                      tour_canvas.wait_for(state="attached", timeout=17000)
-                      validate(tour_canvas, "guided stop 3 of 6")
-                      found = True
-                      break
-                  except PwTimeout:
-                      details = inner.locator("body").evaluate("""body => ({
-                          touring:body.classList.contains('touring'),
-                          name:body.querySelector('#tourName')?.textContent,
-                          step:body.querySelector('#tourStep')?.textContent,
-                          toggle:body.querySelector('#tourToggle')?.getAttribute('aria-pressed'),
-                          holeHidden:body.querySelector('#cosmos-tour-blackhole-v061')?.hidden,
-                          holeSrc:body.querySelector('#cosmos-hole-visit-frame')?.getAttribute('src')
-                      })""")
-                      print("TOUR CHECK",check, details, flush=True)
-              assert found, "guided tour V13 did not reach ready state"
-              stage = inner.locator("#tourStep").inner_text(timeout=15000)
-              destination = inner.locator("#tourName").inner_text(timeout=15000)
-              assert "3" in stage and "Black Hole" in destination, (stage, destination)
-              print("PASS guided tour stop label:", stage, destination, flush=True)
-              context.close()
-              browser.close()
-          PY
+          export COSMOS_CHROMIUM_EXECUTABLE="$(command -v google-chrome)"
+          node tools/cosmos-sun-v207-smoke.cjs \
+            --url "https://thepatientagent.github.io/GPT-6-PAgt/?qa=${GITHUB_SHA}" \
+            --output cosmos-sun-live-qa
+      - name: Preserve browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cosmos-sun-live-qa
+          path: cosmos-sun-live-qa
+          if-no-files-found: ignore

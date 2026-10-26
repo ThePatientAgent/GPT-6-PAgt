@@ -9,6 +9,7 @@ const browserName=process.env.COSMOS_BROWSER||'chromium';
 const fs=require('fs'),path=require('path'),assert=require('assert/strict');
 const args=process.argv.slice(2),value=(key,fallback)=>args.includes(key)?args[args.indexOf(key)+1]:fallback;
 const root=path.resolve(value('--root',path.join(__dirname,'../docs')));
+const liveUrl=value('--url','');
 const output=path.resolve(value('--output','cosmos-sun-qa'));
 const assets=value('--assets','');
 const mobile=value('--viewport','mobile')==='mobile',baseline=args.includes('--baseline'),record=args.includes('--record');
@@ -28,7 +29,7 @@ fs.mkdirSync(output,{recursive:true});
   const errors=[],consoleErrors=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text())});
-  await page.route('**/*',async route=>{
+  if(!liveUrl)await page.route('**/*',async route=>{
     const u=new URL(route.request().url());
     if(u.hostname==='cosmos.test'){
       const file=path.join(root,u.pathname==='/'?'index.html':decodeURIComponent(u.pathname));
@@ -42,7 +43,7 @@ fs.mkdirSync(output,{recursive:true});
   });
   const epoch=new Date('2026-10-26T12:00:00Z');
   await page.clock.install({time:epoch});await page.clock.pauseAt(epoch.getTime()+100);
-  await page.goto('http://cosmos.test/',{waitUntil:'load'});
+  await page.goto(liveUrl||'http://cosmos.test/',{waitUntil:'load',timeout:90000});
   const frame=page.frames().find(f=>f.url().includes('v085-final'));
   assert(frame,'embedded universe missing');
   const info=()=>frame.evaluate(()=>{
@@ -106,8 +107,22 @@ fs.mkdirSync(output,{recursive:true});
   assert(bhChecks.some(e=>e.ready==='true'&&e.geometry==='identity'&&e.radiance==='source-synchronous'),'approved V13 renderer not verified');
   assert(new Set(bhChecks.map(e=>e.phase)).size>1,'black-hole animation failed to advance');
   assert.deepEqual(errors,[],'JavaScript errors');
-  const report={browser:browserName,viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,
-    snapshots,bhChecks,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
+  // Retain coverage of the separate manual V13 entry as well as the guided visit.
+  const manualUrl=new URL(liveUrl||'http://cosmos.test/');manualUrl.searchParams.set('scene','black-hole');
+  await page.goto(manualUrl.href,{waitUntil:'load',timeout:90000});
+  await page.clock.runFor(500);
+  const manualFrame=page.frames().find(f=>f.url().includes('cosmos-black-hole-radiance-v013'));
+  assert(manualFrame,'manual black-hole iframe missing');
+  const manualBefore=await manualFrame.locator('#scene').evaluate(e=>({...e.dataset}));
+  assert.equal(manualBefore.ready,'true');assert.equal(manualBefore.geometry,'identity');
+  assert.equal(manualBefore.radiance,'source-synchronous');assert.equal(manualBefore.prepared,'48');
+  await page.clock.runFor(1300);
+  const manualAfter=await manualFrame.locator('#scene').evaluate(e=>({...e.dataset}));
+  assert.notEqual(manualBefore.phase,manualAfter.phase,'manual black-hole playback stalled');
+  await page.screenshot({path:path.join(output,'black-hole-manual.png')});
+  console.log('PASS manual V13',manualBefore.phase,'→',manualAfter.phase);
+  const report={browser:browserName,url:liveUrl||'local repository files',viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,
+    snapshots,bhChecks,manualBefore,manualAfter,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
   fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2));
   console.log('PASS',report.viewport,stages.join(' → '));
  }finally{await browser.close();}

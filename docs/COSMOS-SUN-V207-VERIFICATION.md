@@ -46,3 +46,5 @@ v206の規則的な扇形を、赤黒いプラズマと金色に白熱するフ�
 v206は [backup/cosmos-sun-v206-20261026](https://github.com/ThePatientAgent/GPT-6-PAgt/tree/backup/cosmos-sun-v206-20261026) に保存した。復旧基準コミットは `20740fa6389ec78f3065c5121e13d811a46c15d0`。
 
 Playwrightを導入した環境で `node tools/cosmos-sun-v207-smoke.cjs --output cosmos-sun-qa` を実行できる。`--viewport desktop` で横画面、`COSMOS_BROWSER=webkit` でWebKit、`--record` で実ツアーの連続フレームを取得する。必要に応じてPlaywrightのモジュールとブラウザーのパスを環境変数で指定できる。
+
+公開後、既存のV13自動テストが短い表示期間を取り逃がすタイミング依存の失敗を確認した。表示時間やツアー本体には手を加えず、同じネイティブツアーを時間制御で検証する方式に更新した。`--url`で公開サイトを検証できる。
