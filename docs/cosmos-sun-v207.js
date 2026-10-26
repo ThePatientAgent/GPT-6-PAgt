@@ -1,4 +1,4 @@
-/* COSMOS v207 — one world-anchored, emissive solar renderer.
+/* COSMOS v208 — white-hot plasma; one world-anchored, emissive solar renderer.
  * No assets, libraries, CSS blending, extra animation loop or full-screen bloom.
  * Sphere diameter = 220 in the existing 440px projection, identical to v206.
  */
@@ -32,9 +32,9 @@
     }
     vec3 palette(float h){
       vec3 c=mix(vec3(.12,.004,.001),vec3(.62,.045,.003),smoothstep(.12,.46,h));
-      c=mix(c,vec3(1.,.27,.012),smoothstep(.40,.67,h));
-      c=mix(c,vec3(1.,.69,.10),smoothstep(.63,.88,h));
-      return mix(c,vec3(1.,.94,.57),smoothstep(.87,1.07,h));
+      c=mix(c,vec3(1.,.43,.045),smoothstep(.40,.67,h));
+      c=mix(c,vec3(1.,.87,.48),smoothstep(.60,.82,h));
+      return mix(c,vec3(1.,.995,.93),smoothstep(.73,.94,h));
     }
     float loopArc(vec2 p,float angle,float width,float height,float phase){
       vec2 axis=vec2(cos(angle),sin(angle));
@@ -76,10 +76,10 @@
         vec3 surface=palette(heat);
         // Emission, not a directional lamp: gentle limb darkening gives volume.
         surface*=.53+.47*pow(z,.32);
-        surface+=vec3(1.,.24,.012)*pow(filament,3.)*.09;
+        surface+=vec3(1.,.76,.36)*pow(filament,3.)*.12;
         float limb=exp(-abs(r-.996)*72.);
         float limbNoise=fbm(vec3(p*16.,t*.14));
-        surface+=vec3(1.,.48,.055)*limb*(.20+.25*limbNoise);
+        surface+=vec3(1.,.86,.54)*limb*(.20+.25*limbNoise);
         rgb=min(surface,vec3(1.))*disk;alpha=disk;
       }
       if(r>.96){
@@ -92,8 +92,8 @@
         float arcs=loopArc(p,2.16,.155,.102,1.2)*.66
                   +loopArc(p,-.42,.113,.073,4.4)*.53
                   +loopArc(p,-1.63,.085,.056,8.1)*.32;
-        vec3 glow=vec3(1.,.37,.024)*edge+vec3(.92,.13,.005)*haze
-                 +vec3(1.,.30,.014)*arcs;
+        vec3 glow=vec3(1.,.72,.32)*edge+vec3(.92,.13,.005)*haze
+                 +vec3(1.,.80,.45)*arcs;
         glow*=1.-disk;
         rgb+=glow;
         alpha=min(1.,alpha+max(glow.r,max(glow.g,glow.b)));
@@ -197,8 +197,8 @@
           const w=Math.sin(u*7+Math.sin(ny*9+t*.15)*1.7+t*.17);
           const f=Math.sin(u*19+ny*15+w*2+t*.24)*Math.sin(ny*23-u*11-w-t*.18);
           const heat=Math.max(0,Math.min(1,.40+.30*f+.16*w));
-          p[i]=90+165*Math.min(1,heat*1.7);p[i+1]=8+195*heat*heat;p[i+2]=2+42*heat**3;p[i+3]=255;
-        }else{const a=Math.exp(-(r-1)*28)*190;p[i]=255;p[i+1]=93;p[i+2]=5;p[i+3]=a;}
+          p[i]=90+165*Math.min(1,heat*1.7);p[i+1]=8+240*heat;p[i+2]=2+220*heat**2;p[i+3]=255;
+        }else{const a=Math.exp(-(r-1)*28)*190;p[i]=255;p[i+1]=184;p[i+2]=82;p[i+3]=a;}
       }
       this.context.putImageData(this.image,0,0);
     }
