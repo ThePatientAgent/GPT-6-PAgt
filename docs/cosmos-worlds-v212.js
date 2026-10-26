@@ -180,10 +180,13 @@
     }
     initialize(){
       const gl=this.gl;this.programs={};this.uniforms={};
-      for(const [name,fs]of [['orion',orionFragment],['core',coreFragment]]){
+      const exotic=window.CosmosExoticScenes?.shaders(projection,noise)||{};
+      for(const [name,fs]of [['orion',orionFragment],['core',coreFragment],...Object.entries(exotic)]){
+       try{
         const p=this.programs[name]=program(gl,vertex,fs,['a_position']),u=this.uniforms[name]={};
-        for(const n of ['u_view','u_eye','u_right','u_up','u_forward','u_time','u_alpha','u_noise'])u[n]=gl.getUniformLocation(p,n);
+        for(const n of ['u_view','u_eye','u_right','u_up','u_forward','u_time','u_alpha','u_noise','u_star_a','u_star_b','u_star_axis'])u[n]=gl.getUniformLocation(p,n);
         gl.useProgram(p);gl.uniform1i(u.u_noise,0);
+       }catch(error){if(name==='orion'||name==='core')throw error;console.warn('COSMOS optional scene shader',name,error);}
       }
       this.starProgram=program(gl,starVertex,starFragment,['a_position','a_uv','a_star']);
       this.starTime=gl.getUniformLocation(this.starProgram,'u_time');this.starAlpha=gl.getUniformLocation(this.starProgram,'u_alpha');
@@ -191,23 +194,29 @@
       this.starBuffer=gl.createBuffer();this.vertices=new Float32Array(6*8*192);this.noise=seedNoise(gl);
       gl.disable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);this.available=true;this.host.classList.add('cosmos-deep-gpu');
     }
-    project(data){this.data=data;this.canvas.style.display=this.available&&data.alpha>.015?'block':'none';}
+    project(data){this.data=this.programs?.[data.mode]?data:null;this.canvas.style.display=this.available&&this.data&&data.alpha>.015?'block':'none';}
     draw(now){
       const d=this.data;if(!this.available||!d||d.alpha<=.015||document.hidden)return;
-      const gl=this.gl,t=this.motion.matches?0:now*.001,scale=Math.min(d.width<700?1.15:1,1440/d.width,1100/d.height);
+      const exotic=d.mode==='spica'||d.mode==='quasar';
+      const gl=this.gl,t=this.motion.matches?0:now*.001,scale=Math.min(d.width<700?(exotic?Math.min(devicePixelRatio||1,1.6):1.15):1,(exotic?1600:1440)/d.width,(exotic?1400:1100)/d.height);
       const w=Math.round(d.width*scale),h=Math.round(d.height*scale);
       if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;gl.viewport(0,0,w,h);}
       const u=this.uniforms[d.mode];gl.useProgram(this.programs[d.mode]);gl.clear(gl.COLOR_BUFFER_BIT);gl.disable(gl.BLEND);
       gl.bindBuffer(gl.ARRAY_BUFFER,this.triangle);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.disableVertexAttribArray(1);gl.disableVertexAttribArray(2);
       gl.uniform2f(u.u_view,d.width,d.height);gl.uniform3fv(u.u_eye,d.eye);gl.uniform3fv(u.u_right,d.camera.right);gl.uniform3fv(u.u_up,d.camera.up);gl.uniform3fv(u.u_forward,d.camera.forward);
-      gl.uniform1f(u.u_time,t);gl.uniform1f(u.u_alpha,d.alpha);gl.drawArrays(gl.TRIANGLES,0,3);
+      gl.uniform1f(u.u_time,t);gl.uniform1f(u.u_alpha,d.alpha);
+      if(d.mode==='spica'){
+        const orbit=window.CosmosExoticScenes.binaryOrbit(t);
+        gl.uniform3fv(u.u_star_a,orbit.a);gl.uniform3fv(u.u_star_b,orbit.b);gl.uniform3fv(u.u_star_axis,orbit.axis);
+      }
+      gl.drawArrays(gl.TRIANGLES,0,3);
       let k=0;const corners=[[-1,-1],[1,-1],[-1,1],[-1,1],[1,-1],[1,1]];
       for(const s of d.stars){if(s.x+s.radius<0||s.x-s.radius>d.width||s.y+s.radius<0||s.y-s.radius>d.height)continue;
         for(const [x,y]of corners){for(const v of [(s.x+x*s.radius)/d.width*2-1,1-(s.y+y*s.radius)/d.height*2,x,y,s.strength,s.phase,s.rays,s.warm])this.vertices[k++]=v;}}
       if(k){gl.useProgram(this.starProgram);gl.bindBuffer(gl.ARRAY_BUFFER,this.starBuffer);gl.bufferData(gl.ARRAY_BUFFER,this.vertices.subarray(0,k),gl.DYNAMIC_DRAW);
         for(const [i,size,offset]of [[0,2,0],[1,2,8],[2,4,16]]){gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,size,gl.FLOAT,false,32,offset);}
         gl.uniform1f(this.starTime,t);gl.uniform1f(this.starAlpha,d.alpha);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);gl.drawArrays(gl.TRIANGLES,0,k/8);gl.disable(gl.BLEND);}
-      this.canvas.dataset.renderer=d.mode==='orion'?'webgl-ionized-orion':'webgl-luminous-galactic-core';this.canvas.dataset.phase=t.toFixed(2);
+      this.canvas.dataset.renderer={orion:'webgl-ionized-orion',core:'webgl-luminous-galactic-core',spica:'webgl-barycentric-spica',quasar:'webgl-accretion-bipolar-jets'}[d.mode];this.canvas.dataset.phase=t.toFixed(2);
     }
   }
   window.CosmosOrbitModel=OrbitModel;window.CosmosOrbitRenderer=OrbitRenderer;window.CosmosDeepRenderer=DeepRenderer;
