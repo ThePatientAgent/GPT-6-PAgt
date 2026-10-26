@@ -362,6 +362,23 @@ opacity:.85;mix-blend-mode:screen;
  mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,rgba(0,0,0,.8) 29%,transparent 36%)!important;
  opacity:.96!important;
 }
+/* v197: organic, asymmetrical solar prominences rather than regular radial spokes. */
+.solar-sun.solar-flame-v195::before{
+ background:
+ radial-gradient(ellipse 7% 13% at 50% 19%,rgba(255,240,145,.88),transparent 95%),
+ radial-gradient(ellipse 10% 7% at 79% 34%,rgba(255,173,35,.88),transparent 95%),
+ radial-gradient(ellipse 8% 12% at 75% 75%,rgba(255,226,99,.75),transparent 95%),
+ radial-gradient(ellipse 12% 8% at 25% 69%,rgba(255,142,25,.82),transparent 95%),
+ radial-gradient(ellipse 7% 10% at 22% 34%,rgba(255,210,74,.75),transparent 95%),
+ radial-gradient(circle at center,transparent 0 22%,rgba(255,241,157,.84) 24%,rgba(255,164,42,.48) 26%,transparent 31%)!important;
+ -webkit-mask-image:none!important;mask-image:none!important;opacity:.88!important;
+}
+.solar-sun.solar-flame-v195::after{
+ background:conic-gradient(from 8deg,transparent 0deg 23deg,rgba(255,209,85,.54) 29deg,transparent 39deg 78deg,rgba(255,234,134,.64) 85deg,transparent 94deg 151deg,rgba(255,155,39,.55) 160deg,transparent 172deg 219deg,rgba(255,225,113,.65) 226deg,transparent 236deg 290deg,rgba(255,165,45,.54) 297deg,transparent 310deg)!important;
+ -webkit-mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%)!important;
+ mask-image:radial-gradient(circle,transparent 0 23%,#000 25%,transparent 31%)!important;
+ opacity:.62!important;
+}
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
