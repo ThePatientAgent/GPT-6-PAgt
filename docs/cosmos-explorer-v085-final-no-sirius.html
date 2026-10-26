@@ -1136,6 +1136,8 @@ solarSun.style.setProperty('background','radial-gradient(circle at 49% 48%,rgba(
 // v202: strong white-hot center confined to the solar disk, with no detached halo.
 solarSun.style.setProperty('background','radial-gradient(circle at 49% 49%,#ffffff 0%,#ffffff 14%,#fffef9 18%,#fff7d9 21%,#ffe49d 23%,#ffbf5a 24.5%,transparent 25.2%)','important');
 solarSun.style.setProperty('background-blend-mode','normal','important');
+// v204: visibly white-hot solar photosphere, still confined to the disk.
+solarSun.style.setProperty('background','radial-gradient(circle at 50% 49%,#fff 0%,#fff 18%,#fffdf3 21%,#ffebad 23%,#ffbd50 24.5%,transparent 25.2%)','important');
 // v193: make the photosphere itself white-hot without illuminating the entire sky.
 // v194 replaces v193 gradient above; retain constrained ambient glow.
 const frontRings=makeRingHalves('front');
@@ -1581,7 +1583,7 @@ function tick(t){
  ):Infinity;
  const proximity=clamp((8-focusDistance)/4,0,1);
  // The galactic core itself still glows strongly as a destination.
- const maximumDim=focusIndex===5?0.38:0.60;
+ const maximumDim=focusIndex===5?0.38:focusIndex===0?0.96:0.60; // v204: suppress distant galactic spiral behind solar system
  const desiredBackdrop=1-(focusPlace?maximumDim*proximity:0);
  backdropLevel+=(desiredBackdrop-backdropLevel)*Math.min(1,dt*3.7);
  const dimming=Math.abs(desiredBackdrop-backdropLevel)>.004;
