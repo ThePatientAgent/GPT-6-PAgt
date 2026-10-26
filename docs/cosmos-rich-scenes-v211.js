@@ -88,11 +88,11 @@
         float dust=smoothstep(.36,.76,field);
         float density=(dust*.75+ridges*.28)*edge*stepSize;
         float light=illumination(p);
-        vec3 blue=mix(vec3(.012,.065,.24),vec3(.16,.42,.95),clamp(light*.38,0.,1.));
+        vec3 blue=mix(vec3(.012,.065,.24),vec3(.22,.52,1.),clamp(light*.38,0.,1.));
         color+=blue*density*(1.35+fine*.35)*exp(-absorption);
         absorption+=density*.30;
       }
-      color=(1.-exp(-color*1.08))*u_alpha;
+      color=(1.-exp(-color*1.48))*u_alpha;
       float alpha=clamp(max(color.b,max(color.r,color.g))*.78,0.,.78);
       gl_FragColor=vec4(color,alpha);
     }
@@ -112,11 +112,11 @@
       }
       float core=exp(-r*r*500.);
       float shoulder=exp(-r*24.)*.8;
-      float halo=exp(-r*5.2)*.24;
+      float halo=exp(-r*5.2)*.32;
       vec2 q=mat2(.976,-.218,.218,.976)*v_local;
       float rays=(exp(-abs(q.x)*210.)*exp(-abs(q.y)*3.8)
-                 +exp(-abs(q.y)*210.)*exp(-abs(q.x)*3.8))*.25*v_star.z;
-      vec3 rgb=(vec3(.78,.91,1.)*(core*2.2+shoulder)
+                 +exp(-abs(q.y)*210.)*exp(-abs(q.x)*3.8))*.34*v_star.z;
+      vec3 rgb=(vec3(.78,.91,1.)*(core*2.5+shoulder*1.2)
                 +vec3(.17,.44,1.)*halo+vec3(.48,.72,1.)*rays)*strength*twinkle*u_alpha;
       rgb*=1.-smoothstep(.75,1.,r);
       gl_FragColor=vec4(rgb,0.);

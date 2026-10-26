@@ -285,7 +285,7 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 </style></head><body>
 <button id="cinemaToggle" type="button" aria-pressed="false" aria-label="Enter cinema mode">◻ Cinema mode</button>
 <button id="tourToggle" type="button" aria-pressed="false" aria-label="Start the cinematic guided tour">▶ CINEMATIC TOUR</button>
-<div id="tourCard" role="status" aria-live="off" aria-atomic="true"><span id="tourStep">THE COSMOS TOUR</span><strong id="tourName">Pleiades</strong><span id="tourHint">Watch the stars move in 3D · Tap anywhere to take control</span></div>
+<div id="tourCard" role="status" aria-live="off" aria-atomic="true"><span id="tourStep">THE COSMOS TOUR</span><strong id="tourName">Pleiades</strong><span id="tourHint">Touch &amp; drag to rotate · タッチで回転</span></div>
 <canvas id="sky" aria-label="Interactive 3D universe. Drag to look around, pinch to move closer." tabindex="0"></canvas><div id="nebula" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div><div id="warp" aria-hidden="true"></div><div id="aim" aria-hidden="true"></div><div id="hybridLayer" aria-hidden="true"></div><div id="markers"></div><div id="hybridCredit" aria-hidden="true">WORLD-ANCHORED ART · 3D PARALLAX</div>
 <header><div><div class="eyebrow">THE PATIENT AGENT · PROJECT WOW</div><div class="brand"><b>COS</b>MOS<span style="color:#6ab8ff">.</span></div><div class="byline" id="byline">A universe you can actually explore.</div></div><div class="headActions" style="display:flex;gap:7px"><button class="pill" id="langBtn" type="button" aria-label="Switch to Japanese">日本語</button><button class="pill" id="helpBtn" type="button">? How to fly</button></div></header>
 <button id="freeFlight" type="button" hidden>↗ Return to free flight</button><div id="hudTag">LIVE 3D EXPLORER · LAB 060<br>CINEMATIC TOUR · ART-DIRECTED COSMOS<br><span id="navMode">FREE FLIGHT / NO FIXED PIVOT</span></div>
@@ -307,8 +307,8 @@ background:radial-gradient(circle at 33% 35%,rgba(228,225,213,.85),transparent 2
 <footer><div class="instructions" id="controlsCopy">DRAG: LOOK AROUND · CHOOSE A DESTINATION TO ORBIT · PINCH: FLY CLOSER</div><nav class="destinations" id="destinations" aria-label="Choose a destination"><button type="button" class="destination active" data-place="-1">✧ Entire galaxy</button></nav><div class="status"><span id="modeLabel">MODE <b>FREE FLIGHT</b></span><span>·</span><span id="locationLabel">Exploring the galaxy</span><span>·</span><span>SIMULATED SPACE</span></div></footer>
 <div id="help" hidden><article><h2 id="helpHeading">The universe is yours to explore.</h2><p id="helpCopy">Drag to look around. Pinch to zoom or use two fingers to pan. Choose a star from the bottom navigation to fly near it and orbit around it. Use Return to free flight to move without a fixed pivot.<br><br>On desktop, use your mouse and scroll wheel. W/A/S/D fly through space; Q/E move vertically.<br><br>This is an artistic experience, not a scientific star map. Positions, distances and planets are illustrative.</p><button id="helpClose" type="button">Begin your voyage →</button></article></div>
 <script src="./cosmos-sun-v207.js?revision=fast-plasma-v210"></script>
-<script src="./cosmos-rich-scenes-v211.js?revision=safe-bh-v213"></script>
-<script src="./cosmos-worlds-v212.js?revision=worlds-v212"></script>
+<script src="./cosmos-rich-scenes-v211.js?revision=cinema-v216"></script>
+<script src="./cosmos-worlds-v212.js?revision=cinema-v216"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('sky'),gl=canvas.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'}),ctx=!gl?canvas.getContext('2d'):null;
@@ -492,13 +492,14 @@ function refreshMode(){
  $('modeLabel').innerHTML=state.orbit?'MODE <b>ORBIT</b>':'MODE <b>FREE FLIGHT</b>';
  if(!lookUsed||performance.now()>lookActiveUntil){$('lookCue').textContent=state.orbit?(english?'DRAG TO ORBIT '+placeName(state.orbit.index):'★ '+placeName(state.orbit.index)+' を中心に回り込む'):(english?'DRAG TO LOOK AROUND':'ドラッグして自由に見回す');}
 }
+function orionViewingDistance(){return Math.max(6.0,2.45*Math.sqrt(1+Math.pow(1.5/Math.max(.35,W/H),2))*1.08);}
 function startOrbit(i){
  if(i<0||!places[i])return;
  const p=places[i].pos.slice(),d=p.map((x,j)=>x-state.pos[j]);
  const gap=Math.hypot(...d);
  // Never orbit from ten galaxy units away: make the requested object visibly local.
- if(gap>(i===3||i===4?5.5:3.15)){fly(i,true);return;}
- const rad=i===4?Math.max(3.45,gap):i===3?Math.max(4.0,gap):Math.max(.65,gap);
+ if(gap>(i===3?orionViewingDistance()+1:i===4?5.5:3.15)){fly(i,true);return;}
+ const rad=i===4?Math.max(3.45,gap):i===3?Math.max(orionViewingDistance(),gap):Math.max(.65,gap);
  state.fly=null;$('warp').classList.remove('on');
  state.orbit={index:i,pivot:p,radius:rad};
  pointAt(p);
@@ -522,7 +523,7 @@ function fly(i,orbitOnArrival=true){
  const target=i<0?initialPos.slice():dest.map((v,j)=>{
   const distance=Math.hypot(...dest.map((x,k)=>x-state.pos[k]));
   const dir=distance>.001?(dest[j]-state.pos[j])/distance:[Math.sin(state.yaw)*Math.cos(state.pitch),Math.sin(state.pitch),Math.cos(state.yaw)*Math.cos(state.pitch)][j];
-  return v-dir*(i===4?3.45:i===3?4.0:2.5);
+  return v-dir*(i===4?3.45:i===3?orionViewingDistance():2.5);
  });
  const from=state.pos.slice(),to=target.slice();
  // Warp follows a world-space path; the destination, not the galaxy centre, sets arrival heading.
@@ -578,7 +579,7 @@ holeCSS.textContent=`
 /* v064: Keep the iframe at full viewport size; the embedded tour-only renderer fits the scene at 60%
    by scaling only its embedded presentation, not the native COSMOS star field or UI.
    Fixed framing throughout this stop: no fly-in, pan, or zoom interpolation. */
-#cosmos-hole-visit-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;pointer-events:none;transform:none!important;transform-origin:50% 50%;transition:none!important}
+#cosmos-hole-visit-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;pointer-events:none;transform:none;transform-origin:50% 50%;transition:none!important}
 .cosmos-hole-visit-heading{position:absolute;z-index:2;top:calc(14px + env(safe-area-inset-top));left:16px;color:#f0d3a5;display:flex;flex-direction:column;gap:2px;font:12px/1.45 system-ui,-apple-system,sans-serif;text-shadow:0 2px 8px #000;letter-spacing:.14em;pointer-events:none}
 .cosmos-hole-visit-heading span{font-size:10px;opacity:.7}
 .cosmos-hole-visit-heading strong{font-size:15px;font-weight:600;letter-spacing:.22em}
@@ -613,6 +614,13 @@ background:linear-gradient(90deg,transparent,#9ab8dbad,transparent)}
 `;
 holeCSS.textContent+="\n/* Consistent cinematic caption, visible above the embedded black-hole renderer. */\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading{z-index:10!important;top:calc(68px + env(safe-area-inset-top))!important;left:18px!important;opacity:1!important;visibility:visible!important;animation:none!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-heading strong{font-size:19px!important;}\n#cosmos-tour-blackhole-v061 .cosmos-hole-visit-actions{display:none!important;}\n";
 holeCSS.textContent+="\n/* Same caption component as every other destination, above black-hole iframe. */\nbody.touring #tourCard{z-index:1000002!important;}\n#cosmos-tour-blackhole-v061{transition:opacity 1150ms ease-in-out,visibility 0s linear 1150ms!important;}\n#cosmos-tour-blackhole-v061.cosmos-hole-open{transition:opacity 850ms ease-in-out,visibility 0s!important;}\n";
+holeCSS.textContent+=`
+/* v216: move the complete V13 frame into view without deforming its geometry. */
+#cosmos-tour-blackhole-v061.cosmos-hole-open #cosmos-hole-visit-frame{animation:cosmos-hole-entry-v216 1800ms cubic-bezier(.18,.65,.25,1) both}
+@keyframes cosmos-hole-entry-v216{from{transform:translate3d(65vw,8vh,0) scale(.88)}to{transform:translate3d(0,0,0) scale(1)}}
+.solar-planet-label[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){#cosmos-tour-blackhole-v061.cosmos-hole-open #cosmos-hole-visit-frame{animation:none!important}}
+`;
 document.head.appendChild(holeCSS);
 document.body.appendChild(tourHoleLayer);
 const tourHoleFrame=tourHoleLayer.querySelector('#cosmos-hole-visit-frame');
@@ -679,7 +687,7 @@ function tourHoleShow(){
  tourHoleStart=-2; // loading, not yet visible
  tourHoleLayer.hidden=false;
  tourHoleLayer.classList.remove('cosmos-hole-open');
- tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=safe-bh-v213';
+ tourHoleFrame.src='./cosmos-black-hole-radiance-v013.html?tour=3&revision=cinema-v216';
  // Fail-safe: still continue the tour if WebKit delays an iframe load event.
  tourHoleLoadFallback=setTimeout(()=>{
   if(!tourActive||tourStops[tourStage]!==6||tourHoleStart!==-2)return;
@@ -716,7 +724,7 @@ function tourWords(){
    const idx=tourStops[tourStage];
    $('tourStep').textContent=(english?'DESTINATION ':'探索地点 ')+(tourStage+1)+' / '+tourStops.length;
    $('tourName').textContent=idx===6?'Black Hole':placeName(idx);
-   $('tourHint').textContent=idx===6?(english?'Animated accretion disk · gravitational lensing':'光が曲がるブラックホール · 動く降着円盤'):(english?'Real-time 3D · Touch to explore freely':'リアルタイム3D · 触れると自由操作へ');
+   $('tourHint').textContent=idx===6?(english?'Animated accretion disk · gravitational lensing':'光が曲がるブラックホール · 動く降着円盤'):(english?'Touch & drag to rotate · タッチで回転':'画面をタッチ・ドラッグで回転できます');
  }
 }
 function tourEnd(){
@@ -1018,7 +1026,7 @@ const frontRings=makeRingHalves('front');
 // v069: separate projected Saturn ring and planet captions, following the orbiting bodies.
 const saturnRing=document.createElement('div');saturnRing.className='solar-saturn-ring';hybridLayer.appendChild(saturnRing);
 const solarNames=['EARTH','SATURN','MARS','NEPTUNE'];
-const solarLabels=solarNames.map(name=>{const el=document.createElement('div');el.className='solar-planet-label';el.textContent=name;hybridLayer.appendChild(el);return el;});
+const solarLabels=solarNames.map(name=>{const el=document.createElement('div');el.className='solar-planet-label';el.hidden=true;el.setAttribute('aria-hidden','true');el.textContent=name;hybridLayer.appendChild(el);return el;});
 const detailedEarth=document.createElement('div');detailedEarth.className='solar-earth';hybridLayer.appendChild(detailedEarth);
 const earthMoon=document.createElement('div');earthMoon.className='solar-moon';hybridLayer.appendChild(earthMoon);
 
@@ -1439,8 +1447,9 @@ function updateHybrid(c,t){
   // and does not consume any frame-time drawing complex surface shaders or fractal textures.
   const art=hybridArts[i];
   const selected=i===state.active || (state.orbit&&state.orbit.index===i);
-  const inRange=selected&&p&&p.z>.08&&p.z<9;
-  const alpha=inRange?clamp((9-p.z)/3.1,0,1)*clamp(p.z/.65,0,1):0;
+  const visibilityRange=i===3?orionViewingDistance()+3.1:9;
+  const inRange=selected&&p&&p.z>.08&&p.z<visibilityRange;
+  const alpha=inRange?clamp((visibilityRange-p.z)/3.1,0,1)*clamp(p.z/.65,0,1):0;
   if(alpha>.015){
    const size=clamp(1000/Math.max(p.z,.9),92,W<700?Math.min(W*.76,340):620);
    // Transform only; no canvas draw, no on-the-fly texture generation.
