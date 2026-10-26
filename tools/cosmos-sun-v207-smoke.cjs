@@ -61,10 +61,21 @@ fs.mkdirSync(output,{recursive:true});
   });
   const stages=[],snapshots=[],bhChecks=[];
   let solarCaptured=false,pleiadesCaptured=false,pleiadesCheck=null,ended=false,elapsed=0,last='';
+  const deepChecks={},seenPlanets=new Set();let orbitCheck=null;
   for(let i=0;i<170;i++){
     await page.clock.runFor(250);elapsed+=250;
     const s=await info();
     if(s.name!==last){stages.push(s.name);console.log('STAGE',s.name,elapsed);last=s.name;}
+    if(!baseline&&s.name==='Solar system'&&s.sunOpacity>.5){
+      const names=await frame.evaluate(()=>{
+        const sun=document.querySelector('.cosmos-sun-v207').getBoundingClientRect(),sx=sun.x+sun.width/2,sy=sun.y+sun.height/2;
+        const bodies=[['EARTH',document.querySelector('.solar-earth')],['SATURN',document.querySelector('.cosmos-v096-saturn')],['NEPTUNE',document.querySelectorAll('.local-satellite')[3]]];
+        return bodies.filter(([name,e])=>{if(!e||+e.style.opacity<.1)return false;const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;
+          const hiddenBySun=+e.style.zIndex<91&&Math.hypot(x-sx,y-sy)<sun.width/4;
+          return !hiddenBySun&&x>0&&x<innerWidth&&y>65&&y<innerHeight-65;}).map(([name])=>name);
+      });
+      names.forEach(n=>seenPlanets.add(n));
+    }
     if(!baseline&&!pleiadesCaptured&&s.name==='Pleiades'&&elapsed>=3500){
       const nebula=frame.locator('.cosmos-pleiades-v211');
       const data=await nebula.evaluate(e=>({renderer:e.dataset.renderer,phase:e.dataset.phase,
@@ -72,6 +83,13 @@ fs.mkdirSync(output,{recursive:true});
       assert.equal(data.renderer,'webgl-volume-reflection-nebula');assert(data.visible);assert(+data.phase>0);assert.equal(data.error,0);
       await page.screenshot({path:path.join(output,'pleiades.png')});
       console.log('PLEIADES',data);pleiadesCaptured=true;pleiadesCheck=data;
+    }
+    if(!baseline&&((s.name==='Orion'&&elapsed>=8250)||(s.name==='Galactic core'&&elapsed>=21000))&&!deepChecks[s.name]){
+      const data=await frame.locator('.cosmos-deep-v212').evaluate(e=>({renderer:e.dataset.renderer,phase:e.dataset.phase,
+        visible:getComputedStyle(e).display!=='none',error:e.getContext('webgl').getError()}));
+      assert.equal(data.renderer,s.name==='Orion'?'webgl-ionized-orion':'webgl-luminous-galactic-core');
+      assert(data.visible);assert(+data.phase>0);assert.equal(data.error,0);deepChecks[s.name]=data;
+      await page.screenshot({path:path.join(output,s.name==='Orion'?'orion.png':'galactic-core.png')});console.log('DEEP',s.name,data);
     }
     if(s.name==='Black Hole'&&!s.bhHidden){
       const child=page.frames().find(f=>f.url().includes('cosmos-black-hole-radiance-v013'));
@@ -101,6 +119,23 @@ fs.mkdirSync(output,{recursive:true});
       }
       const solar=await info();
       assert(solar.bhHidden,'black-hole iframe reappeared');
+      if(!baseline){
+        orbitCheck=await frame.evaluate(()=>{
+          const svg=document.querySelector('.cosmos-solar-orbits-v212'),mask=svg.querySelector('mask'),shadow=svg.querySelector('circle');
+          const bodies=[['EARTH',document.querySelector('.solar-earth')],['SATURN',document.querySelector('.cosmos-v096-saturn')],['NEPTUNE',document.querySelectorAll('.local-satellite')[3]]];
+          const distances=bodies.map(([name,body])=>{const r=body.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;let nearest=Infinity;
+            for(const path of svg.querySelectorAll('path[data-body="'+name+'"]')){const length=path.getTotalLength();for(let t=0;t<=length;t+=1.5){const p=path.getPointAtLength(t);nearest=Math.min(nearest,Math.hypot(x-p.x,y-p.y));}}
+            return {name,x,y,error:nearest};});
+          const sun=document.querySelector('.cosmos-sun-v207').getBoundingClientRect();
+          return {model:svg.dataset.model,visible:getComputedStyle(svg).display!=='none',maskX:mask.getAttribute('x'),maskY:mask.getAttribute('y'),
+            maskWidth:+mask.getAttribute('width'),maskHeight:+mask.getAttribute('height'),viewport:[innerWidth,innerHeight],shadowRadius:+shadow.getAttribute('r'),sunRadius:sun.width/4,distances};
+        });
+        assert.equal(orbitCheck.model,'shared-kepler-perspective');assert(orbitCheck.visible);
+        assert.equal(orbitCheck.maskX,'0');assert.equal(orbitCheck.maskY,'0');
+        assert.deepEqual([orbitCheck.maskWidth,orbitCheck.maskHeight],orbitCheck.viewport);assert(orbitCheck.shadowRadius>orbitCheck.sunRadius);
+        orbitCheck.distances.forEach(p=>assert(p.error<1.5,p.name+' must follow its rendered orbit'));
+        console.log('ORBITS',orbitCheck.distances);
+      }
       const glCheck=await frame.locator(baseline?'.solar-sun canvas':'.cosmos-sun-v207 canvas').first().evaluate(e=>{
         const gl=e.getContext('webgl');return gl?{error:gl.getError(),width:e.width,height:e.height}:null;
       });
@@ -114,6 +149,8 @@ fs.mkdirSync(output,{recursive:true});
     if(stages.includes('Galactic core')&&!s.touring){ended=true;break;}
   }
   assert(solarCaptured,'tour never reached the visible Sun');
+  if(!baseline)assert.equal(Object.keys(deepChecks).length,2,'both new deep scenes must render');
+  if(!baseline)assert.deepEqual([...seenPlanets].sort(),['EARTH','NEPTUNE','SATURN'],'all three planets must enter the viewport');
   if(!baseline)assert(pleiadesCaptured,'living reflection nebula was not verified');
   assert(ended,'tour did not complete');
   assert.deepEqual(stages,['Pleiades','Orion','Black Hole','Solar system','Galactic core']);
@@ -144,7 +181,7 @@ fs.mkdirSync(output,{recursive:true});
   await page.screenshot({path:path.join(output,'black-hole-manual.png')});
   console.log('PASS manual V13',manualBefore.phase,'→',manualAfter.phase);
   const report={browser:browserName,url:liveUrl||'local repository files',viewport:mobile?'390x844 @2x':'1440x900 @1x',baseline,stages,ended,elapsed,
-    snapshots,pleiadesCheck,bhChecks,manualBefore,manualAfter,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
+    snapshots,pleiadesCheck,deepChecks,orbitCheck,seenPlanets:[...seenPlanets],bhChecks,manualBefore,manualAfter,errors,consoleErrors,clock:'deterministic; captures do not measure device FPS'};
   fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2));
   console.log('PASS',report.viewport,stages.join(' → '));
  }finally{await browser.close();}

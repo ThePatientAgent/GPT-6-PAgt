@@ -1,0 +1,316 @@
+{
+  "version": "v212",
+  "restoreCommit": "becb3510c15e63e580ca8fc46d6f8e6f389aa8f5",
+  "views": [
+    {
+      "browser": "chromium",
+      "viewport": "390x844 @2x",
+      "stages": [
+        "Pleiades",
+        "Orion",
+        "Black Hole",
+        "Solar system",
+        "Galactic core"
+      ],
+      "completed": true,
+      "errors": [],
+      "deepScenes": {
+        "Orion": {
+          "renderer": "webgl-ionized-orion",
+          "phase": "8.26",
+          "visible": true,
+          "error": 0
+        },
+        "Galactic core": {
+          "renderer": "webgl-luminous-galactic-core",
+          "phase": "21.06",
+          "visible": true,
+          "error": 0
+        }
+      },
+      "orbitGeometry": {
+        "model": "shared-kepler-perspective",
+        "visible": true,
+        "maskX": "0",
+        "maskY": "0",
+        "maskWidth": 390,
+        "maskHeight": 844,
+        "viewport": [
+          390,
+          844
+        ],
+        "shadowRadius": 125.48625,
+        "sunRadius": 119.45999145507812,
+        "distances": [
+          {
+            "name": "EARTH",
+            "x": 307,
+            "y": 582.9000244140625,
+            "error": 0.2846305865153962
+          },
+          {
+            "name": "SATURN",
+            "x": 130.89999389648438,
+            "y": 632.5000305175781,
+            "error": 0.15902502131417165
+          },
+          {
+            "name": "NEPTUNE",
+            "x": 235.99998474121094,
+            "y": 717.3000183105469,
+            "error": 0.7432573600784587
+          }
+        ]
+      },
+      "seenPlanets": [
+        "EARTH",
+        "SATURN",
+        "NEPTUNE"
+      ],
+      "sunRect": {
+        "x": -43.91999816894531,
+        "y": 183.0800018310547,
+        "width": 477.8399658203125,
+        "height": 477.8399658203125
+      },
+      "blackHole": {
+        "renderer": "webgl-differential-accretion",
+        "geometry": "identity",
+        "phaseBefore": "5.89",
+        "phaseAfter": "16.26"
+      }
+    },
+    {
+      "browser": "chromium",
+      "viewport": "1440x900 @1x",
+      "stages": [
+        "Pleiades",
+        "Orion",
+        "Black Hole",
+        "Solar system",
+        "Galactic core"
+      ],
+      "completed": true,
+      "errors": [],
+      "deepScenes": {
+        "Orion": {
+          "renderer": "webgl-ionized-orion",
+          "phase": "8.24",
+          "visible": true,
+          "error": 0
+        },
+        "Galactic core": {
+          "renderer": "webgl-luminous-galactic-core",
+          "phase": "21.04",
+          "visible": true,
+          "error": 0
+        }
+      },
+      "orbitGeometry": {
+        "model": "shared-kepler-perspective",
+        "visible": true,
+        "maskX": "0",
+        "maskY": "0",
+        "maskWidth": 1440,
+        "maskHeight": 900,
+        "viewport": [
+          1440,
+          900
+        ],
+        "shadowRadius": 167.25000000000003,
+        "sunRadius": 161.260009765625,
+        "distances": [
+          {
+            "name": "EARTH",
+            "x": 841.7000122070312,
+            "y": 620.2999877929688,
+            "error": 0.08127137599869176
+          },
+          {
+            "name": "SATURN",
+            "x": 654.9000244140625,
+            "y": 674.9000549316406,
+            "error": 0.24081290953767429
+          },
+          {
+            "name": "NEPTUNE",
+            "x": 767.8000183105469,
+            "y": 764.3000183105469,
+            "error": 0.07314997908672756
+          }
+        ]
+      },
+      "seenPlanets": [
+        "EARTH",
+        "SATURN",
+        "NEPTUNE"
+      ],
+      "sunRect": {
+        "x": 397.4800109863281,
+        "y": 127.48001098632812,
+        "width": 645.0400390625,
+        "height": 645.0400390625
+      },
+      "blackHole": {
+        "renderer": "webgl-differential-accretion",
+        "geometry": "identity",
+        "phaseBefore": "5.76",
+        "phaseAfter": "16.26"
+      }
+    },
+    {
+      "browser": "webkit",
+      "viewport": "390x844 @2x",
+      "stages": [
+        "Pleiades",
+        "Orion",
+        "Black Hole",
+        "Solar system",
+        "Galactic core"
+      ],
+      "completed": true,
+      "errors": [],
+      "deepScenes": {
+        "Orion": {
+          "renderer": "webgl-ionized-orion",
+          "phase": "8.24",
+          "visible": true,
+          "error": 0
+        },
+        "Galactic core": {
+          "renderer": "webgl-luminous-galactic-core",
+          "phase": "21.04",
+          "visible": true,
+          "error": 0
+        }
+      },
+      "orbitGeometry": {
+        "model": "shared-kepler-perspective",
+        "visible": true,
+        "maskX": "0",
+        "maskY": "0",
+        "maskWidth": 390,
+        "maskHeight": 844,
+        "viewport": [
+          390,
+          844
+        ],
+        "shadowRadius": 125.48625,
+        "sunRadius": 119.46000671386719,
+        "distances": [
+          {
+            "name": "EARTH",
+            "x": 311.1000061035156,
+            "y": 580.5999755859375,
+            "error": 0.7492505920264703
+          },
+          {
+            "name": "SATURN",
+            "x": 136.70000076293945,
+            "y": 633.2000122070312,
+            "error": 0.5617959963749819
+          },
+          {
+            "name": "NEPTUNE",
+            "x": 243.5,
+            "y": 716.0999755859375,
+            "error": 0.16607984534885417
+          }
+        ]
+      },
+      "seenPlanets": [
+        "EARTH",
+        "SATURN",
+        "NEPTUNE"
+      ],
+      "sunRect": {
+        "x": -43.91999816894531,
+        "y": 183.0800018310547,
+        "width": 477.84002685546875,
+        "height": 477.8399658203125
+      },
+      "blackHole": {
+        "renderer": "webgl-differential-accretion",
+        "geometry": "identity",
+        "phaseBefore": "5.76",
+        "phaseAfter": "16.26"
+      }
+    }
+  ],
+  "lifecycle": {
+    "checks": {
+      "orion": {
+        "first": {
+          "hash": 1540652339,
+          "whiteFraction": 0.00018620347212005295,
+          "error": 0
+        },
+        "later": {
+          "hash": 336945066,
+          "whiteFraction": 0.0001885022804178314,
+          "error": 0
+        }
+      },
+      "core": {
+        "first": {
+          "hash": -872643047,
+          "whiteFraction": 0.0016574407826982491,
+          "error": 0
+        },
+        "later": {
+          "hash": 1728074881,
+          "whiteFraction": 0.0016574407826982491,
+          "error": 0
+        }
+      }
+    },
+    "fixedCameraEvolution": "both modes passed",
+    "contextLossAndRestore": "both native fallbacks and GPU restoration passed",
+    "reducedMotion": "procedural time frozen",
+    "errors": []
+  },
+  "preserved": {
+    "cosmos-sun-v207.js": true,
+    "cosmos-rich-scenes-v211.js": true,
+    "cosmos-black-hole-radiance-v013.html": true,
+    "nativeCameraAndTourFunctions": true
+  },
+  "orbitModel": {
+    "slots": [
+      "EARTH",
+      "SATURN",
+      "NEPTUNE"
+    ],
+    "focus": "Sun",
+    "periodLaw": "relative periods proportional to a^(3/2)",
+    "radialScale": "illustrative compressed world units",
+    "checks": "nested paths, shared focus, planar motion, closed periods and equal swept areas passed"
+  },
+  "video": {
+    "file": "media/cosmos-worlds-v212.mp4",
+    "width": 780,
+    "height": 1688,
+    "fps": 30,
+    "durationSeconds": 6,
+    "frames": {
+      "orion": {
+        "frames": 60,
+        "uniqueFrames": 60
+      },
+      "solar": {
+        "frames": 60,
+        "uniqueFrames": 60
+      },
+      "core": {
+        "frames": 60,
+        "uniqueFrames": 60
+      }
+    },
+    "method": "Native animation frames with controlled browser clocks; encoded frame rate is not measured device FPS"
+  },
+  "notMeasured": [
+    "Physical iPhone GPU frame times",
+    "Physical iOS Safari performance",
+    "Battery use and thermals"
+  ]
+}
