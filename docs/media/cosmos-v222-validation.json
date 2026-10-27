@@ -1,0 +1,55 @@
+{
+  "version": "v222",
+  "implementationCommit": "5a6feaaa116a58871ccd47540bd435f0efb85ac9",
+  "tour": [
+    "Pleiades",
+    "Orion",
+    "Black Hole",
+    "Solar system",
+    "Spica",
+    "Galactic core",
+    "Quasar",
+    "Cygnus X-1",
+    "Pleiades"
+  ],
+  "localVerified": [
+    "full eight-stop looping tour",
+    "V13 to Solar handoff",
+    "solar camera orientation",
+    "three visible planets on shared Kepler paths",
+    "mobile touch and desktop mouse rotation without interrupting the tour",
+    "fixed-camera evolving photospheres, disks, jets and captured wind",
+    "fixed binary barycentres and closed orbits",
+    "zero JavaScript and WebGL errors"
+  ],
+  "viewports": [
+    "390x844 @2x",
+    "1440x900 @1x"
+  ],
+  "publicSourceBytesMatched": [
+    "index.html",
+    "cosmos-exotics-v221.js",
+    "cosmos-cygnus-v222.js",
+    "cosmos-worlds-v212.js",
+    "cosmos-explorer-v085-final-no-sirius.html",
+    "cosmos-sun-v207.js",
+    "cosmos-black-hole-radiance-v013.html"
+  ],
+  "liveCapture": {
+    "url": "https://thepatientagent.github.io/GPT-6-PAgt/?start=cygnus&v=222",
+    "path": "cosmos-cygnus-x1-v222-live.mp4",
+    "frames": 188,
+    "uniqueFrames": 188,
+    "fps": 24,
+    "durationSeconds": 7.833333333333333,
+    "width": 780,
+    "height": 1688,
+    "sha256": "137049c4c64503180933baedaf723fcb03092094e28146684fd1370e301ef895",
+    "type": "native browser frame-clock rendering; not a physical-device FPS measurement"
+  },
+  "deployedBrowserWorkflow": "https://github.com/ThePatientAgent/GPT-6-PAgt/actions/runs/40423034601",
+  "notVerified": [
+    "physical iPhone hardware performance",
+    "Safari on iOS"
+  ]
+}
