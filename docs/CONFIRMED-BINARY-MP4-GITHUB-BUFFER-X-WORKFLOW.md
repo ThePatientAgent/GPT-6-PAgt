@@ -143,3 +143,13 @@ Then `mcp__buffer__get_post({postId:NEW_BUFFER_ID})` and require `status:"sent"`
 ## Reference
 
 Project-specific full handoff: [X-VIDEO-POSTING-RUNBOOK-2026-10-19.md](X-VIDEO-POSTING-RUNBOOK-2026-10-19.md)
+
+
+## Verified square COSMOS video post — 2026-10-30 11:38 JST
+
+- Approved source: `COSMOS_PROMO_X_SQUARE_1080.mp4` (1080×1080, 30fps, 10 s). Original 4,393,540 bytes, SHA-256 `857481b51e842ea912aa0429a17b0373498fefebe884224ddb655411030175fd`.
+- Re-encoded for transfer/X (`libx264 -preset slow -crf 25 -pix_fmt yuv420p -movflags +faststart`): 1080×1080, 30fps, 10 s, 2,432,568 bytes, SHA-256 `41ad7430aa7c1094ab61a189411fc73448da4254b4d376177614a90daee4723e`.
+- Public GitHub media blob SHA `3a2b17878014f6c11978bb1a54e4150c10e1f731`; committed at `7bbdb11cee15fedca2e0a9a115fe42ac25c54b19`, path `docs/media/cosmos-square-interactive-promo-2026-10-30.mp4`.
+- Transfer: uploaded temporary base64 text to ChatGPT Files Library; used `files__read` in four 400-line pieces within a single `functions.exec` call, joined in JS and passed unchanged to GitHub `create_blob(encoding:base64)`. Verified resulting blob SHA against local Git blob hash. The 5.8 MB base64 attempt hit h2 protocol error; 3.24 MB re-encode succeeded.
+- Buffer X channel `6ad20694778b240e2f27f846`, post ID `6ae403314b8768bfb2d67c83`; `shareNow`, independently verified `sent`, `sentAt=2026-10-30T02:38:44.401Z`, `error=null`, video 10 s. Public X post: https://x.com/2111046152070291456/status/2115996796199506201
+- Temporary base64 Library files deleted after delivery. Do not repost the 2026-10-30 square promotional video unless user asks for another distinct post.
